@@ -1,6 +1,9 @@
 /bin/*
 /lib/*
 *.o
+
+src/Makefile.inc
+
 src/scotch/mcv
 src/scotch/gord
 src/scotch/amk_p2
