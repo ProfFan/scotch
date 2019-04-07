@@ -120,6 +120,7 @@ install				:	required	$(bindir)	$(includedir)	$(libdir)	$(mandir)/man1
 					-$(CP) -f ../bin/d[agm]*$(EXE) $(bindir)
 					-$(CP) -f ../include/*esmumps*.h $(includedir)
 					-$(CP) -f ../include/*scotch*.h $(includedir)
+					-$(CP) -f ../include/metis.h $(includedir)
 					-$(CP) -f ../lib/*esmumps*$(LIB) $(libdir)
 					-$(CP) -f ../lib/*scotch*$(LIB) $(libdir)
 					-$(CP) -Rf ../man/* $(mandir)
