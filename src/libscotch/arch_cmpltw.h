@@ -1,4 +1,5 @@
-/* Copyright 2007,2008,2010,2011,2014,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2007,2008,2010,2011,2014,2015,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -59,27 +60,27 @@
     of the intSort2asc1 routine.             +*/
 
 typedef struct ArchCmpltwLoad_ {
-  Anum                      veloval;              /*+ Vertex load  +*/
-  Anum                      vertnum;              /*+ Vertex index +*/
+  Anum veloval; /*+ Vertex load  +*/
+  Anum vertnum; /*+ Vertex index +*/
 } ArchCmpltwLoad;
 
 /*+ The weighted complete graph definitions. +*/
 
 typedef struct ArchCmpltw_ {
-  Anum                      vertnbr;              /*+ Number of vertices +*/
-  ArchCmpltwLoad *          velotab;              /*+ Vertex index array +*/
-  Anum                      velosum;              /*+ Sum of all weights +*/
+  Anum vertnbr;            /*+ Number of vertices +*/
+  ArchCmpltwLoad *velotab; /*+ Vertex index array +*/
+  Anum velosum;            /*+ Sum of all weights +*/
 } ArchCmpltw;
 
 /*+ The weighted domain structure. +*/
 
 typedef struct ArchCmpltwDom_ {
-  Anum                      vertmin;              /*+ Minimum vertex number +*/
-  Anum                      vertnbr;              /*+ Number of vertices    +*/
-  Anum                      veloval;              /*+ Weight of subdomain   +*/
+  Anum vertmin; /*+ Minimum vertex number +*/
+  Anum vertnbr; /*+ Number of vertices    +*/
+  Anum veloval; /*+ Weight of subdomain   +*/
 } ArchCmpltwDom;
 
-#define archCmpltwMatch             archCmpltMatch
+#define archCmpltwMatch archCmpltMatch
 
 #endif /* ARCH_CMPLTW_H_STRUCT */
 
@@ -91,27 +92,36 @@ typedef struct ArchCmpltwDom_ {
 #ifndef ARCH_CMPLTW_H_PROTO
 #define ARCH_CMPLTW_H_PROTO
 
-int                         archCmpltwArchBuild (ArchCmpltw * restrict const archptr, const Anum, const Anum * restrict const);
-int                         archCmpltwArchLoad  (ArchCmpltw * restrict const, FILE * restrict const);
-int                         archCmpltwArchSave  (const ArchCmpltw * const, FILE * restrict const);
-int                         archCmpltwArchFree  (ArchCmpltw * restrict const);
+int archCmpltwArchBuild(ArchCmpltw *restrict const archptr, const Anum,
+                        const Anum *restrict const);
+int archCmpltwArchLoad(ArchCmpltw *restrict const, FILE *restrict const);
+int archCmpltwArchSave(const ArchCmpltw *const, FILE *restrict const);
+int archCmpltwArchFree(ArchCmpltw *restrict const);
 
-#define archCmpltwMatchInit         archCmpltMatchInit
-#define archCmpltwMatchExit         archCmpltMatchExit
-#define archCmpltwMatchMate         archCmpltMatchMate
+#define archCmpltwMatchInit archCmpltMatchInit
+#define archCmpltwMatchExit archCmpltMatchExit
+#define archCmpltwMatchMate archCmpltMatchMate
 
-ArchDomNum                  archCmpltwDomNum    (const ArchCmpltw * const, const ArchCmpltwDom * const);
-int                         archCmpltwDomTerm   (const ArchCmpltw * const, ArchCmpltwDom * restrict const, const ArchDomNum);
-Anum                        archCmpltwDomSize   (const ArchCmpltw * const, const ArchCmpltwDom * const);
-Anum                        archCmpltwDomWght   (const ArchCmpltw * const, const ArchCmpltwDom * const);
-Anum                        archCmpltwDomDist   (const ArchCmpltw * const, const ArchCmpltwDom * const, const ArchCmpltwDom * const);
-int                         archCmpltwDomFrst   (const ArchCmpltw * const, ArchCmpltwDom * const);
-int                         archCmpltwDomLoad   (const ArchCmpltw * const, ArchCmpltwDom * const, FILE * const);
-int                         archCmpltwDomSave   (const ArchCmpltw * const, const ArchCmpltwDom * const, FILE * const);
-int                         archCmpltwDomBipart (const ArchCmpltw * const, const ArchCmpltwDom * const, ArchCmpltwDom * restrict const, ArchCmpltwDom * restrict const);
-int                         archCmpltwDomIncl   (const ArchCmpltw * const, const ArchCmpltwDom * const, const ArchCmpltwDom * const);
+ArchDomNum archCmpltwDomNum(const ArchCmpltw *const,
+                            const ArchCmpltwDom *const);
+int archCmpltwDomTerm(const ArchCmpltw *const, ArchCmpltwDom *restrict const,
+                      const ArchDomNum);
+Anum archCmpltwDomSize(const ArchCmpltw *const, const ArchCmpltwDom *const);
+Anum archCmpltwDomWght(const ArchCmpltw *const, const ArchCmpltwDom *const);
+Anum archCmpltwDomDist(const ArchCmpltw *const, const ArchCmpltwDom *const,
+                       const ArchCmpltwDom *const);
+int archCmpltwDomFrst(const ArchCmpltw *const, ArchCmpltwDom *const);
+int archCmpltwDomLoad(const ArchCmpltw *const, ArchCmpltwDom *const,
+                      FILE *const);
+int archCmpltwDomSave(const ArchCmpltw *const, const ArchCmpltwDom *const,
+                      FILE *const);
+int archCmpltwDomBipart(const ArchCmpltw *const, const ArchCmpltwDom *const,
+                        ArchCmpltwDom *restrict const,
+                        ArchCmpltwDom *restrict const);
+int archCmpltwDomIncl(const ArchCmpltw *const, const ArchCmpltwDom *const,
+                      const ArchCmpltwDom *const);
 #ifdef SCOTCH_PTSCOTCH
-int                         archCmpltwDomMpiType (const ArchCmpltw * const, MPI_Datatype * const);
+int archCmpltwDomMpiType(const ArchCmpltw *const, MPI_Datatype *const);
 #endif /* SCOTCH_PTSCOTCH */
 
 #endif /* ARCH_CMPLTW_H_PROTO */

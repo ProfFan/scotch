@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -57,8 +57,8 @@
 
 /*+ Graph option flags. +*/
 
-#define HGRAPHFREEVNHD              0x0400        /* Free vnhdtab array */
-#define HGRAPHFREETABS              (GRAPHFREETABS | HGRAPHFREEVNHD)
+#define HGRAPHFREEVNHD 0x0400 /* Free vnhdtab array */
+#define HGRAPHFREETABS (GRAPHFREETABS | HGRAPHFREEVNHD)
 
 /*
 **  The type and structure definitions.
@@ -67,24 +67,29 @@
 /*+ Halo graph structure. +*/
 
 typedef struct Hgraph_ {
-  Graph                     s;                    /*+ Source graph                                                   +*/
-  Gnum                      vnohnbr;              /*+ Number of non-halo vertices                                    +*/
-  Gnum                      vnohnnd;              /*+ Based number of first halo vertex in graph (s.vertnnd if none) +*/
-  Gnum *                    vnhdtax;              /*+ End vertex array for non-halo vertices [vnohnbr, based]        +*/
-  Gnum                      vnlosum;              /*+ Sum of vertex loads for non-halo vertices only (<= s.velosum)  +*/
-  Gnum                      enohnbr;              /*+ Number of non-halo edges                                       +*/
-  Gnum                      enlosum;              /*+ Sum of non-halo edge loads                                     +*/
-  Gnum                      levlnum;              /*+ Nested dissection level                                        +*/
+  Graph s;      /*+ Source graph      +*/
+  Gnum vnohnbr; /*+ Number of non-halo vertices +*/
+  Gnum vnohnnd; /*+ Based number of first halo vertex in graph (s.vertnnd if
+                   none) +*/
+  Gnum *
+      vnhdtax;  /*+ End vertex array for non-halo vertices [vnohnbr, based]  +*/
+  Gnum vnlosum; /*+ Sum of vertex loads for non-halo vertices only (<=
+                   s.velosum)  +*/
+  Gnum enohnbr; /*+ Number of non-halo edges +*/
+  Gnum enlosum; /*+ Sum of non-halo edge loads +*/
+  Gnum levlnum; /*+ Nested dissection level +*/
 } Hgraph;
 
 /*
 **  The function prototypes.
 */
 
-int                         hgraphInit          (Hgraph * const);
-void                        hgraphExit          (Hgraph * const);
-void                        hgraphFree          (Hgraph * const);
-Gnum                        hgraphBase          (Hgraph * const, const Gnum);
-int                         hgraphCheck         (const Hgraph *);
-int                         hgraphInduceList    (const Hgraph * restrict const, const Gnum, const Gnum * restrict const, const Gnum, Hgraph * restrict const);
-void                        hgraphUnhalo        (const Hgraph * const, Graph * const);
+int hgraphInit(Hgraph *const);
+void hgraphExit(Hgraph *const);
+void hgraphFree(Hgraph *const);
+Gnum hgraphBase(Hgraph *const, const Gnum);
+int hgraphCheck(const Hgraph *);
+int hgraphInduceList(const Hgraph *restrict const, const Gnum,
+                     const Gnum *restrict const, const Gnum,
+                     Hgraph *restrict const);
+void hgraphUnhalo(const Hgraph *const, Graph *const);

@@ -73,38 +73,38 @@
 */
 
 static union {
-  KdgraphMapRbParam         param;
-  StratNodeMethodData       padding;
-} kdgraphmapstdefaultrb = { { &stratdummy, &stratdummy, 0.05 } };
+  KdgraphMapRbParam param;
+  StratNodeMethodData padding;
+} kdgraphmapstdefaultrb = {{&stratdummy, &stratdummy, 0.05}};
 
-static StratMethodTab       kdgraphmapstmethtab[] = { /* Mapping methods array */
-                              { KDGRAPHMAPSTMETHRB, "r",  kdgraphMapRb, &kdgraphmapstdefaultrb },
-                              { -1,                 NULL, NULL,         NULL } };
+static StratMethodTab kdgraphmapstmethtab[] = {/* Mapping methods array */
+                                               {KDGRAPHMAPSTMETHRB, "r",
+                                                kdgraphMapRb,
+                                                &kdgraphmapstdefaultrb},
+                                               {-1, NULL, NULL, NULL}};
 
-static StratParamTab        kdgraphmapstparatab[] = { /* Method parameter list */
-                              { KDGRAPHMAPSTMETHRB,  STRATPARAMSTRAT,  "sep",
-                                (byte *) &kdgraphmapstdefaultrb.param,
-                                (byte *) &kdgraphmapstdefaultrb.param.stratsep,
-                                (void *) &bdgraphbipartststratab },
-                              { KDGRAPHMAPSTMETHRB,  STRATPARAMSTRAT,  "seq",
-                                (byte *) &kdgraphmapstdefaultrb.param,
-                                (byte *) &kdgraphmapstdefaultrb.param.stratseq,
-                                (void *) &kgraphmapststratab },
-                              { KDGRAPHMAPSTMETHRB,  STRATPARAMDOUBLE, "bal",
-                                (byte *) &kdgraphmapstdefaultrb.param,
-                                (byte *) &kdgraphmapstdefaultrb.param.kbalval,
-                                NULL },
-                              { KDGRAPHMAPSTMETHNBR, STRATPARAMINT,    NULL,
-                                NULL, NULL, NULL } };
+static StratParamTab kdgraphmapstparatab[] =
+    {/* Method parameter list */
+     {KDGRAPHMAPSTMETHRB, STRATPARAMSTRAT, "sep",
+      (byte *)&kdgraphmapstdefaultrb.param,
+      (byte *)&kdgraphmapstdefaultrb.param.stratsep,
+      (void *)&bdgraphbipartststratab},
+     {KDGRAPHMAPSTMETHRB, STRATPARAMSTRAT, "seq",
+      (byte *)&kdgraphmapstdefaultrb.param,
+      (byte *)&kdgraphmapstdefaultrb.param.stratseq,
+      (void *)&kgraphmapststratab},
+     {KDGRAPHMAPSTMETHRB, STRATPARAMDOUBLE, "bal",
+      (byte *)&kdgraphmapstdefaultrb.param,
+      (byte *)&kdgraphmapstdefaultrb.param.kbalval, NULL},
+     {KDGRAPHMAPSTMETHNBR, STRATPARAMINT, NULL, NULL, NULL, NULL}};
 
-static StratParamTab        kdgraphmapstcondtab[] = { /* Graph condition parameter table */
-                              { STRATNODENBR,        STRATPARAMINT,    NULL,
-                                NULL, NULL, NULL } };
+static StratParamTab kdgraphmapstcondtab[] =
+    {/* Graph condition parameter table */
+     {STRATNODENBR, STRATPARAMINT, NULL, NULL, NULL, NULL}};
 
-StratTab                    kdgraphmapststratab = { /* Strategy tables for graph mapping methods */
-                              kdgraphmapstmethtab,
-                              kdgraphmapstparatab,
-                              kdgraphmapstcondtab };
+StratTab kdgraphmapststratab = {/* Strategy tables for graph mapping methods */
+                                kdgraphmapstmethtab, kdgraphmapstparatab,
+                                kdgraphmapstcondtab};
 
 /****************************************/
 /*                                      */
@@ -120,74 +120,81 @@ StratTab                    kdgraphmapststratab = { /* Strategy tables for graph
 ** - !0  : on error.
 */
 
-int
-kdgraphMapSt (
-Kdgraph * restrict const      grafptr,            /*+ Mapping graph    +*/
-Kdmapping * restrict const    mappptr,            /*+ Dynamic mapping  +*/
-const Strat * restrict const  strat)              /*+ Mapping strategy +*/
+int kdgraphMapSt(Kdgraph *restrict const grafptr,   /*+ Mapping graph    +*/
+                 Kdmapping *restrict const mappptr, /*+ Dynamic mapping  +*/
+                 const Strat *restrict const strat) /*+ Mapping strategy +*/
 {
-  StratTest           val;
-  int                 o;
+  StratTest val;
+  int o;
 
 #ifdef SCOTCH_DEBUG_KDGRAPH2
-  if (sizeof (Gnum) != sizeof (INT)) {
-    errorPrint ("kdgraphMapSt: invalid type specification for parser variables");
-    return     (1);
+  if (sizeof(Gnum) != sizeof(INT)) {
+    errorPrint("kdgraphMapSt: invalid type specification for parser variables");
+    return (1);
   }
-  if ((sizeof (KdgraphMapRbParam) > sizeof (StratNodeMethodData))) {
-    errorPrint ("kdgraphMapSt: invalid type specification");
-    return     (1);
+  if ((sizeof(KdgraphMapRbParam) > sizeof(StratNodeMethodData))) {
+    errorPrint("kdgraphMapSt: invalid type specification");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_KDGRAPH2 */
 #ifdef SCOTCH_DEBUG_KDGRAPH1
-  if ((strat->tabl != &kdgraphmapststratab) &&
-      (strat       != &stratdummy)) {
-    errorPrint ("kdgraphMapSt: invalid parameter (1)");
-    return     (1);
+  if ((strat->tabl != &kdgraphmapststratab) && (strat != &stratdummy)) {
+    errorPrint("kdgraphMapSt: invalid parameter (1)");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_KDGRAPH1 */
 
   o = 0;
   switch (strat->type) {
-    case STRATNODECONCAT :
-      o = kdgraphMapSt (grafptr, mappptr, strat->data.concat.strat[0]); /* Apply first strategy          */
-      if (o == 0)                                 /* If it worked all right                              */
-        o |= kdgraphMapSt (grafptr, mappptr, strat->data.concat.strat[1]); /* Then apply second strategy */
-      break;
-    case STRATNODECOND :
-      o = stratTestEval (strat->data.cond.test, &val, (void *) grafptr); /* Evaluate expression */
-      if (o == 0) {                               /* If evaluation was correct                  */
+  case STRATNODECONCAT:
+    o = kdgraphMapSt(grafptr, mappptr,
+                     strat->data.concat.strat[0]); /* Apply first strategy */
+    if (o == 0) /* If it worked all right                              */
+      o |= kdgraphMapSt(
+          grafptr, mappptr,
+          strat->data.concat.strat[1]); /* Then apply second strategy */
+    break;
+  case STRATNODECOND:
+    o = stratTestEval(strat->data.cond.test, &val,
+                      (void *)grafptr); /* Evaluate expression */
+    if (o == 0) { /* If evaluation was correct                  */
 #ifdef SCOTCH_DEBUG_KDGRAPH2
-        if ((val.typetest != STRATTESTVAL) ||
-            (val.typenode != STRATPARAMLOG)) {
-          errorPrint ("kdgraphMapSt: invalid test result");
-          o = 1;
-          break;
-        }
-#endif /* SCOTCH_DEBUG_KDGRAPH2 */
-        if (val.data.val.vallog == 1)             /* If expression is true                           */
-          o = kdgraphMapSt (grafptr, mappptr, strat->data.cond.strat[0]); /* Apply first strategy    */
-        else {                                    /* Else if expression is false                     */
-          if (strat->data.cond.strat[1] != NULL)  /* And if there is an else statement               */
-            o = kdgraphMapSt (grafptr, mappptr, strat->data.cond.strat[1]); /* Apply second strategy */
-        }
+      if ((val.typetest != STRATTESTVAL) || (val.typenode != STRATPARAMLOG)) {
+        errorPrint("kdgraphMapSt: invalid test result");
+        o = 1;
+        break;
       }
-      break;
-    case STRATNODEEMPTY :
-      break;
-    case STRATNODESELECT :
-      errorPrint ("kdgraphMapSt: selection operator not implemented for k-way strategies");
-      return      (1);
+#endif                              /* SCOTCH_DEBUG_KDGRAPH2 */
+      if (val.data.val.vallog == 1) /* If expression is true */
+        o = kdgraphMapSt(
+            grafptr, mappptr,
+            strat->data.cond.strat[0]); /* Apply first strategy    */
+      else { /* Else if expression is false                     */
+        if (strat->data.cond.strat[1] !=
+            NULL) /* And if there is an else statement               */
+          o = kdgraphMapSt(
+              grafptr, mappptr,
+              strat->data.cond.strat[1]); /* Apply second strategy */
+      }
+    }
+    break;
+  case STRATNODEEMPTY:
+    break;
+  case STRATNODESELECT:
+    errorPrint("kdgraphMapSt: selection operator not implemented for k-way "
+               "strategies");
+    return (1);
 #ifdef SCOTCH_DEBUG_KDGRAPH1
-    case STRATNODEMETHOD :
+  case STRATNODEMETHOD:
 #else  /* SCOTCH_DEBUG_KDGRAPH1 */
-    default :
+  default:
 #endif /* SCOTCH_DEBUG_KDGRAPH1 */
-      return (strat->tabl->methtab[strat->data.method.meth].func (grafptr, mappptr, (void *) &strat->data.method.data));
+    return (strat->tabl->methtab[strat->data.method.meth].func(
+        grafptr, mappptr, (void *)&strat->data.method.data));
 #ifdef SCOTCH_DEBUG_KDGRAPH1
-    default :
-      errorPrint ("kdgraphMapSt: invalid parameter (2)");
-      return     (1);
+  default:
+    errorPrint("kdgraphMapSt: invalid parameter (2)");
+    return (1);
 #endif /* SCOTCH_DEBUG_KDGRAPH1 */
   }
   return (o);

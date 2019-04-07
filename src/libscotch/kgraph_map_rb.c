@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2011,2013,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2011,2013,2014,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -105,72 +106,81 @@
 ** - !0  : on error.
 */
 
-int
-kgraphMapRb (
-Kgraph * const                          grafptr,
-const KgraphMapRbParam * restrict const paraptr)
-{
-  KgraphMapRbData               datadat;          /* Data passed to each bipartitioning job            */
-  Graph                         indgrafdat;       /* Induced graph without fixed vertices              */
-  Graph * restrict              indgrafptr;       /* Pointer to top-level graph without fixed vertices */
-  KgraphMapRbVflo * restrict    vflotab;          /* Array of fixed vertex load slots                  */
-  Anum                          vflonbr;          /* Number of fixed vertex load slots                 */
-  int                           o;
+int kgraphMapRb(Kgraph *const grafptr,
+                const KgraphMapRbParam *restrict const paraptr) {
+  KgraphMapRbData datadat; /* Data passed to each bipartitioning job */
+  Graph indgrafdat; /* Induced graph without fixed vertices              */
+  Graph *restrict
+      indgrafptr; /* Pointer to top-level graph without fixed vertices */
+  KgraphMapRbVflo *restrict vflotab; /* Array of fixed vertex load slots */
+  Anum vflonbr; /* Number of fixed vertex load slots                 */
+  int o;
 
-  grafptr->kbalval = paraptr->kbalval;            /* Store last k-way imbalance ratio */
+  grafptr->kbalval = paraptr->kbalval; /* Store last k-way imbalance ratio */
 
   datadat.grafptr = &grafptr->s;
   datadat.mappptr = &grafptr->m;
 
-  datadat.r.mappptr   = (grafptr->r.m.parttax != NULL) ? &grafptr->r.m : NULL;
-  datadat.r.vmlotax   = grafptr->r.vmlotax;
-  datadat.r.cmloval   = grafptr->r.cmloval;
-  datadat.r.crloval   = grafptr->r.crloval;
-  datadat.pfixtax     = grafptr->pfixtax;
-  datadat.paraptr     = paraptr;
+  datadat.r.mappptr = (grafptr->r.m.parttax != NULL) ? &grafptr->r.m : NULL;
+  datadat.r.vmlotax = grafptr->r.vmlotax;
+  datadat.r.cmloval = grafptr->r.cmloval;
+  datadat.r.crloval = grafptr->r.crloval;
+  datadat.pfixtax = grafptr->pfixtax;
+  datadat.paraptr = paraptr;
   datadat.comploadrat = grafptr->comploadrat;
-  datadat.comploadmin = (1.0 - paraptr->kbalval) * grafptr->comploadrat; /* Ratio can have been tilted when working on subgraph */
+  datadat.comploadmin = (1.0 - paraptr->kbalval) *
+                        grafptr->comploadrat; /* Ratio can have been tilted when
+                                                 working on subgraph */
   datadat.comploadmax = (1.0 + paraptr->kbalval) * grafptr->comploadrat;
 
   if (grafptr->pfixtax == NULL) {
-    indgrafptr = &grafptr->s;                     /* Work on the original graph */
-    vflonbr    = 0;                               /* No fixed vertex load slots */
-    vflotab    = NULL;
-  }
-  else {
-    if (kgraphMapRbVfloBuild (grafptr->m.archptr, &grafptr->s, grafptr->vfixnbr, grafptr->pfixtax,
-                              &indgrafdat, &vflonbr, &vflotab) != 0) {
-      errorPrint ("kgraphMapRb: cannot create induced graph");
-      return     (1);
+    indgrafptr = &grafptr->s; /* Work on the original graph */
+    vflonbr = 0;              /* No fixed vertex load slots */
+    vflotab = NULL;
+  } else {
+    if (kgraphMapRbVfloBuild(grafptr->m.archptr, &grafptr->s, grafptr->vfixnbr,
+                             grafptr->pfixtax, &indgrafdat, &vflonbr,
+                             &vflotab) != 0) {
+      errorPrint("kgraphMapRb: cannot create induced graph");
+      return (1);
     }
     indgrafptr = &indgrafdat;
   }
 
-  o = ((archPart (grafptr->m.archptr) != 0) ? kgraphMapRbPart : kgraphMapRbMap) (&datadat, indgrafptr, vflonbr, vflotab); /* Compute recursive bipartitioning */
+  o = ((archPart(grafptr->m.archptr) != 0) ? kgraphMapRbPart : kgraphMapRbMap)(
+      &datadat, indgrafptr, vflonbr,
+      vflotab); /* Compute recursive bipartitioning */
 
-  if (grafptr->pfixtax != NULL) {                 /* If fixed vertices   */
-    memFree (vflotab);                            /* Not used any longer */
+  if (grafptr->pfixtax != NULL) { /* If fixed vertices   */
+    memFree(vflotab);             /* Not used any longer */
 
-    graphExit (&indgrafdat);
-    if (kgraphMapRbVfloMerge (&grafptr->m, grafptr->vfixnbr, grafptr->pfixtax, vflonbr) != 0) {
-      errorPrint ("kgraphMapRb: cannot merge fixed vertex domains");
-      return     (1);
+    graphExit(&indgrafdat);
+    if (kgraphMapRbVfloMerge(&grafptr->m, grafptr->vfixnbr, grafptr->pfixtax,
+                             vflonbr) != 0) {
+      errorPrint("kgraphMapRb: cannot merge fixed vertex domains");
+      return (1);
     }
   }
 
-  if (memReallocGroup (grafptr->comploadavg,      /* Reallocate cost array according to potential new size                                        */
-                       &grafptr->comploadavg, (size_t) (grafptr->m.domnmax * sizeof (Gnum)), /* TRICK: can send both compload arrays in one piece */
-                       &grafptr->comploaddlt, (size_t) (grafptr->m.domnmax * sizeof (Gnum)), NULL) == NULL) {
-    errorPrint ("kgraphMapRb: out of memory (3)");
-    return     (1);
+  if (memReallocGroup(grafptr->comploadavg, /* Reallocate cost array according
+                                               to potential new size */
+                      &grafptr->comploadavg,
+                      (size_t)(grafptr->m.domnmax *
+                               sizeof(Gnum)), /* TRICK: can send both compload
+                                                 arrays in one piece */
+                      &grafptr->comploaddlt,
+                      (size_t)(grafptr->m.domnmax * sizeof(Gnum)),
+                      NULL) == NULL) {
+    errorPrint("kgraphMapRb: out of memory (3)");
+    return (1);
   }
-  kgraphFron (grafptr);
-  kgraphCost (grafptr);                           /* Compute cost of full k-way partition */
+  kgraphFron(grafptr);
+  kgraphCost(grafptr); /* Compute cost of full k-way partition */
 
 #ifdef SCOTCH_DEBUG_KGRAPH2
-  if (kgraphCheck (grafptr) != 0) {
-    errorPrint ("kgraphMapRb: inconsistent graph data");
-    return     (1);
+  if (kgraphCheck(grafptr) != 0) {
+    errorPrint("kgraphMapRb: inconsistent graph data");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
 
@@ -193,102 +203,120 @@ const KgraphMapRbParam * restrict const paraptr)
 ** - !0  : on error.
 */
 
-int
-kgraphMapRbVfloBuild (
-const Arch * restrict const                 archptr, /*+ Target architecture                           +*/
-const Graph * restrict const                orggrafptr, /*+ Original graph with fixed vertices         +*/
-const Gnum                                  orgvfixnbr, /*+ Number of fixed vertices in graph          +*/
-const Anum * restrict const                 orgpfixtax, /*+ Array of fixed vertex terminal domains     +*/
-Graph * restrict const                      indgrafptr, /*+ Induced subgraph without fixed vertices    +*/
-Anum * restrict const                       vflonbrptr, /*+ Pointer to number of fixed vertex slots    +*/
-KgraphMapRbVflo * restrict * restrict const vflotabptr) /*+ Pointer to fixed vertex load array pointer +*/
+int kgraphMapRbVfloBuild(
+    const Arch *restrict const archptr, /*+ Target architecture +*/
+    const Graph
+        *restrict const orggrafptr, /*+ Original graph with fixed vertices +*/
+    const Gnum orgvfixnbr, /*+ Number of fixed vertices in graph          +*/
+    const Anum *restrict const
+        orgpfixtax, /*+ Array of fixed vertex terminal domains     +*/
+    Graph *restrict const
+        indgrafptr, /*+ Induced subgraph without fixed vertices    +*/
+    Anum *restrict const
+        vflonbrptr, /*+ Pointer to number of fixed vertex slots    +*/
+    KgraphMapRbVflo *restrict *restrict const
+        vflotabptr) /*+ Pointer to fixed vertex load array pointer +*/
 {
-  ArchDom                     domndat;
-  Gnum                        orgvertnum;
-  GraphPart * restrict        orgparttax;         /* Part array for induced graph            */
-  KgraphMapRbVflo * restrict  hashtab;            /* Hash table for merging fixed vertices   */
-  Gnum                        hashnbr;            /* Prospective number of cells in table    */
-  Gnum                        hashsiz;            /* Size of hash table                      */
-  Gnum                        hashnum;
-  Gnum                        hashmsk;            /* Mask for access to hash table           */
-  Gnum                        velomsk;            /* Zero if all fixed vertex loads are zero */
-  Anum                        vflonbr;
+  ArchDom domndat;
+  Gnum orgvertnum;
+  GraphPart *restrict orgparttax; /* Part array for induced graph            */
+  KgraphMapRbVflo *restrict
+      hashtab;  /* Hash table for merging fixed vertices   */
+  Gnum hashnbr; /* Prospective number of cells in table    */
+  Gnum hashsiz; /* Size of hash table                      */
+  Gnum hashnum;
+  Gnum hashmsk; /* Mask for access to hash table           */
+  Gnum velomsk; /* Zero if all fixed vertex loads are zero */
+  Anum vflonbr;
 
-  const Gnum * restrict const orgvelotax = orggrafptr->velotax;
+  const Gnum *restrict const orgvelotax = orggrafptr->velotax;
 
-  if (archVar (archptr) == 0) {                   /* If fixed size architecture */
-    archDomFrst (archptr, &domndat);
-    hashnbr = archDomSize (archptr, &domndat);    /* Get maximum size of distinct terminal domains */
+  if (archVar(archptr) == 0) { /* If fixed size architecture */
+    archDomFrst(archptr, &domndat);
+    hashnbr = archDomSize(
+        archptr, &domndat); /* Get maximum size of distinct terminal domains */
     if (orgvfixnbr < hashnbr)
       hashnbr = orgvfixnbr;
-  }
-  else
+  } else
     hashnbr = orgvfixnbr;
-  for (hashsiz = 0, hashmsk = hashnbr; hashmsk != 0; hashsiz ++, hashmsk >>= 1) ; /* Get upper power of two */
-  hashsiz = 1 << (hashsiz + 2);                   /* Fill hash table at 25% maximum                         */
+  for (hashsiz = 0, hashmsk = hashnbr; hashmsk != 0; hashsiz++, hashmsk >>= 1)
+    ;                           /* Get upper power of two */
+  hashsiz = 1 << (hashsiz + 2); /* Fill hash table at 25% maximum */
   hashmsk = hashsiz - 1;
 
-  if (memAllocGroup ((void **) (void *)
-                     &hashtab,    (size_t) (hashsiz             * sizeof (KgraphMapRbVflo)), /* Use fixed vertex load slots as hash slots */
-                     &orgparttax, (size_t) (orggrafptr->vertnbr * sizeof (GraphPart)), NULL) == NULL) {
-    errorPrint ("kgraphMapRbVfloBuild: out of memory");
-    return     (1);
+  if (memAllocGroup(
+          (void **)(void *)&hashtab,
+          (size_t)(hashsiz * sizeof(KgraphMapRbVflo)), /* Use fixed vertex load
+                                                          slots as hash slots */
+          &orgparttax, (size_t)(orggrafptr->vertnbr * sizeof(GraphPart)),
+          NULL) == NULL) {
+    errorPrint("kgraphMapRbVfloBuild: out of memory");
+    return (1);
   }
   orgparttax -= orggrafptr->baseval;
 
-  memSet (hashtab, ~0, hashsiz * sizeof (KgraphMapRbVflo)); /* Set all vertex numbers to ~0 */
+  memSet(hashtab, ~0,
+         hashsiz * sizeof(KgraphMapRbVflo)); /* Set all vertex numbers to ~0 */
 
-  velomsk = 0;                                    /* Assume all fixed vertex loads are zero */
-  for (orgvertnum = orggrafptr->baseval; orgvertnum < orggrafptr->vertnnd; orgvertnum ++) {
-    Anum                orgpfixval;
+  velomsk = 0; /* Assume all fixed vertex loads are zero */
+  for (orgvertnum = orggrafptr->baseval; orgvertnum < orggrafptr->vertnnd;
+       orgvertnum++) {
+    Anum orgpfixval;
 
     orgpfixval = orgpfixtax[orgvertnum];
-    if (orgpfixval >= 0) {                        /* If vertex is a fixed vertex */
-      Gnum                hashnum;
-      Gnum                veloval;
+    if (orgpfixval >= 0) { /* If vertex is a fixed vertex */
+      Gnum hashnum;
+      Gnum veloval;
 
-      veloval  = (orgvelotax == NULL) ? 1 : orgvelotax[orgvertnum]; /* Get fixed vertex load */
-      velomsk |= veloval;                         /* See if all fixed vertex loads are zero  */
+      veloval = (orgvelotax == NULL)
+                    ? 1
+                    : orgvelotax[orgvertnum]; /* Get fixed vertex load */
+      velomsk |= veloval; /* See if all fixed vertex loads are zero  */
 
-      for (hashnum = (orgpfixval * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk; ; hashnum = (hashnum + 1) & hashmsk) {
+      for (hashnum = (orgpfixval * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk;;
+           hashnum = (hashnum + 1) & hashmsk) {
         if (hashtab[hashnum].termnum == orgpfixval) { /* If hash slot found   */
-          hashtab[hashnum].veloval += veloval;    /* Add contribution to slot */
+          hashtab[hashnum].veloval += veloval; /* Add contribution to slot */
           break;
         }
-        if (hashtab[hashnum].termnum == ~0) {     /* If hash slot empty */
-          hashtab[hashnum].termnum = orgpfixval;  /* Create slot        */
+        if (hashtab[hashnum].termnum == ~0) {    /* If hash slot empty */
+          hashtab[hashnum].termnum = orgpfixval; /* Create slot        */
           hashtab[hashnum].veloval = veloval;
           break;
         }
       }
-      orgparttax[orgvertnum] = 1;                 /* Fixed vertex will not be kept in induced subgraph */
-    }
-    else
-      orgparttax[orgvertnum] = 0;                 /* Keep non-fixed vertex in induced subgraph */
+      orgparttax[orgvertnum] =
+          1; /* Fixed vertex will not be kept in induced subgraph */
+    } else
+      orgparttax[orgvertnum] =
+          0; /* Keep non-fixed vertex in induced subgraph */
   }
 
-  if (graphInducePart (orggrafptr, orgparttax, orggrafptr->vertnbr - orgvfixnbr, 0, indgrafptr) != 0) { /* Keep non-fixed vertices in induced graph */
-    errorPrint ("kgraphMapRbVfloBuild: cannot build induced subgraph");
-    memFree    (hashtab);
-    return     (1);
+  if (graphInducePart(orggrafptr, orgparttax, orggrafptr->vertnbr - orgvfixnbr,
+                      0, indgrafptr) !=
+      0) { /* Keep non-fixed vertices in induced graph */
+    errorPrint("kgraphMapRbVfloBuild: cannot build induced subgraph");
+    memFree(hashtab);
+    return (1);
   }
 
-  if (velomsk == 0) {                             /* If all fixed vertex loads are zero */
-    memFree (hashtab);                            /* No need to allocate a table        */
+  if (velomsk == 0) { /* If all fixed vertex loads are zero */
+    memFree(hashtab); /* No need to allocate a table        */
     *vflonbrptr = 0;
     *vflotabptr = NULL;
     return (0);
   }
 
-  for (hashnum = vflonbr = 0; hashnum < hashsiz; hashnum ++) { /* Recycle hash table into fixed vertex load table */
+  for (hashnum = vflonbr = 0; hashnum < hashsiz;
+       hashnum++) { /* Recycle hash table into fixed vertex load table */
     if (hashtab[hashnum].termnum != ~0) {
       hashtab[vflonbr] = hashtab[hashnum];
-      vflonbr ++;
+      vflonbr++;
     }
   }
 
   *vflonbrptr = vflonbr;
-  *vflotabptr = memRealloc (hashtab, vflonbr * sizeof (KgraphMapRbVflo));
+  *vflotabptr = memRealloc(hashtab, vflonbr * sizeof(KgraphMapRbVflo));
 
   return (0);
 }
@@ -300,118 +328,133 @@ KgraphMapRbVflo * restrict * restrict const vflotabptr) /*+ Pointer to fixed ver
 ** - void  : in all cases.
 */
 
-void
-kgraphMapRbVfloSplit (
-const Arch * restrict const       archptr,        /*+ Target architecture                 +*/
-const ArchDom * restrict const    domnsubtab,     /*+ Array of the two subdomains         +*/
-const Anum                        vflonbr,        /*+ Number of fixed vertex load slots   +*/
-KgraphMapRbVflo * restrict const  vflotab,        /*+ Fixed vertex load array             +*/
-Anum * restrict const             vflonbrtab,     /*+ Number of slots in each subdomain   +*/
-Gnum * restrict const             vflowgttab)     /*+ Fixed vertex load in each subdomain +*/
+void kgraphMapRbVfloSplit(
+    const Arch *restrict const archptr, /*+ Target architecture +*/
+    const ArchDom
+        *restrict const domnsubtab, /*+ Array of the two subdomains         +*/
+    const Anum vflonbr,             /*+ Number of fixed vertex load slots   +*/
+    KgraphMapRbVflo *restrict const vflotab, /*+ Fixed vertex load array +*/
+    Anum *restrict const vflonbrtab, /*+ Number of slots in each subdomain   +*/
+    Gnum *restrict const vflowgttab) /*+ Fixed vertex load in each subdomain +*/
 {
-  KgraphMapRbVflo     vflodat;                    /* Temporary swap area                      */
-  ArchDom             domndat;                    /* Terminal domain attached to fixed vertex */
-  Gnum                compload0;                  /* Load of slots in first subdomain         */
-  Gnum                compload1;                  /* Load of slots in second subdomain        */
-  Gnum                vflomax;
-  Gnum                vflonum;
-  Gnum                vflonnd;
+  KgraphMapRbVflo vflodat; /* Temporary swap area                      */
+  ArchDom domndat;         /* Terminal domain attached to fixed vertex */
+  Gnum compload0;          /* Load of slots in first subdomain         */
+  Gnum compload1;          /* Load of slots in second subdomain        */
+  Gnum vflomax;
+  Gnum vflonum;
+  Gnum vflonnd;
 
-  compload0 =
-  compload1 = 0;
+  compload0 = compload1 = 0;
 
   vflomax = vflonbr;
-  if (archVar (archptr) == 0) {
-    for (vflonum = 0, vflonnd = vflonbr - 1; vflonum < vflonnd; ) {
+  if (archVar(archptr) == 0) {
+    for (vflonum = 0, vflonnd = vflonbr - 1; vflonum < vflonnd;) {
       while (1) {
 #ifdef SCOTCH_DEBUG_KGRAPH2
-        int                 o;
+        int o;
 
         o =
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
-        archDomTerm (archptr, &domndat, vflotab[vflonum].termnum);
+            archDomTerm(archptr, &domndat, vflotab[vflonum].termnum);
 #ifdef SCOTCH_DEBUG_KGRAPH2
         if (o != 0) {
-          errorPrint ("kgraphMapRbVfloSplit: internal error (1)");
+          errorPrint("kgraphMapRbVfloSplit: internal error (1)");
           return;
         }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
-        if (archDomIncl (archptr, &domnsubtab[0], &domndat) == 1) { /* If terminal vertex subdomain included in first subdomain */
-          compload0 += vflotab[vflonum].veloval;  /* Fixed vertex belongs to first subdomain                                    */
-          if (++ vflonum > vflonnd)               /* If passed beyond the limit of the second subdomain                         */
+        if (archDomIncl(archptr, &domnsubtab[0], &domndat) ==
+            1) { /* If terminal vertex subdomain included in first subdomain */
+          compload0 +=
+              vflotab[vflonum]
+                  .veloval;        /* Fixed vertex belongs to first subdomain        */
+          if (++vflonum > vflonnd) /* If passed beyond the limit of the second
+                                      subdomain                         */
             goto quit;
-        }
-        else {
+        } else {
 #ifdef SCOTCH_DEBUG_KGRAPH2
-          if (archDomIncl (archptr, &domnsubtab[1], &domndat) != 1) { /* If terminal vertex subdomain not included in second subdomain */
-            errorPrint ("kgraphMapRbVfloSplit: internal error (2)");
+          if (archDomIncl(archptr, &domnsubtab[1], &domndat) !=
+              1) { /* If terminal vertex subdomain not included in second
+                      subdomain */
+            errorPrint("kgraphMapRbVfloSplit: internal error (2)");
             return;
           }
-#endif /* SCOTCH_DEBUG_KGRAPH2 */
-          break;                                  /* We have found a candidate for swapping */
+#endif           /* SCOTCH_DEBUG_KGRAPH2 */
+          break; /* We have found a candidate for swapping */
         }
       }
       while (1) {
-        archDomTerm (archptr, &domndat, vflotab[vflonnd].termnum);
-        if (archDomIncl (archptr, &domnsubtab[1], &domndat) == 1) { /* If terminal vertex subdomain included in second subdomain */
-          compload1 += vflotab[vflonnd].veloval;  /* Fixed vertex belongs to second subdomain                                    */
-          if (-- vflonnd <= vflonum) {            /* If matched the location of a slot that also belongs to second subdomain     */
-            compload1 += vflotab[vflonnd].veloval; /* Add load of reached slot to second subdomain                               */
+        archDomTerm(archptr, &domndat, vflotab[vflonnd].termnum);
+        if (archDomIncl(archptr, &domnsubtab[1], &domndat) ==
+            1) { /* If terminal vertex subdomain included in second subdomain */
+          compload1 +=
+              vflotab[vflonnd]
+                  .veloval; /* Fixed vertex belongs to second subdomain */
+          if (--vflonnd <= vflonum) { /* If matched the location of a slot that
+                                         also belongs to second subdomain     */
+            compload1 += vflotab[vflonnd].veloval; /* Add load of reached slot
+                                                      to second subdomain */
             goto quit;
           }
-        }
-        else {
+        } else {
 #ifdef SCOTCH_DEBUG_KGRAPH2
-          if (archDomIncl (archptr, &domnsubtab[0], &domndat) != 1) { /* If terminal vertex subdomain not included in first subdomain */
-            errorPrint ("kgraphMapRbVfloSplit: internal error (3)");
+          if (archDomIncl(archptr, &domnsubtab[0], &domndat) !=
+              1) { /* If terminal vertex subdomain not included in first
+                      subdomain */
+            errorPrint("kgraphMapRbVfloSplit: internal error (3)");
             return;
           }
-#endif /* SCOTCH_DEBUG_KGRAPH2 */
-          break;                                  /* We have found a candidate for swapping */
+#endif           /* SCOTCH_DEBUG_KGRAPH2 */
+          break; /* We have found a candidate for swapping */
         }
       }
 
-      vflodat          = vflotab[vflonum];        /* Swap slots */
+      vflodat = vflotab[vflonum]; /* Swap slots */
       vflotab[vflonum] = vflotab[vflonnd];
       vflotab[vflonnd] = vflodat;
-      compload0 += vflotab[vflonum ++].veloval;
-      compload1 += vflotab[vflonnd --].veloval;
+      compload0 += vflotab[vflonum++].veloval;
+      compload1 += vflotab[vflonnd--].veloval;
     }
-  }
-  else {                                          /* If variable-sized architecture, pseudo-terminals may not always be included */
-    for (vflonum = 0, vflonnd = vflonbr - 1; vflonum <= vflonnd; ) {
+  } else { /* If variable-sized architecture, pseudo-terminals may not always be
+              included */
+    for (vflonum = 0, vflonnd = vflonbr - 1; vflonum <= vflonnd;) {
 #ifdef SCOTCH_DEBUG_KGRAPH2
-      int                 o;
+      int o;
 
       o =
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
-      archDomTerm (archptr, &domndat, vflotab[vflonum].termnum);
+          archDomTerm(archptr, &domndat, vflotab[vflonum].termnum);
 #ifdef SCOTCH_DEBUG_KGRAPH2
       if (o != 0) {
-        errorPrint ("kgraphMapRbVfloSplit: internal error (4)");
+        errorPrint("kgraphMapRbVfloSplit: internal error (4)");
         return;
       }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
-      if (archDomIncl (archptr, &domnsubtab[0], &domndat) == 1) { /* If vertex subdomain included in first subdomain */
-        compload0 += vflotab[vflonum].veloval;    /* Fixed vertex belongs to first subdomain                         */
-        vflonum ++;
-        continue;                                 /* Keep it in place */
+      if (archDomIncl(archptr, &domnsubtab[0], &domndat) ==
+          1) { /* If vertex subdomain included in first subdomain */
+        compload0 +=
+            vflotab[vflonum]
+                .veloval; /* Fixed vertex belongs to first subdomain */
+        vflonum++;
+        continue; /* Keep it in place */
       }
-      if (archDomIncl (archptr, &domnsubtab[1], &domndat) == 1) { /* If vertex subdomain included in second subdomain */
-        compload1 += vflotab[vflonum].veloval;    /* Fixed vertex belongs to second subdomain                         */
+      if (archDomIncl(archptr, &domnsubtab[1], &domndat) ==
+          1) { /* If vertex subdomain included in second subdomain */
+        compload1 +=
+            vflotab[vflonum]
+                .veloval; /* Fixed vertex belongs to second subdomain */
 
-        vflodat          = vflotab[vflonum];      /* Swap slots */
+        vflodat = vflotab[vflonum]; /* Swap slots */
         vflotab[vflonum] = vflotab[vflonnd];
         vflotab[vflonnd] = vflodat;
-      }
-      else {                                      /* Fixed vertex is more generic than the two subdomains */
-        vflomax --;                               /* One less slot to consider in the future              */
-        vflodat          = vflotab[vflonum];      /* Swap slots */
+      } else {     /* Fixed vertex is more generic than the two subdomains */
+        vflomax--; /* One less slot to consider in the future              */
+        vflodat = vflotab[vflonum]; /* Swap slots */
         vflotab[vflonum] = vflotab[vflonnd];
         vflotab[vflonnd] = vflotab[vflomax];
         vflotab[vflomax] = vflodat;
       }
-      vflonnd --;                                 /* One less slot to consider */
+      vflonnd--; /* One less slot to consider */
     }
   }
 
@@ -430,95 +473,107 @@ quit:
 ** - !0  : on error.
 */
 
-int
-kgraphMapRbVfloMerge (
-Mapping * restrict const    mappptr,              /*+ Mapping to prolong                     +*/
-const Gnum                  vfixnbr,              /*+ Number of fixed vertices in graph      +*/
-const Anum * restrict const pfixtax,              /*+ Array of fixed vertex terminal domains +*/
-const Anum                  vflonbr)              /*+ Number of fixed vertex load slots      +*/
+int kgraphMapRbVfloMerge(
+    Mapping *restrict const mappptr, /*+ Mapping to prolong +*/
+    const Gnum vfixnbr, /*+ Number of fixed vertices in graph      +*/
+    const Anum
+        *restrict const pfixtax, /*+ Array of fixed vertex terminal domains +*/
+    const Anum vflonbr)          /*+ Number of fixed vertex load slots      +*/
 {
-  Anum                            domnnum;
-  Gnum                            vertnum;
-  Gnum                            vertnnd;
-  KgraphMapRbVfloHash * restrict  hashtab;        /* Hash table for merging fixed vertices   */
-  Gnum                            hashnbr;        /* Prospective number of cells in table    */
-  Gnum                            hashsiz;        /* Size of hash table                      */
-  Gnum                            hashnum;
-  Gnum                            hashmsk;        /* Mask for access to hash table           */
+  Anum domnnum;
+  Gnum vertnum;
+  Gnum vertnnd;
+  KgraphMapRbVfloHash *restrict
+      hashtab;  /* Hash table for merging fixed vertices   */
+  Gnum hashnbr; /* Prospective number of cells in table    */
+  Gnum hashsiz; /* Size of hash table                      */
+  Gnum hashnum;
+  Gnum hashmsk; /* Mask for access to hash table           */
 
-  const Arch * restrict const archptr = mappptr->archptr;
-  Anum * restrict const       parttax = mappptr->parttax;
+  const Arch *restrict const archptr = mappptr->archptr;
+  Anum *restrict const parttax = mappptr->parttax;
 
   hashnbr = mappptr->domnnbr + vflonbr;
-  for (hashsiz = 0, hashmsk = hashnbr; hashmsk != 0; hashsiz ++, hashmsk >>= 1) ; /* Get upper power of two */
-  hashsiz = 1 << (hashsiz + 2);                   /* Fill hash table at 25% maximum                         */
+  for (hashsiz = 0, hashmsk = hashnbr; hashmsk != 0; hashsiz++, hashmsk >>= 1)
+    ;                           /* Get upper power of two */
+  hashsiz = 1 << (hashsiz + 2); /* Fill hash table at 25% maximum */
   hashmsk = hashsiz - 1;
 
-  if ((hashtab = memAlloc (hashsiz * sizeof (KgraphMapRbVfloHash))) == NULL) { /* Use fixed vertex load slots as hash slots */
-    errorPrint ("kgraphMapRbVfloMerge: out of memory (1)");
-    return     (1);
+  if ((hashtab = memAlloc(hashsiz * sizeof(KgraphMapRbVfloHash))) ==
+      NULL) { /* Use fixed vertex load slots as hash slots */
+    errorPrint("kgraphMapRbVfloMerge: out of memory (1)");
+    return (1);
   }
-  memSet (hashtab, ~0, hashsiz * sizeof (KgraphMapRbVfloHash)); /* Set all vertex numbers to ~0 */
+  memSet(hashtab, ~0,
+         hashsiz *
+             sizeof(KgraphMapRbVfloHash)); /* Set all vertex numbers to ~0 */
 
-  for (domnnum = 0; domnnum < mappptr->domnnbr; domnnum ++) { /* Load all existing domains into hash table */
-    Anum                termnum;
+  for (domnnum = 0; domnnum < mappptr->domnnbr;
+       domnnum++) { /* Load all existing domains into hash table */
+    Anum termnum;
 
-    termnum = archDomNum (archptr, &mappptr->domntab[domnnum]);
-    for (hashnum = (termnum * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk; ; hashnum = (hashnum + 1) & hashmsk) {
-      if (hashtab[hashnum].termnum == termnum)    /* If domain found */
+    termnum = archDomNum(archptr, &mappptr->domntab[domnnum]);
+    for (hashnum = (termnum * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk;;
+         hashnum = (hashnum + 1) & hashmsk) {
+      if (hashtab[hashnum].termnum == termnum) /* If domain found */
         break;
-      if (hashtab[hashnum].termnum == ~0) {       /* If empty slot found */
-        hashtab[hashnum].termnum = termnum;       /* Fill it             */
+      if (hashtab[hashnum].termnum == ~0) { /* If empty slot found */
+        hashtab[hashnum].termnum = termnum; /* Fill it             */
         hashtab[hashnum].domnnum = domnnum;
         break;
       }
     }
   }
 
-  for (vertnum = mappptr->grafptr->baseval, vertnnd = mappptr->grafptr->vertnnd; vertnum < vertnnd; vertnum ++) {
-    Anum                pfixval;
+  for (vertnum = mappptr->grafptr->baseval, vertnnd = mappptr->grafptr->vertnnd;
+       vertnum < vertnnd; vertnum++) {
+    Anum pfixval;
 
     pfixval = pfixtax[vertnum];
-    if (pfixval < 0) {                            /* If vertex is not a fixed vertex */
+    if (pfixval < 0) { /* If vertex is not a fixed vertex */
 #ifdef SCOTCH_DEBUG_KGRAPH2
-      if (mappptr->parttax[vertnum] < 0) {        /* If vertex has not been mapped */
-        errorPrint ("kgraphMapRbVfloMerge: internal error (1)");
-        return     (1);
+      if (mappptr->parttax[vertnum] < 0) { /* If vertex has not been mapped */
+        errorPrint("kgraphMapRbVfloMerge: internal error (1)");
+        return (1);
       }
-#endif /* SCOTCH_DEBUG_KGRAPH2 */
-      continue;                                   /* Skip to next vertex */
+#endif          /* SCOTCH_DEBUG_KGRAPH2 */
+      continue; /* Skip to next vertex */
     }
 
 #ifdef SCOTCH_DEBUG_KGRAPH2
-    if (mappptr->parttax[vertnum] >= 0) {         /* If fixed vertex has been mapped */
-      errorPrint ("kgraphMapRbVfloMerge: internal error (2)");
-      return     (1);
+    if (mappptr->parttax[vertnum] >= 0) { /* If fixed vertex has been mapped */
+      errorPrint("kgraphMapRbVfloMerge: internal error (2)");
+      return (1);
     }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
 
-    for (hashnum = (pfixval * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk; ; hashnum = (hashnum + 1) & hashmsk) {
-      if (hashtab[hashnum].termnum == pfixval)    /* If hash slot found */
+    for (hashnum = (pfixval * KGRAPHMAPRBVFLOHASHPRIME) & hashmsk;;
+         hashnum = (hashnum + 1) & hashmsk) {
+      if (hashtab[hashnum].termnum == pfixval) /* If hash slot found */
         break;
-      if (hashtab[hashnum].termnum == ~0) {       /* If hash slot empty */
+      if (hashtab[hashnum].termnum == ~0) { /* If hash slot empty */
         if (domnnum >= mappptr->domnmax) {
-          if (mapResize (mappptr, mappptr->domnmax + (mappptr->domnmax >> 2) + 8) != 0) { /* Increase size by 25% */
-            errorPrint ("kgraphMapRbVfloMerge: out of memory (2)");
-            return     (1);
+          if (mapResize(mappptr, mappptr->domnmax + (mappptr->domnmax >> 2) +
+                                     8) != 0) { /* Increase size by 25% */
+            errorPrint("kgraphMapRbVfloMerge: out of memory (2)");
+            return (1);
           }
         }
-        archDomTerm (archptr, &mappptr->domntab[domnnum], pfixval); /* Add new domain to domain array */
+        archDomTerm(archptr, &mappptr->domntab[domnnum],
+                    pfixval); /* Add new domain to domain array */
 
-        hashtab[hashnum].termnum = pfixval;       /* Create slot */
+        hashtab[hashnum].termnum = pfixval; /* Create slot */
         hashtab[hashnum].domnnum = domnnum;
-        domnnum ++;                               /* One more domain created */
+        domnnum++; /* One more domain created */
         break;
       }
     }
-    parttax[vertnum] = hashtab[hashnum].domnnum;  /* Assign fixed vertex to existing domain */
+    parttax[vertnum] =
+        hashtab[hashnum].domnnum; /* Assign fixed vertex to existing domain */
   }
   mappptr->domnnbr = domnnum;
 
-  memFree (hashtab);
+  memFree(hashtab);
 
   return (0);
 }
@@ -539,189 +594,220 @@ const Anum                  vflonbr)              /*+ Number of fixed vertex loa
 ** - !0  : on error.
 */
 
-int
-kgraphMapRbBgraph (
-const KgraphMapRbData * restrict const  dataptr,  /*+ Global data                     +*/
-Bgraph * restrict const                 actgrafptr, /*+ Graph to build                +*/
-const Graph * restrict const            srcgrafptr, /*+ Source graph                  +*/
-const Mapping * restrict const          srcmappptr, /*+ Current mapping               +*/
-const ArchDom * restrict const          domnsubtab, /*+ Array of the two subdomains   +*/
-const Gnum * restrict const             vflowgttab) /*+ Array of vertex weight biases +*/
+int kgraphMapRbBgraph(
+    const KgraphMapRbData *restrict const dataptr, /*+ Global data +*/
+    Bgraph *restrict const actgrafptr, /*+ Graph to build                +*/
+    const Graph *restrict const srcgrafptr,   /*+ Source graph   +*/
+    const Mapping *restrict const srcmappptr, /*+ Current mapping +*/
+    const ArchDom
+        *restrict const domnsubtab,        /*+ Array of the two subdomains   +*/
+    const Gnum *restrict const vflowgttab) /*+ Array of vertex weight biases +*/
 {
-  Gnum                  actvertnum;               /* Number of current active vertex   */
-  Gnum                  commloadextn0;            /* External communication load       */
-  Gnum                  commgainextn0;            /* External communication gain       */
-  Gnum * restrict       veextax;                  /* External gain array               */
-  Gnum                  veexmsk;                  /* Flag set if external array useful */
-  int                   flagval;
-  int                   o;
+  Gnum actvertnum;        /* Number of current active vertex   */
+  Gnum commloadextn0;     /* External communication load       */
+  Gnum commgainextn0;     /* External communication gain       */
+  Gnum *restrict veextax; /* External gain array               */
+  Gnum veexmsk;           /* Flag set if external array useful */
+  int flagval;
+  int o;
 
-  const Arch * restrict const     archptr    = dataptr->mappptr->archptr;
-  const Gnum * restrict const     orgverttax = dataptr->grafptr->verttax;
-  const Gnum * restrict const     orgvendtax = dataptr->grafptr->vendtax;
-  const Gnum * restrict const     orgedgetax = dataptr->grafptr->edgetax;
-  const Gnum * restrict const     orgedlotax = dataptr->grafptr->edlotax;
-  const Mapping * restrict const  oldmappptr = dataptr->r.mappptr;
-  const Gnum * restrict const     orgvmlotax = dataptr->r.vmlotax;
-  const Anum * restrict const     orgpfixtax = dataptr->pfixtax;
-  const Gnum * restrict const     actverttax = srcgrafptr->verttax; /* Get pointers from source graph before bgraphInit() */
-  const Gnum * restrict const     actvendtax = srcgrafptr->vendtax;
-  const Gnum * restrict const     actedgetax = srcgrafptr->edgetax;
-  const Gnum * restrict const     actvnumtax = srcgrafptr->vnumtax;
+  const Arch *restrict const archptr = dataptr->mappptr->archptr;
+  const Gnum *restrict const orgverttax = dataptr->grafptr->verttax;
+  const Gnum *restrict const orgvendtax = dataptr->grafptr->vendtax;
+  const Gnum *restrict const orgedgetax = dataptr->grafptr->edgetax;
+  const Gnum *restrict const orgedlotax = dataptr->grafptr->edlotax;
+  const Mapping *restrict const oldmappptr = dataptr->r.mappptr;
+  const Gnum *restrict const orgvmlotax = dataptr->r.vmlotax;
+  const Anum *restrict const orgpfixtax = dataptr->pfixtax;
+  const Gnum *restrict const actverttax =
+      srcgrafptr
+          ->verttax; /* Get pointers from source graph before bgraphInit() */
+  const Gnum *restrict const actvendtax = srcgrafptr->vendtax;
+  const Gnum *restrict const actedgetax = srcgrafptr->edgetax;
+  const Gnum *restrict const actvnumtax = srcgrafptr->vnumtax;
 
-  if (bgraphInit (actgrafptr, srcgrafptr, srcmappptr->archptr, domnsubtab, vflowgttab) != 0) {
-    errorPrint ("kgraphMapRbBgraph: cannot create bipartition graph");
-    return     (1);
+  if (bgraphInit(actgrafptr, srcgrafptr, srcmappptr->archptr, domnsubtab,
+                 vflowgttab) != 0) {
+    errorPrint("kgraphMapRbBgraph: cannot create bipartition graph");
+    return (1);
   }
 
-  flagval = KGRAPHMAPRBVEEXNONE;                  /* Assume no processing */
-  if ((! archPart (archptr)) && (actvnumtax != NULL))
+  flagval = KGRAPHMAPRBVEEXNONE; /* Assume no processing */
+  if ((!archPart(archptr)) && (actvnumtax != NULL))
     flagval |= KGRAPHMAPRBVEEXMAPP;
-  if (orgpfixtax != NULL)                         /* Fixed vertices always imply (actvnumtax != NULL) */
+  if (orgpfixtax != NULL) /* Fixed vertices always imply (actvnumtax != NULL) */
     flagval |= KGRAPHMAPRBVEEXVFIX;
   if (dataptr->r.mappptr != NULL)
     flagval |= KGRAPHMAPRBVEEXREMA;
 
-  if (flagval == KGRAPHMAPRBVEEXNONE)             /* If nothing to do */
+  if (flagval == KGRAPHMAPRBVEEXNONE) /* If nothing to do */
     return (0);
 
-  if ((veextax = (Gnum *) memAlloc (actgrafptr->s.vertnbr * sizeof (Gnum))) == NULL) {
-    errorPrint ("kgraphMapRbBgraph: out of memory");
-    return     (1);
+  if ((veextax = (Gnum *)memAlloc(actgrafptr->s.vertnbr * sizeof(Gnum))) ==
+      NULL) {
+    errorPrint("kgraphMapRbBgraph: out of memory");
+    return (1);
   }
   veextax -= actgrafptr->s.baseval;
 
-  o = 1;                                          /* Assume failure                */
-  veexmsk = 0;                                    /* No useful array entry yet     */
-  commloadextn0 =                                 /* No external communication yet */
-  commgainextn0 = 0;
-  for (actvertnum = actgrafptr->s.baseval;        /* Compute external loads */
-       actvertnum < actgrafptr->s.vertnnd; actvertnum ++) {
-    Gnum                commloadextn;             /* External communication load for current vertex */
-    Gnum                commgainextn;             /* External communication gain for current vertex */
-    Gnum                orgvertnum;               /* Number of current original vertex              */
+  o = 1;          /* Assume failure                */
+  veexmsk = 0;    /* No useful array entry yet     */
+  commloadextn0 = /* No external communication yet */
+      commgainextn0 = 0;
+  for (actvertnum = actgrafptr->s.baseval; /* Compute external loads */
+       actvertnum < actgrafptr->s.vertnnd; actvertnum++) {
+    Gnum commloadextn; /* External communication load for current vertex */
+    Gnum commgainextn; /* External communication gain for current vertex */
+    Gnum orgvertnum;   /* Number of current original vertex              */
 
-    commloadextn =                                /* Assume no external loads */
-    commgainextn = 0;
+    commloadextn = /* Assume no external loads */
+        commgainextn = 0;
 
-    if (actvnumtax == NULL)                       /* If active graph is not a subgraph      */
-      orgvertnum = actvertnum;                    /* Its number is that of original graph   */
-    else {                                        /* Else we have external edges to process */
-      orgvertnum = actvnumtax[actvertnum];        /* Get vertex number in original graph    */
+    if (actvnumtax == NULL)    /* If active graph is not a subgraph      */
+      orgvertnum = actvertnum; /* Its number is that of original graph   */
+    else {                     /* Else we have external edges to process */
+      orgvertnum =
+          actvnumtax[actvertnum]; /* Get vertex number in original graph    */
 
-      if ((flagval & KGRAPHMAPRBVEEXEDGE) != 0) { /* If edge-based gains have to be computed */
-        Gnum                orgedgenum;
-        Gnum                orgedgennd;
-        Gnum                actedgenum;
-        Gnum                actedgennd;
+      if ((flagval & KGRAPHMAPRBVEEXEDGE) !=
+          0) { /* If edge-based gains have to be computed */
+        Gnum orgedgenum;
+        Gnum orgedgennd;
+        Gnum actedgenum;
+        Gnum actedgennd;
 
         orgedgenum = orgverttax[orgvertnum];
         orgedgennd = orgvendtax[orgvertnum];
         actedgenum = actverttax[actvertnum];
         actedgennd = actvendtax[actvertnum];
-        if ((orgedgennd - orgedgenum) != (actedgennd - actedgenum)) { /* If vertex has external edges */
-          Gnum                orgedloval;
-          Gnum                actvertend;         /* Next internal end vertex index to find in original edge array */
+        if ((orgedgennd - orgedgenum) !=
+            (actedgennd - actedgenum)) { /* If vertex has external edges */
+          Gnum orgedloval;
+          Gnum actvertend; /* Next internal end vertex index to find in original
+                              edge array */
 
-          orgedloval = 1;                         /* Assume no edge loads */
-          actvertend = (actedgenum >= actedgennd) ? ~0 : actvnumtax[actedgetax[actedgenum]];
-          for ( ; orgedgenum < orgedgennd; orgedgenum ++) {
-            Gnum                orgvertend;
+          orgedloval = 1; /* Assume no edge loads */
+          actvertend = (actedgenum >= actedgennd)
+                           ? ~0
+                           : actvnumtax[actedgetax[actedgenum]];
+          for (; orgedgenum < orgedgennd; orgedgenum++) {
+            Gnum orgvertend;
 
             orgvertend = orgedgetax[orgedgenum];
-            if (orgvertend == actvertend) {       /* If internal edge found    */
-              actedgenum ++;                      /* Skip internal active edge */
-              actvertend = (actedgenum >= actedgennd) ? ~0 : actvnumtax[actedgetax[actedgenum]]; /* Set next internal end vertex index to fetch */
-              continue;                           /* Skip internal original edge */
+            if (orgvertend == actvertend) { /* If internal edge found    */
+              actedgenum++;                 /* Skip internal active edge */
+              actvertend =
+                  (actedgenum >= actedgennd)
+                      ? ~0
+                      : actvnumtax[actedgetax[actedgenum]]; /* Set next internal
+                                                               end vertex index
+                                                               to fetch */
+              continue; /* Skip internal original edge */
             }
 
             if (orgedlotax != NULL)
               orgedloval = orgedlotax[orgedgenum];
 
             if (orgpfixtax != NULL) {
-              ArchDom             domndat;
-              Anum                pfixval;
+              ArchDom domndat;
+              Anum pfixval;
 
               pfixval = orgpfixtax[orgvertend];
-              if (pfixval >= 0) {                 /* If end vertex is fixed */
+              if (pfixval >= 0) { /* If end vertex is fixed */
 #ifdef SCOTCH_DEBUG_KGRAPH2
-                if (dataptr->mappptr->parttax[orgvertend] != ~0) { /* If original vertex has a current part */
-                  errorPrint ("kgraphMapRbBgraph: internal error");
+                if (dataptr->mappptr->parttax[orgvertend] !=
+                    ~0) { /* If original vertex has a current part */
+                  errorPrint("kgraphMapRbBgraph: internal error");
                   goto fail;
                 }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
 
-                if (archDomTerm (archptr, &domndat, pfixval) != 0) { /* Get its domain */
-                  errorPrint ("kgraphMapRbBgraph: invalid fixed part array");
+                if (archDomTerm(archptr, &domndat, pfixval) !=
+                    0) { /* Get its domain */
+                  errorPrint("kgraphMapRbBgraph: invalid fixed part array");
                   goto fail;
                 }
 
-                commloadextn += (archDomIncl (archptr, &domnsubtab[0], &domndat) != 0)
-                                ? 0 : (orgedloval * archDomDist (archptr, &domnsubtab[0], &domndat));
-                commgainextn += (archDomIncl (archptr, &domnsubtab[1], &domndat) != 0)
-                                ? 0 : (orgedloval * archDomDist (archptr, &domnsubtab[1], &domndat));
+                commloadextn +=
+                    (archDomIncl(archptr, &domnsubtab[0], &domndat) != 0)
+                        ? 0
+                        : (orgedloval *
+                           archDomDist(archptr, &domnsubtab[0], &domndat));
+                commgainextn +=
+                    (archDomIncl(archptr, &domnsubtab[1], &domndat) != 0)
+                        ? 0
+                        : (orgedloval *
+                           archDomDist(archptr, &domnsubtab[1], &domndat));
 
-                continue;                         /* Process next edge */
+                continue; /* Process next edge */
               }
             }
 
             if ((flagval & KGRAPHMAPRBVEEXMAPP) != 0) { /* If mapping */
-              ArchDom *           domnptr;
+              ArchDom *domnptr;
 
-              domnptr = mapDomain (srcmappptr, orgvertend);
-              commloadextn += orgedloval * archDomDist (archptr, &domnsubtab[0], domnptr);
-              commgainextn += orgedloval * archDomDist (archptr, &domnsubtab[1], domnptr);
+              domnptr = mapDomain(srcmappptr, orgvertend);
+              commloadextn +=
+                  orgedloval * archDomDist(archptr, &domnsubtab[0], domnptr);
+              commgainextn +=
+                  orgedloval * archDomDist(archptr, &domnsubtab[1], domnptr);
             }
           }
 
-          commloadextn *= dataptr->r.crloval;     /* Scale regular, non-remapping gains */
+          commloadextn *=
+              dataptr->r.crloval; /* Scale regular, non-remapping gains */
           commgainextn *= dataptr->r.crloval;
         }
       }
     }
 
-    if (oldmappptr != NULL) {                     /* If remapping gains have to be computed */
-      ArchDom *           domnptr;
-      Gnum                edloval;
+    if (oldmappptr != NULL) { /* If remapping gains have to be computed */
+      ArchDom *domnptr;
+      Gnum edloval;
 
       edloval = dataptr->r.cmloval;
       if (orgvmlotax != NULL)
         edloval *= orgvmlotax[orgvertnum];
 
-      domnptr = mapDomain (oldmappptr, orgvertnum);
-      commloadextn += (archDomIncl (archptr, &domnsubtab[0], domnptr) != 0)
-                      ? 0 : (edloval * archDomDist (archptr, &domnsubtab[0], domnptr));
-      commgainextn += (archDomIncl (archptr, &domnsubtab[1], domnptr) != 0)
-                      ? 0 : (edloval * archDomDist (archptr, &domnsubtab[1], domnptr));
+      domnptr = mapDomain(oldmappptr, orgvertnum);
+      commloadextn +=
+          (archDomIncl(archptr, &domnsubtab[0], domnptr) != 0)
+              ? 0
+              : (edloval * archDomDist(archptr, &domnsubtab[0], domnptr));
+      commgainextn +=
+          (archDomIncl(archptr, &domnsubtab[1], domnptr) != 0)
+              ? 0
+              : (edloval * archDomDist(archptr, &domnsubtab[1], domnptr));
     }
 
-    commgainextn  -= commloadextn;                /* Compute vertex gain        */
-    commloadextn0 += commloadextn;                /* Account for external edges */
+    commgainextn -= commloadextn;  /* Compute vertex gain        */
+    commloadextn0 += commloadextn; /* Account for external edges */
     commgainextn0 += commgainextn;
 
-    veextax[actvertnum] = commgainextn;           /* Record external gain value */
-    veexmsk            |= commgainextn;           /* Accumulate non-zero values */
+    veextax[actvertnum] = commgainextn; /* Record external gain value */
+    veexmsk |= commgainextn;            /* Accumulate non-zero values */
   }
-  o = 0;                                          /* Computations succeeded */
+  o = 0; /* Computations succeeded */
 
-fail :
-  if ((o != 0) || (veexmsk == 0)) {               /* If external gain array is useless */
-    memFree (veextax + actgrafptr->s.baseval);    /* Forget about it                   */
-    return  (o);                                  /* Return error code                 */
+fail:
+  if ((o != 0) || (veexmsk == 0)) { /* If external gain array is useless */
+    memFree(veextax + actgrafptr->s.baseval); /* Forget about it */
+    return (o); /* Return error code                 */
   }
 
-  actgrafptr->s.flagval |= BGRAPHFREEVEEX;        /* Keep external gain array */
-  actgrafptr->veextax    = veextax;
+  actgrafptr->s.flagval |= BGRAPHFREEVEEX; /* Keep external gain array */
+  actgrafptr->veextax = veextax;
 
-  actgrafptr->commload      = commloadextn0;      /* Account for external gains in future computations */
-  actgrafptr->commgainextn  = commgainextn0;
+  actgrafptr->commload =
+      commloadextn0; /* Account for external gains in future computations */
+  actgrafptr->commgainextn = commgainextn0;
   actgrafptr->commloadextn0 = commloadextn0;
   actgrafptr->commgainextn0 = commgainextn0;
 
 #ifdef SCOTCH_DEBUG_KGRAPH2
-  if (bgraphCheck (actgrafptr) != 0) {
-    errorPrint ("kgraphMapRbBgraph: inconsistent graph data");
-    return     (1);
+  if (bgraphCheck(actgrafptr) != 0) {
+    errorPrint("kgraphMapRbBgraph: inconsistent graph data");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_KGRAPH2 */
 

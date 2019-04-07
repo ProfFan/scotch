@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -79,24 +79,24 @@
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphOrderInit (
-const SCOTCH_Dgraph * const grafptr,              /*+ Distributed graph to order         +*/
-SCOTCH_Dordering * const    ordeptr)              /*+ Ordering structure to initialize   +*/
+int SCOTCH_dgraphOrderInit(
+    const SCOTCH_Dgraph *const grafptr, /*+ Distributed graph to order +*/
+    SCOTCH_Dordering *const ordeptr) /*+ Ordering structure to initialize   +*/
 {
-  Dgraph *            srcgrafptr;
-  Dorder *            srcordeptr;
+  Dgraph *srcgrafptr;
+  Dorder *srcordeptr;
 
 #ifdef SCOTCH_DEBUG_LIBRARY1
-  if (sizeof (SCOTCH_Dordering) < sizeof (Dorder)) {
-    errorPrint (STRINGIFY (SCOTCH_graphDorderInit) ": internal error");
-    return     (1);
+  if (sizeof(SCOTCH_Dordering) < sizeof(Dorder)) {
+    errorPrint(STRINGIFY(SCOTCH_graphDorderInit) ": internal error");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_LIBRARY1 */
 
-  srcgrafptr = (Dgraph *) grafptr;                /* Use structure as source graph */
-  srcordeptr = (Dorder *) ordeptr;
-  return (dorderInit (srcordeptr, srcgrafptr->baseval, srcgrafptr->vertglbnbr, srcgrafptr->proccomm));
+  srcgrafptr = (Dgraph *)grafptr; /* Use structure as source graph */
+  srcordeptr = (Dorder *)ordeptr;
+  return (dorderInit(srcordeptr, srcgrafptr->baseval, srcgrafptr->vertglbnbr,
+                     srcgrafptr->proccomm));
 }
 
 /*+ This routine frees an API ordering.
@@ -104,12 +104,9 @@ SCOTCH_Dordering * const    ordeptr)              /*+ Ordering structure to init
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_dgraphOrderExit (
-const SCOTCH_Dgraph * const grafptr,
-SCOTCH_Dordering * const    ordeptr)
-{
-  dorderExit ((Dorder *) ordeptr);
+void SCOTCH_dgraphOrderExit(const SCOTCH_Dgraph *const grafptr,
+                            SCOTCH_Dordering *const ordeptr) {
+  dorderExit((Dorder *)ordeptr);
 }
 
 /*+ This routine saves the contents of
@@ -119,13 +116,12 @@ SCOTCH_Dordering * const    ordeptr)
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphOrderSave (
-const SCOTCH_Dgraph * const     grafptr,          /*+ Graph to order   +*/
-const SCOTCH_Dordering * const  ordeptr,          /*+ Ordering to save +*/
-FILE * const                    stream)           /*+ Output stream    +*/
+int SCOTCH_dgraphOrderSave(
+    const SCOTCH_Dgraph *const grafptr,    /*+ Graph to order   +*/
+    const SCOTCH_Dordering *const ordeptr, /*+ Ordering to save +*/
+    FILE *const stream)                    /*+ Output stream    +*/
 {
-  return (dorderSave ((Dorder *) ordeptr, (Dgraph *) grafptr, stream));
+  return (dorderSave((Dorder *)ordeptr, (Dgraph *)grafptr, stream));
 }
 
 /*+ This routine computes an ordering
@@ -136,13 +132,12 @@ FILE * const                    stream)           /*+ Output stream    +*/
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphOrderCompute (
-SCOTCH_Dgraph * const       grafptr,              /*+ Graph to order      +*/
-SCOTCH_Dordering * const    ordeptr,              /*+ Ordering to compute +*/
-SCOTCH_Strat * const        stratptr)             /*+ Ordering strategy   +*/
+int SCOTCH_dgraphOrderCompute(
+    SCOTCH_Dgraph *const grafptr,    /*+ Graph to order      +*/
+    SCOTCH_Dordering *const ordeptr, /*+ Ordering to compute +*/
+    SCOTCH_Strat *const stratptr)    /*+ Ordering strategy   +*/
 {
-  return (SCOTCH_dgraphOrderComputeList (grafptr, ordeptr, 0, NULL, stratptr));
+  return (SCOTCH_dgraphOrderComputeList(grafptr, ordeptr, 0, NULL, stratptr));
 }
 
 /*+ This routine computes a partial ordering
@@ -154,68 +149,76 @@ SCOTCH_Strat * const        stratptr)             /*+ Ordering strategy   +*/
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphOrderComputeList (
-SCOTCH_Dgraph * const       grafptr,              /*+ Graph to order                  +*/
-SCOTCH_Dordering * const    ordeptr,              /*+ Ordering to compute             +*/
-const SCOTCH_Num            listnbr,              /*+ Number of vertices in list      +*/
-const SCOTCH_Num * const    listtab,              /*+ List of vertex indices to order +*/
-SCOTCH_Strat * const        stratptr)             /*+ Ordering strategy               +*/
+int SCOTCH_dgraphOrderComputeList(
+    SCOTCH_Dgraph *const grafptr,    /*+ Graph to order                  +*/
+    SCOTCH_Dordering *const ordeptr, /*+ Ordering to compute             +*/
+    const SCOTCH_Num listnbr,        /*+ Number of vertices in list      +*/
+    const SCOTCH_Num *const listtab, /*+ List of vertex indices to order +*/
+    SCOTCH_Strat *const stratptr)    /*+ Ordering strategy               +*/
 {
-  Dorder *            srcordeptr;                 /* Pointer to ordering          */
-  DorderCblk *        srccblkptr;                 /* Initial column block         */
-  Dgraph * restrict   srcgrafptr;                 /* Pointer to scotch graph      */
-  Hdgraph             srcgrafdat;                 /* Halo source graph structure  */
-  Gnum                srclistnbr;                 /* Number of items in list      */
-  Gnum * restrict     srclisttab;                 /* Subgraph vertex list         */
-  const Strat *       ordstratptr;                /* Pointer to ordering strategy */
+  Dorder *srcordeptr;          /* Pointer to ordering          */
+  DorderCblk *srccblkptr;      /* Initial column block         */
+  Dgraph *restrict srcgrafptr; /* Pointer to scotch graph      */
+  Hdgraph srcgrafdat;          /* Halo source graph structure  */
+  Gnum srclistnbr;             /* Number of items in list      */
+  Gnum *restrict srclisttab;   /* Subgraph vertex list         */
+  const Strat *ordstratptr;    /* Pointer to ordering strategy */
 
-  srcgrafptr = (Dgraph *) grafptr;
+  srcgrafptr = (Dgraph *)grafptr;
 
 #ifdef SCOTCH_DEBUG_DGRAPH2
-  if (dgraphCheck (srcgrafptr) != 0) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphOrderComputeList) ": invalid input graph");
-    return     (1);
+  if (dgraphCheck(srcgrafptr) != 0) {
+    errorPrint(
+        STRINGIFY(SCOTCH_dgraphOrderComputeList) ": invalid input graph");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_DGRAPH2 */
 
-  if (*((Strat **) stratptr) == NULL)             /* Set default ordering strategy if necessary */
-    SCOTCH_stratDgraphOrderBuild (stratptr, SCOTCH_STRATQUALITY, srcgrafptr->procglbnbr, 0, 0.2);
+  if (*((Strat **)stratptr) ==
+      NULL) /* Set default ordering strategy if necessary */
+    SCOTCH_stratDgraphOrderBuild(stratptr, SCOTCH_STRATQUALITY,
+                                 srcgrafptr->procglbnbr, 0, 0.2);
 
-  ordstratptr = *((Strat **) stratptr);
+  ordstratptr = *((Strat **)stratptr);
   if (ordstratptr->tabl != &hdgraphorderststratab) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphOrderComputeList) ": not a distributed ordering strategy");
-    return     (1);
+    errorPrint(STRINGIFY(
+        SCOTCH_dgraphOrderComputeList) ": not a distributed ordering strategy");
+    return (1);
   }
 
-  srcgrafdat.s            = *srcgrafptr;          /* Copy non-halo graph data       */
-  srcgrafdat.s.edloloctax = NULL;                 /* Never mind about edge loads    */
-  srcgrafdat.s.vlblloctax = NULL;                 /* Do not propagate vertex labels */
-  srcgrafdat.vhallocnbr   = 0;                    /* No halo on graph               */
-  srcgrafdat.vhndloctax   = srcgrafdat.s.vendloctax;
-  srcgrafdat.ehallocnbr   = 0;
-  srcgrafdat.levlnum      = 0;
+  srcgrafdat.s = *srcgrafptr;     /* Copy non-halo graph data       */
+  srcgrafdat.s.edloloctax = NULL; /* Never mind about edge loads    */
+  srcgrafdat.s.vlblloctax = NULL; /* Do not propagate vertex labels */
+  srcgrafdat.vhallocnbr = 0;      /* No halo on graph               */
+  srcgrafdat.vhndloctax = srcgrafdat.s.vendloctax;
+  srcgrafdat.ehallocnbr = 0;
+  srcgrafdat.levlnum = 0;
 
-  srcordeptr = (Dorder *) ordeptr;                /* Get ordering */
+  srcordeptr = (Dorder *)ordeptr; /* Get ordering */
 
-  srclistnbr = (Gnum)   listnbr;                  /* Build vertex list */
-  srclisttab = (Gnum *) listtab;
+  srclistnbr = (Gnum)listnbr; /* Build vertex list */
+  srclisttab = (Gnum *)listtab;
 
-  intRandInit ();                                 /* Check that random number generator is initialized */
+  intRandInit(); /* Check that random number generator is initialized */
 
-/* TODO: Take list into account */
-  dorderFree (srcordeptr);                        /* Clean all existing ordering data */
-  if ((srccblkptr = dorderFrst (srcordeptr)) == NULL) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphOrderComputeList) ": cannot create root column block");
-    return     (1);
+  /* TODO: Take list into account */
+  dorderFree(srcordeptr); /* Clean all existing ordering data */
+  if ((srccblkptr = dorderFrst(srcordeptr)) == NULL) {
+    errorPrint(STRINGIFY(
+        SCOTCH_dgraphOrderComputeList) ": cannot create root column block");
+    return (1);
   }
-  hdgraphOrderSt (&srcgrafdat, srccblkptr, ordstratptr);
-  dorderDispose  (srccblkptr);
+  hdgraphOrderSt(&srcgrafdat, srccblkptr, ordstratptr);
+  dorderDispose(srccblkptr);
 
-  srcgrafptr->flagval   |= srcgrafdat.s.flagval & (DGRAPHFREEEDGEGST | DGRAPHHASEDGEGST);
-  srcgrafptr->edgegsttax = srcgrafdat.s.edgegsttax; /* Get edge ghost array from working graph if it gained one */
+  srcgrafptr->flagval |=
+      srcgrafdat.s.flagval & (DGRAPHFREEEDGEGST | DGRAPHHASEDGEGST);
+  srcgrafptr->edgegsttax =
+      srcgrafdat.s.edgegsttax; /* Get edge ghost array from working graph if it
+                                  gained one */
 
-  *srcgrafptr = srcgrafdat.s;                     /* Get back Dgraph structure, possibly updated (additional ghost data arrays) */
+  *srcgrafptr = srcgrafdat.s; /* Get back Dgraph structure, possibly updated
+                                 (additional ghost data arrays) */
 
   return (0);
 }
@@ -227,17 +230,16 @@ SCOTCH_Strat * const        stratptr)             /*+ Ordering strategy         
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_stratDgraphOrder (
-SCOTCH_Strat * const        stratptr,
-const char * const          string)
-{
-  if (*((Strat **) stratptr) != NULL)
-    stratExit (*((Strat **) stratptr));
+int SCOTCH_stratDgraphOrder(SCOTCH_Strat *const stratptr,
+                            const char *const string) {
+  if (*((Strat **)stratptr) != NULL)
+    stratExit(*((Strat **)stratptr));
 
-  if ((*((Strat **) stratptr) = stratInit (&hdgraphorderststratab, string)) == NULL) {
-    errorPrint (STRINGIFY (SCOTCH_stratDgraphOrder) ": error in ordering strategy");
-    return     (1);
+  if ((*((Strat **)stratptr) = stratInit(&hdgraphorderststratab, string)) ==
+      NULL) {
+    errorPrint(
+        STRINGIFY(SCOTCH_stratDgraphOrder) ": error in ordering strategy");
+    return (1);
   }
 
   return (0);
@@ -250,72 +252,78 @@ const char * const          string)
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_stratDgraphOrderBuild (
-SCOTCH_Strat * const        stratptr,             /*+ Strategy to create                 +*/
-const SCOTCH_Num            flagval,              /*+ Desired characteristics            +*/
-const SCOTCH_Num            procnbr,              /*+ Number of processes for running    +*/
-const SCOTCH_Num            levlnbr,              /*+ Number of nested dissection levels +*/
-const double                balrat)               /*+ Desired imbalance ratio            +*/
+int SCOTCH_stratDgraphOrderBuild(
+    SCOTCH_Strat *const stratptr, /*+ Strategy to create                 +*/
+    const SCOTCH_Num flagval,     /*+ Desired characteristics            +*/
+    const SCOTCH_Num procnbr,     /*+ Number of processes for running    +*/
+    const SCOTCH_Num levlnbr,     /*+ Number of nested dissection levels +*/
+    const double balrat)          /*+ Desired imbalance ratio            +*/
 {
-  char                bufftab[8192];              /* Should be enough */
-  char                bbaltab[32];
-  char                levltab[32];
-  char                verttab[32];
-  Gnum                vertnbr;
-  char *              tstpptr;
-  char *              tstsptr;
-  char *              oleaptr;
-  char *              osepptr;
+  char bufftab[8192]; /* Should be enough */
+  char bbaltab[32];
+  char levltab[32];
+  char verttab[32];
+  Gnum vertnbr;
+  char *tstpptr;
+  char *tstsptr;
+  char *oleaptr;
+  char *osepptr;
 
-  vertnbr = MAX (2000 * procnbr, 10000);
-  vertnbr = MIN (vertnbr, 1000000);
+  vertnbr = MAX(2000 * procnbr, 10000);
+  vertnbr = MIN(vertnbr, 1000000);
 
-  sprintf (bbaltab, "%lf", balrat);
-  sprintf (levltab, GNUMSTRING, levlnbr);
-  sprintf (verttab, GNUMSTRING, vertnbr);
+  sprintf(bbaltab, "%lf", balrat);
+  sprintf(levltab, GNUMSTRING, levlnbr);
+  sprintf(verttab, GNUMSTRING, vertnbr);
 
-  strcpy (bufftab, "n{sep=/(<TSTP>)?m{vert=<VERT>,asc=b{width=3,strat=q{strat=f}},low=q{strat=h},seq=q{strat=m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},org=h{pass=10}f{bal=<BBAL>}}}}};,ole=q{strat=n{sep=/(<TSTS>)?m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},org=h{pass=10}f{bal=<BBAL>}}};,ole=<OLEA>,ose=<OSEP>}},ose=s,osq=n{sep=/(<TSTS>)?m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},org=h{pass=10}f{bal=<BBAL>}}};,ole=<OLEA>,ose=<OSEP>}}");
+  strcpy(
+      bufftab,
+      "n{sep=/"
+      "(<TSTP>)?m{vert=<VERT>,asc=b{width=3,strat=q{strat=f}},low=q{strat=h},"
+      "seq=q{strat=m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},"
+      "org=h{pass=10}f{bal=<BBAL>}}}}};,ole=q{strat=n{sep=/"
+      "(<TSTS>)?m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},org="
+      "h{pass=10}f{bal=<BBAL>}}};,ole=<OLEA>,ose=<OSEP>}},ose=s,osq=n{sep=/"
+      "(<TSTS>)?m{vert=120,low=h{pass=10},asc=b{width=3,bnd=f{bal=<BBAL>},org="
+      "h{pass=10}f{bal=<BBAL>}}};,ole=<OLEA>,ose=<OSEP>}}");
 
   switch (flagval & (SCOTCH_STRATLEVELMIN | SCOTCH_STRATLEVELMAX)) {
-    case SCOTCH_STRATLEVELMIN :
-      tstpptr = "0=0";
-      tstsptr = "(levl<<LEVL>)|(vert>240)";
-      break;
-    case SCOTCH_STRATLEVELMAX :
-      tstpptr = "(levl<<LEVL>)";
-      tstsptr = "(levl<<LEVL>)&(vert>240)";
-      break;
-    case (SCOTCH_STRATLEVELMIN | SCOTCH_STRATLEVELMAX) :
-      tstpptr =
-      tstsptr = "levl<<LEVL>";
-      oleaptr = "s";                              /* Simple ordering for leaves */
-      break;
-    default :
-      tstpptr = "0=0";
-      tstsptr = "vert>240";
-      break;
+  case SCOTCH_STRATLEVELMIN:
+    tstpptr = "0=0";
+    tstsptr = "(levl<<LEVL>)|(vert>240)";
+    break;
+  case SCOTCH_STRATLEVELMAX:
+    tstpptr = "(levl<<LEVL>)";
+    tstsptr = "(levl<<LEVL>)&(vert>240)";
+    break;
+  case (SCOTCH_STRATLEVELMIN | SCOTCH_STRATLEVELMAX):
+    tstpptr = tstsptr = "levl<<LEVL>";
+    oleaptr = "s"; /* Simple ordering for leaves */
+    break;
+  default:
+    tstpptr = "0=0";
+    tstsptr = "vert>240";
+    break;
   }
 
   oleaptr = ((flagval & SCOTCH_STRATLEAFSIMPLE) != 0)
-            ? "s"
-            : "f{cmin=15,cmax=100000,frat=0.0}";
+                ? "s"
+                : "f{cmin=15,cmax=100000,frat=0.0}";
 
-  osepptr = ((flagval & SCOTCH_STRATSEPASIMPLE) != 0)
-            ? "s"
-            : "g";
+  osepptr = ((flagval & SCOTCH_STRATSEPASIMPLE) != 0) ? "s" : "g";
 
-  stringSubst (bufftab, "<TSTP>", tstpptr);
-  stringSubst (bufftab, "<TSTS>", tstsptr);
-  stringSubst (bufftab, "<LEVL>", levltab);
-  stringSubst (bufftab, "<OLEA>", oleaptr);
-  stringSubst (bufftab, "<OSEP>", osepptr);
-  stringSubst (bufftab, "<BBAL>", bbaltab);
-  stringSubst (bufftab, "<VERT>", verttab);
+  stringSubst(bufftab, "<TSTP>", tstpptr);
+  stringSubst(bufftab, "<TSTS>", tstsptr);
+  stringSubst(bufftab, "<LEVL>", levltab);
+  stringSubst(bufftab, "<OLEA>", oleaptr);
+  stringSubst(bufftab, "<OSEP>", osepptr);
+  stringSubst(bufftab, "<BBAL>", bbaltab);
+  stringSubst(bufftab, "<VERT>", verttab);
 
-  if (SCOTCH_stratDgraphOrder (stratptr, bufftab) != 0) {
-    errorPrint (STRINGIFY (SCOTCH_stratDgraphOrderBuild) ": error in parallel ordering strategy");
-    return     (1);
+  if (SCOTCH_stratDgraphOrder(stratptr, bufftab) != 0) {
+    errorPrint(STRINGIFY(
+        SCOTCH_stratDgraphOrderBuild) ": error in parallel ordering strategy");
+    return (1);
   }
 
   return (0);

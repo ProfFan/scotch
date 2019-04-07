@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2010,2011,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2010,2011,2014,2018 IPB, Universite de Bordeaux, INRIA &
+*CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -75,59 +76,66 @@
 
 /*+ Graph option flags. +*/
 
-#define BGRAPHFREEFRON              (GRAPHBITSNOTUSED) /* Free frontier array               */
-#define BGRAPHFREEPART              (GRAPHBITSNOTUSED << 1) /* Free part array              */
-#define BGRAPHFREEVEEX              (GRAPHBITSNOTUSED << 2) /* Free external gain array     */
-#define BGRAPHHASANCHORS            (GRAPHBITSNOTUSED << 3) /* If graph has anchor vertices */
+#define BGRAPHFREEFRON                                                         \
+  (GRAPHBITSNOTUSED) /* Free frontier array               */
+#define BGRAPHFREEPART                                                         \
+  (GRAPHBITSNOTUSED << 1) /* Free part array              */
+#define BGRAPHFREEVEEX                                                         \
+  (GRAPHBITSNOTUSED << 2) /* Free external gain array     */
+#define BGRAPHHASANCHORS                                                       \
+  (GRAPHBITSNOTUSED << 3) /* If graph has anchor vertices */
 
 /*+ The bipartition graph structure. +*/
 
 typedef struct Bgraph_ {
-  Graph                     s;                    /*+ Source graph data                                  +*/
-  Gnum *                    veextax;              /*+ Array of vertex external gain if moved to part 1   +*/
-  GraphPart *               parttax;              /*+ Array of parts for every vertex                    +*/
-  Gnum *                    frontab;              /*+ Array of frontier vertex numbers                   +*/
-  Gnum                      fronnbr;              /*+ Number of frontier vertices                        +*/
-  Gnum                      compload0min;         /*+ Minimum allowed load in part 0 (strategy variable) +*/
-  Gnum                      compload0max;         /*+ Maximum allowed load in part 0 (strategy variable) +*/
-  Gnum                      compload0avg;         /*+ Average load of part 0                             +*/
-  Gnum                      compload0dlt;         /*+ Difference from the average                        +*/
-  Gnum                      compload0;            /*+ Load in part 0 (strategy variable)                 +*/
-  Gnum                      compsize0;            /*+ Number of vertices in part 0                       +*/
-  Gnum                      commload;             /*+ Communication load                                 +*/
-  Gnum                      commloadextn0;        /*+ Communication load if all moved to part 0          +*/
-  Gnum                      commgainextn0;        /*+ External gain if all swapped from part 0           +*/
-  Gnum                      commgainextn;         /*+ External gain if all swapped                       +*/
-  double                    bbalval;              /*+ Bipartitioning imbalance ratio (strategy variable) +*/
-  Anum                      domndist;             /*+ Distance between subdomains                        +*/
-  Gnum                      domnwght[2];          /*+ Weights of the two subdomains                      +*/
-  Gnum                      vfixload[2];          /*+ Vertex load biases of the two subdomains           +*/
-  INT                       levlnum;              /*+ Coarsening level                                   +*/
+  Graph s;            /*+ Source graph data                                  +*/
+  Gnum *veextax;      /*+ Array of vertex external gain if moved to part 1   +*/
+  GraphPart *parttax; /*+ Array of parts for every vertex                    +*/
+  Gnum *frontab;      /*+ Array of frontier vertex numbers                   +*/
+  Gnum fronnbr;       /*+ Number of frontier vertices                        +*/
+  Gnum compload0min;  /*+ Minimum allowed load in part 0 (strategy variable) +*/
+  Gnum compload0max;  /*+ Maximum allowed load in part 0 (strategy variable) +*/
+  Gnum compload0avg;  /*+ Average load of part 0                             +*/
+  Gnum compload0dlt;  /*+ Difference from the average                        +*/
+  Gnum compload0;     /*+ Load in part 0 (strategy variable)                 +*/
+  Gnum compsize0;     /*+ Number of vertices in part 0                       +*/
+  Gnum commload;      /*+ Communication load                                 +*/
+  Gnum commloadextn0; /*+ Communication load if all moved to part 0          +*/
+  Gnum commgainextn0; /*+ External gain if all swapped from part 0           +*/
+  Gnum commgainextn;  /*+ External gain if all swapped                       +*/
+  double bbalval;     /*+ Bipartitioning imbalance ratio (strategy variable) +*/
+  Anum domndist;      /*+ Distance between subdomains                        +*/
+  Gnum domnwght[2];   /*+ Weights of the two subdomains                      +*/
+  Gnum vfixload[2];   /*+ Vertex load biases of the two subdomains           +*/
+  INT levlnum;        /*+ Coarsening level                                   +*/
 } Bgraph;
 
 /*+ The save graph structure. +*/
 
 typedef struct BgraphStore_ {
-  Gnum                      fronnbr;              /*+ Number of frontier nodes      +*/
-  Gnum                      compload0dlt;         /*+ Difference from the average   +*/
-  Gnum                      compsize0;            /*+ Number of vertices in part 0  +*/
-  Gnum                      commload;             /*+ Communication load            +*/
-  Gnum                      commgainextn;         /*+ External gain if all swapped  +*/
-  byte *                    datatab;              /*+ Variable-sized data array     +*/
+  Gnum fronnbr;      /*+ Number of frontier nodes      +*/
+  Gnum compload0dlt; /*+ Difference from the average   +*/
+  Gnum compsize0;    /*+ Number of vertices in part 0  +*/
+  Gnum commload;     /*+ Communication load            +*/
+  Gnum commgainextn; /*+ External gain if all swapped  +*/
+  byte *datatab;     /*+ Variable-sized data array     +*/
 } BgraphStore;
 
 /*
 **  The function prototypes.
 */
 
-int                         bgraphInit          (Bgraph * restrict const, const Graph * restrict const, const Arch * restrict const, const ArchDom * restrict const, const Gnum * restrict const);
-void                        bgraphInit2         (Bgraph * restrict const, const Anum, const Anum, const Anum, const Gnum, const Gnum);
-void                        bgraphExit          (Bgraph * restrict const);
-void                        bgraphSwal          (Bgraph * restrict const);
-void                        bgraphZero          (Bgraph * restrict const);
-int                         bgraphCheck         (const Bgraph * restrict const);
+int bgraphInit(Bgraph *restrict const, const Graph *restrict const,
+               const Arch *restrict const, const ArchDom *restrict const,
+               const Gnum *restrict const);
+void bgraphInit2(Bgraph *restrict const, const Anum, const Anum, const Anum,
+                 const Gnum, const Gnum);
+void bgraphExit(Bgraph *restrict const);
+void bgraphSwal(Bgraph *restrict const);
+void bgraphZero(Bgraph *restrict const);
+int bgraphCheck(const Bgraph *restrict const);
 
-int                         bgraphStoreInit     (const Bgraph * const, BgraphStore * const);
-void                        bgraphStoreExit     (BgraphStore * const);
-void                        bgraphStoreSave     (const Bgraph * const, BgraphStore * const);
-void                        bgraphStoreUpdt     (Bgraph * const, const BgraphStore * const);
+int bgraphStoreInit(const Bgraph *const, BgraphStore *const);
+void bgraphStoreExit(BgraphStore *const);
+void bgraphStoreSave(const Bgraph *const, BgraphStore *const);
+void bgraphStoreUpdt(Bgraph *const, const BgraphStore *const);

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -60,7 +60,7 @@
 /*                              */
 /********************************/
 
-static char                 errorProgName[32] = "";
+static char errorProgName[32] = "";
 
 /* This routine sets the program name for
 ** error reporting.
@@ -68,14 +68,11 @@ static char                 errorProgName[32] = "";
 ** - VOID  : in all cases.
 */
 
-void
-errorProg (
-const char * const          progstr)              /*+ Program name +*/
+void errorProg(const char *const progstr) /*+ Program name +*/
 {
-  strncpy (errorProgName, progstr, 29);
+  strncpy(errorProgName, progstr, 29);
   errorProgName[29] = '\0';
-  strcat  (errorProgName, ": ");
-
+  strcat(errorProgName, ": ");
 }
 
 /* This routine prints an error message with
@@ -85,19 +82,17 @@ const char * const          progstr)              /*+ Program name +*/
 ** - EXIT  : in all cases.
 */
 
-void
-errorPrint (
-const char * const          errstr,               /*+ printf-like variable argument list */
-...)
-{
-  va_list             errlist;                    /* Argument list of the call */
+void errorPrint(
+    const char *const errstr, /*+ printf-like variable argument list */
+    ...) {
+  va_list errlist; /* Argument list of the call */
 
-  fprintf  (stderr, "%sERROR: ", errorProgName);
-  va_start (errlist, errstr);
-  vfprintf (stderr, errstr, errlist);             /* Print arguments */
-  va_end   (errlist);
-  fprintf  (stderr, "\n");
-  fflush   (stderr);                              /* In case it has been set to buffered mode */
+  fprintf(stderr, "%sERROR: ", errorProgName);
+  va_start(errlist, errstr);
+  vfprintf(stderr, errstr, errlist); /* Print arguments */
+  va_end(errlist);
+  fprintf(stderr, "\n");
+  fflush(stderr); /* In case it has been set to buffered mode */
 }
 
 /* This routine prints a warning message with
@@ -107,17 +102,15 @@ const char * const          errstr,               /*+ printf-like variable argum
 ** - VOID  : in all cases.
 */
 
-void
-errorPrintW (
-const char * const          errstr,               /*+ printf-like variable argument list */
-...)
-{
-  va_list             errlist;                    /* Argument list of the call */
+void errorPrintW(
+    const char *const errstr, /*+ printf-like variable argument list */
+    ...) {
+  va_list errlist; /* Argument list of the call */
 
-  fprintf  (stderr, "%sWARNING: ", errorProgName);
-  va_start (errlist, errstr);
-  vfprintf (stderr, errstr, errlist);             /* Print arguments */
-  va_end   (errlist);
-  fprintf  (stderr, "\n");
-  fflush   (stderr);                              /* In case it has been set to buffered mode */
+  fprintf(stderr, "%sWARNING: ", errorProgName);
+  va_start(errlist, errstr);
+  vfprintf(stderr, errstr, errlist); /* Print arguments */
+  va_end(errlist);
+  fprintf(stderr, "\n");
+  fflush(stderr); /* In case it has been set to buffered mode */
 }

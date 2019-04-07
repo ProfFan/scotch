@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -60,25 +60,28 @@
 
 /* Change some function names. */
 
-#if ((defined SCOTCH_RENAME_PARSER) || (defined yylex)) /* If prefix renaming    */
-#define scotchyyparse               stratParserParse2 /* Parser function name    */
+#if ((defined SCOTCH_RENAME_PARSER) ||                                         \
+     (defined yylex))                   /* If prefix renaming    */
+#define scotchyyparse stratParserParse2 /* Parser function name    */
 #ifndef yylval
-#define yylval                      SCOTCH_NAME_MACRO3 (scotchyy, SCOTCH_NAME_SUFFIX, lval) /* It should be Yacc/Bison's job to redefine it! */
-#endif /* yylval              */
-#else /* SCOTCH_RENAME_PARSER */
-#define yylex                       stratParserLex /* Lexical analyzer           */
-#define yyparse                     stratParserParse2 /* Parser function name    */
-#endif /* SCOTCH_RENAME_PARSER */
+#define yylval                                                                 \
+  SCOTCH_NAME_MACRO3(scotchyy, SCOTCH_NAME_SUFFIX,                             \
+                     lval)   /* It should be Yacc/Bison's job to redefine it! */
+#endif                       /* yylval              */
+#else                        /* SCOTCH_RENAME_PARSER */
+#define yylex stratParserLex /* Lexical analyzer           */
+#define yyparse stratParserParse2 /* Parser function name    */
+#endif                            /* SCOTCH_RENAME_PARSER */
 
 /*
 **  The function prototypes.
 */
 
-Strat *                     stratParserParse    (const StratTab * const, const char * const);
+Strat *stratParserParse(const StratTab *const, const char *const);
 
-int                         yylex               (void);
-int                         yyparse             (void);
+int yylex(void);
+int yyparse(void);
 
 #ifdef PARSER_YY
-static int                  yyerror             (const char * const);
+static int yyerror(const char *const);
 #endif /* PARSER_YY */

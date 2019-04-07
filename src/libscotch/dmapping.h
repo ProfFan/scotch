@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -55,12 +55,12 @@
 /*+ This structure defines a mapping fragment. +*/
 
 typedef struct DmappingFrag_ {
-  struct DmappingFrag_ *    nextptr;              /*+ Pointer to next fragment            +*/
-  Gnum                      vertnbr;              /*+ Number of local vertices in mapping +*/
-  Gnum *                    vnumtab;              /*+ Vertex index array                  +*/
-  Anum *                    parttab;              /*+ Mapping array [vertlocnbr]          +*/
-  Anum                      domnnbr;              /*+ Local number of domains             +*/
-  ArchDom *                 domntab;              /*+ Array of domains [domnnbr]          +*/
+  struct DmappingFrag_ *nextptr; /*+ Pointer to next fragment            +*/
+  Gnum vertnbr;                  /*+ Number of local vertices in mapping +*/
+  Gnum *vnumtab;                 /*+ Vertex index array                  +*/
+  Anum *parttab;                 /*+ Mapping array [vertlocnbr]          +*/
+  Anum domnnbr;                  /*+ Local number of domains             +*/
+  ArchDom *domntab;              /*+ Array of domains [domnnbr]          +*/
 } DmappingFrag;
 
 /*+ This structure defines an (eventually
@@ -68,14 +68,14 @@ typedef struct DmappingFrag_ {
     a target architecture.                +*/
 
 typedef struct Dmapping_ {
-  struct DmappingFrag_ *    fragptr;              /*+ Pointer to first mapping fragment   +*/
-  Gnum                      fragnbr;              /*+ Number of local fragments           +*/
-  Gnum                      vertlocmax;           /*+ Size of biggest local fragment      +*/
-  Gnum                      vertlocnbr;           /*+ Number of local vertices in mapping +*/
-  Arch                      archdat;              /*+ Architecture data                   +*/
+  struct DmappingFrag_ *fragptr; /*+ Pointer to first mapping fragment   +*/
+  Gnum fragnbr;                  /*+ Number of local fragments           +*/
+  Gnum vertlocmax;               /*+ Size of biggest local fragment      +*/
+  Gnum vertlocnbr;               /*+ Number of local vertices in mapping +*/
+  Arch archdat;                  /*+ Architecture data                   +*/
 #ifdef SCOTCH_PTHREAD
-  pthread_mutex_t           mutelocdat;           /*+ Local mutex for updates             +*/
-#endif /* SCOTCH_PTHREAD */
+  pthread_mutex_t mutelocdat; /*+ Local mutex for updates             +*/
+#endif                        /* SCOTCH_PTHREAD */
 } Dmapping;
 
 /*+ The sort structure, used to sort mapped vertices.
@@ -83,16 +83,18 @@ typedef struct Dmapping_ {
     and not an Anum because of intSort2asc1.           +*/
 
 typedef struct DmappingTermSort_ {
-  Gnum                      vertnum;              /*+ Vertex number: FIRST     +*/
-  Gnum                      termnum;              /*+ Direct permutation index +*/
+  Gnum vertnum; /*+ Vertex number: FIRST     +*/
+  Gnum termnum; /*+ Direct permutation index +*/
 } DmappingTermSort;
 
 /*
 **  The function prototypes.
 */
 
-int                         dmapInit            (Dmapping * restrict const, const Arch * restrict const);
-void                        dmapExit            (Dmapping * const);
-void                        dmapAdd             (Dmapping * restrict const, DmappingFrag * restrict const);
-int                         dmapSave            (const Dmapping * restrict const, const Dgraph * restrict const, FILE * restrict const);
-int                         dmapTerm            (const Dmapping * restrict const, const Dgraph * restrict const, Gnum * restrict const);
+int dmapInit(Dmapping *restrict const, const Arch *restrict const);
+void dmapExit(Dmapping *const);
+void dmapAdd(Dmapping *restrict const, DmappingFrag *restrict const);
+int dmapSave(const Dmapping *restrict const, const Dgraph *restrict const,
+             FILE *restrict const);
+int dmapTerm(const Dmapping *restrict const, const Dgraph *restrict const,
+             Gnum *restrict const);

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -73,40 +73,40 @@
 ** block read.
 */
 
-SCOTCH_FORTRAN (                      \
-DGRAPHLOAD, dgraphload, (             \
-SCOTCH_Dgraph * const       grafptr,  \
-int * const                 fileptr,  \
-const SCOTCH_Num * const    baseval,  \
-const SCOTCH_Num * const    flagval,  \
-int * const                 revaptr), \
-(grafptr, fileptr, baseval, flagval, revaptr))
-{
-  FILE *              stream;                     /* Stream to build from handle */
-  int                 filenum;                    /* Duplicated handle           */
-  int                 o;
+SCOTCH_FORTRAN(DGRAPHLOAD, dgraphload,
+               (SCOTCH_Dgraph *const grafptr, int *const fileptr,
+                const SCOTCH_Num *const baseval,
+                const SCOTCH_Num *const flagval, int *const revaptr),
+               (grafptr, fileptr, baseval, flagval, revaptr)) {
+  FILE *stream; /* Stream to build from handle */
+  int filenum;  /* Duplicated handle           */
+  int o;
 
-  if (*fileptr == -1)                             /* If process does not want to open a stream */
+  if (*fileptr == -1) /* If process does not want to open a stream */
     stream = NULL;
   else {
-    if ((filenum = dup (*fileptr)) < 0) {         /* If cannot duplicate file descriptor */
-      errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (DGRAPHLOAD)) ": cannot duplicate handle");
-      *revaptr = 1;                               /* Indicate error */
+    if ((filenum = dup(*fileptr)) <
+        0) { /* If cannot duplicate file descriptor */
+      errorPrint(STRINGIFY(
+          SCOTCH_NAME_PUBLICFU(DGRAPHLOAD)) ": cannot duplicate handle");
+      *revaptr = 1; /* Indicate error */
       return;
     }
-    if ((stream = fdopen (filenum, "r")) == NULL) { /* Build stream from handle */
-      errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (DGRAPHLOAD)) ": cannot open input stream");
-      close      (filenum);
+    if ((stream = fdopen(filenum, "r")) ==
+        NULL) { /* Build stream from handle */
+      errorPrint(STRINGIFY(
+          SCOTCH_NAME_PUBLICFU(DGRAPHLOAD)) ": cannot open input stream");
+      close(filenum);
       *revaptr = 1;
       return;
     }
-    setbuf (stream, NULL);                        /* Do not buffer on input */
+    setbuf(stream, NULL); /* Do not buffer on input */
   }
 
-  o = SCOTCH_dgraphLoad (grafptr, stream, *baseval, *flagval);
+  o = SCOTCH_dgraphLoad(grafptr, stream, *baseval, *flagval);
 
-  if (stream != NULL)                             /* If process has an open stream */
-    fclose (stream);                              /* This closes filenum too       */
+  if (stream != NULL) /* If process has an open stream */
+    fclose(stream);   /* This closes filenum too       */
 
   *revaptr = o;
 }

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -72,19 +72,18 @@
 ** - !0  : on error.
 */
 
-int
-wgraphStoreInit (
-const Wgraph * const        grafptr,
-WgraphStore * const         storptr)
-{
-  Gnum                savsize;
-  
-  savsize = 2 * grafptr->partnbr * sizeof (Gnum) + /* Compute size for frontier, part arrays, communication load and size */
-            grafptr->s.vertnbr * (sizeof (Gnum) + sizeof (Anum));
+int wgraphStoreInit(const Wgraph *const grafptr, WgraphStore *const storptr) {
+  Gnum savsize;
 
-  if ((storptr->datatab = (byte *) memAlloc (savsize)) == NULL) { /* Allocate save structure */
-    errorPrint ("wgraphStoreInit: out of memory");
-    return     (1);
+  savsize = 2 * grafptr->partnbr *
+                sizeof(Gnum) + /* Compute size for frontier, part arrays,
+                                  communication load and size */
+            grafptr->s.vertnbr * (sizeof(Gnum) + sizeof(Anum));
+
+  if ((storptr->datatab = (byte *)memAlloc(savsize)) ==
+      NULL) { /* Allocate save structure */
+    errorPrint("wgraphStoreInit: out of memory");
+    return (1);
   }
 
   return (0);
@@ -95,11 +94,8 @@ WgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-wgraphStoreExit (
-WgraphStore * const         storptr)
-{
-  memFree (storptr->datatab);
+void wgraphStoreExit(WgraphStore *const storptr) {
+  memFree(storptr->datatab);
 #ifdef SCOTCH_DEBUG_WGRAPH2
   storptr->datatab = NULL;
 #endif /* SCOTCH_DEBUG_WGRAPH2 */
@@ -111,29 +107,26 @@ WgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-wgraphStoreSave (
-const Wgraph * const        grafptr,
-WgraphStore * const         storptr)
-{
-  byte *              compload;                   /* Pointer to part load data save area */
-  byte *              compsize;                   /* Pointer to part size data save area */
-  byte *              frontab;                    /* Pointer to frontier data save area  */
-  byte *              parttab;                    /* Pointer to partition data save area */
+void wgraphStoreSave(const Wgraph *const grafptr, WgraphStore *const storptr) {
+  byte *compload; /* Pointer to part load data save area */
+  byte *compsize; /* Pointer to part size data save area */
+  byte *frontab;  /* Pointer to frontier data save area  */
+  byte *parttab;  /* Pointer to partition data save area */
 
-  storptr->partnbr  = grafptr->partnbr;           /* Save partition parameters */
-  storptr->fronnbr  = grafptr->fronnbr;
+  storptr->partnbr = grafptr->partnbr; /* Save partition parameters */
+  storptr->fronnbr = grafptr->fronnbr;
   storptr->fronload = grafptr->fronload;
 
-  compload = storptr->datatab;                    /* Compute data offsets within save structure */
-  compsize = compload + grafptr->partnbr * sizeof (Gnum);
-  frontab  = compsize + grafptr->partnbr * sizeof (Gnum);
-  parttab  = frontab  + grafptr->fronnbr * sizeof (Gnum);
+  compload = storptr->datatab; /* Compute data offsets within save structure */
+  compsize = compload + grafptr->partnbr * sizeof(Gnum);
+  frontab = compsize + grafptr->partnbr * sizeof(Gnum);
+  parttab = frontab + grafptr->fronnbr * sizeof(Gnum);
 
-  memCpy (compload, grafptr->compload, grafptr->partnbr * sizeof (Gnum));
-  memCpy (compsize, grafptr->compsize, grafptr->partnbr * sizeof (Gnum));
-  memCpy (frontab,  grafptr->frontab,  grafptr->fronnbr * sizeof (Gnum));
-  memCpy (parttab,  grafptr->parttax + grafptr->s.baseval, grafptr->s.vertnbr * sizeof (Anum));
+  memCpy(compload, grafptr->compload, grafptr->partnbr * sizeof(Gnum));
+  memCpy(compsize, grafptr->compsize, grafptr->partnbr * sizeof(Gnum));
+  memCpy(frontab, grafptr->frontab, grafptr->fronnbr * sizeof(Gnum));
+  memCpy(parttab, grafptr->parttax + grafptr->s.baseval,
+         grafptr->s.vertnbr * sizeof(Anum));
 }
 
 /* This routine updates partition data of the
@@ -142,32 +135,29 @@ WgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-wgraphStoreUpdt (
-Wgraph * const              grafptr,
-const WgraphStore * const   storptr)
-{
-  byte *              compload;                   /* Pointer to part load data save area */
-  byte *              compsize;                   /* Pointer to part size data save area */
-  byte *              frontab;                    /* Pointer to frontier data save area  */
-  byte *              parttab;                    /* Pointer to partition data save area */
+void wgraphStoreUpdt(Wgraph *const grafptr, const WgraphStore *const storptr) {
+  byte *compload; /* Pointer to part load data save area */
+  byte *compsize; /* Pointer to part size data save area */
+  byte *frontab;  /* Pointer to frontier data save area  */
+  byte *parttab;  /* Pointer to partition data save area */
 
-  grafptr->partnbr  = storptr->partnbr;           /* Load partition parameters */
-  grafptr->fronnbr  = storptr->fronnbr;
+  grafptr->partnbr = storptr->partnbr; /* Load partition parameters */
+  grafptr->fronnbr = storptr->fronnbr;
   grafptr->fronload = storptr->fronload;
 
-  compload = storptr->datatab;                    /* Compute data offsets within save structure */
-  compsize = compload + grafptr->partnbr * sizeof (Gnum);
-  frontab  = compsize + grafptr->partnbr * sizeof (Gnum);
-  parttab  = frontab  + grafptr->fronnbr * sizeof (Gnum);
+  compload = storptr->datatab; /* Compute data offsets within save structure */
+  compsize = compload + grafptr->partnbr * sizeof(Gnum);
+  frontab = compsize + grafptr->partnbr * sizeof(Gnum);
+  parttab = frontab + grafptr->fronnbr * sizeof(Gnum);
 
-  memCpy (grafptr->compload, compload, grafptr->partnbr * sizeof (Gnum));
-  memCpy (grafptr->compsize, compsize, grafptr->partnbr * sizeof (Gnum));
-  memCpy (grafptr->frontab,  frontab,  grafptr->fronnbr * sizeof (Gnum));
-  memCpy (grafptr->parttax + grafptr->s.baseval, parttab, grafptr->s.vertnbr * sizeof (Anum));
+  memCpy(grafptr->compload, compload, grafptr->partnbr * sizeof(Gnum));
+  memCpy(grafptr->compsize, compsize, grafptr->partnbr * sizeof(Gnum));
+  memCpy(grafptr->frontab, frontab, grafptr->fronnbr * sizeof(Gnum));
+  memCpy(grafptr->parttax + grafptr->s.baseval, parttab,
+         grafptr->s.vertnbr * sizeof(Anum));
 
 #ifdef SCOTCH_DEBUG_WGRAPH2
-  if (wgraphCheck (grafptr) != 0)
-    errorPrint ("wgraphStoreUpdt: inconsistent graph data");
+  if (wgraphCheck(grafptr) != 0)
+    errorPrint("wgraphStoreUpdt: inconsistent graph data");
 #endif /* SCOTCH_DEBUG_WGRAPH2 */
 }

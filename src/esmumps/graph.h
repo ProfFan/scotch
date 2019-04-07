@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -57,20 +57,29 @@
 **  The defines.
 */
 
-#define Graph                       SCOTCH_Graph
+#define Graph SCOTCH_Graph
 
-#define graphInit                   SCOTCH_graphInit
-#define graphExit                   SCOTCH_graphExit
-#define graphLoad                   SCOTCH_graphLoad
-#define graphSave                   SCOTCH_graphSave
-#define graphBase                   SCOTCH_graphBase
-#define graphData                   SCOTCH_graphData
-#define graphCheck                  SCOTCH_graphCheck
+#define graphInit SCOTCH_graphInit
+#define graphExit SCOTCH_graphExit
+#define graphLoad SCOTCH_graphLoad
+#define graphSave SCOTCH_graphSave
+#define graphBase SCOTCH_graphBase
+#define graphData SCOTCH_graphData
+#define graphCheck SCOTCH_graphCheck
 
 /*
 **  The function prototypes.
 */
 
-int                         graphBuild          (Graph * const grafptr, const INT baseval, const INT vertnbr, const INT edgenbr, void * const ngbdptr, INT nghbfrstfunc (void * const, const INT), INT nghbnextfunc (void * const));
-int                         graphBuildGraph     (Graph * const grafptr, const INT baseval, const INT vertnbr, const INT edgenbr, INT * restrict verttab, INT * restrict velotab, INT * restrict edgetab);
-int                         graphBuildGraph2    (Graph * const grafptr, const INT baseval, const INT vertnbr, const INT edgenbr, INT * restrict verttab, INT * restrict vendtab, INT * restrict velotab, INT * restrict vlbltab, INT * restrict edgetab, INT * restrict edlotab);
+int graphBuild(Graph *const grafptr, const INT baseval, const INT vertnbr,
+               const INT edgenbr, void *const ngbdptr,
+               INT nghbfrstfunc(void *const, const INT),
+               INT nghbnextfunc(void *const));
+int graphBuildGraph(Graph *const grafptr, const INT baseval, const INT vertnbr,
+                    const INT edgenbr, INT *restrict verttab,
+                    INT *restrict velotab, INT *restrict edgetab);
+int graphBuildGraph2(Graph *const grafptr, const INT baseval, const INT vertnbr,
+                     const INT edgenbr, INT *restrict verttab,
+                     INT *restrict vendtab, INT *restrict velotab,
+                     INT *restrict vlbltab, INT *restrict edgetab,
+                     INT *restrict edlotab);

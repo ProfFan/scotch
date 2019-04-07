@@ -31,10 +31,10 @@
    version 2.2 of Bison.  */
 
 #ifndef YY_SCOTCHYY_Y_TAB_H_INCLUDED
-# define YY_SCOTCHYY_Y_TAB_H_INCLUDED
+#define YY_SCOTCHYY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+#define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int scotchyydebug;
@@ -42,19 +42,18 @@ extern int scotchyydebug;
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    METHODNAME = 258,
-    PARAMNAME = 259,
-    VALCASE = 260,
-    VALDOUBLE = 261,
-    VALINT = 262,
-    VALSTRING = 263,
-    VALSTRAT = 264,
-    VALPARAM = 265,
-    VALTEST = 266
-  };
+#define YYTOKENTYPE
+enum yytokentype {
+  METHODNAME = 258,
+  PARAMNAME = 259,
+  VALCASE = 260,
+  VALDOUBLE = 261,
+  VALINT = 262,
+  VALSTRING = 263,
+  VALSTRAT = 264,
+  VALPARAM = 265,
+  VALTEST = 266
+};
 #endif
 /* Tokens.  */
 #define METHODNAME 258
@@ -68,36 +67,34 @@ extern int scotchyydebug;
 #define VALTEST 266
 
 /* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+#if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
 
-union YYSTYPE
-{
+union YYSTYPE {
 #line 92 "parser_yy.y" /* yacc.c:1909  */
 
-  char                      CASEVAL;              /* Case value          */
-  StratTest *               TEST;                 /* Test type           */
-  StratTestType             TESTOP;               /* Relational type     */
-  double                    DOUBLE;               /* Double-precision    */
-  INT                       INTEGER;              /* Integer             */
-  char                      STRING[PARSERSTRINGLEN]; /* Character string */
+  char CASEVAL;                 /* Case value          */
+  StratTest *TEST;              /* Test type           */
+  StratTestType TESTOP;         /* Relational type     */
+  double DOUBLE;                /* Double-precision    */
+  INT INTEGER;                  /* Integer             */
+  char STRING[PARSERSTRINGLEN]; /* Character string */
   struct {
-    const StratTab *        tabl;                 /* Current tables    */
-    Strat *                 strat;                /* Current method    */
-    StratParamTab *         param;                /* Current parameter */
-  } SAVE;                                         /* Parameter type    */
-  Strat *                   STRAT;                /* Strategy tree     */
+    const StratTab *tabl; /* Current tables    */
+    Strat *strat;         /* Current method    */
+    StratParamTab *param; /* Current parameter */
+  } SAVE;                 /* Parameter type    */
+  Strat *STRAT;           /* Strategy tree     */
 
 #line 91 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
+#define YYSTYPE_IS_TRIVIAL 1
+#define YYSTYPE_IS_DECLARED 1
 #endif
-
 
 extern YYSTYPE scotchyylval;
 
-int scotchyyparse (void);
+int scotchyyparse(void);
 
 #endif /* !YY_SCOTCHYY_Y_TAB_H_INCLUDED  */

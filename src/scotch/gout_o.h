@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -62,25 +62,25 @@
 
 /*+ Generic PostScript output definitions. +*/
 
-#define O_PSDPI                     72            /* PostScript dots-per-inch              */
-#define O_PSPAGEHEIGHT              11.6          /* PostScript page height (in inches)    */
-#define O_PSPAGEWIDTH               8.2           /* PostScript page witdh (in inches)     */
-#define O_PSPICTHEIGHT              10.0          /* PostScript picture height (in inches) */
-#define O_PSPICTWIDTH               6.6           /* PostScript picture witdh (in inches)  */
+#define O_PSDPI 72          /* PostScript dots-per-inch              */
+#define O_PSPAGEHEIGHT 11.6 /* PostScript page height (in inches)    */
+#define O_PSPAGEWIDTH 8.2   /* PostScript page witdh (in inches)     */
+#define O_PSPICTHEIGHT 10.0 /* PostScript picture height (in inches) */
+#define O_PSPICTWIDTH 6.6   /* PostScript picture witdh (in inches)  */
 
 /*+ PostScript mesh output definitions. +*/
 
-#define O_POSMESHPICTRESOL          10000.0       /* Picture resolution */
+#define O_POSMESHPICTRESOL 10000.0 /* Picture resolution */
 
-#define O_POSMESHISOCOS             0.866025404   /* cos(30 degrees)              */
-#define O_POSMESHISOSIN             0.5           /* sin(30 degrees)              */
-#define O_POSMESHISOREDUC           0.20          /* Z-axis reduction coefficient */
+#define O_POSMESHISOCOS 0.866025404 /* cos(30 degrees)              */
+#define O_POSMESHISOSIN 0.5         /* sin(30 degrees)              */
+#define O_POSMESHISOREDUC 0.20      /* Z-axis reduction coefficient */
 
-#define O_POSMESHCOLNBR             16            /* Number of colors */
+#define O_POSMESHCOLNBR 16 /* Number of colors */
 
 /*+ Tulip graph output definitions. +*/
 
-#define O_TULMESHDISKRATIO          0.1           /* Node disk ratio */
+#define O_TULMESHDISKRATIO 0.1 /* Node disk ratio */
 
 /*
 **  The type and structure definitions.
@@ -89,79 +89,84 @@
 /*+ The 2D point type. +*/
 
 typedef struct O_Point_ {
-  double                    c[2];                 /*+ Page coordinates +*/
+  double c[2]; /*+ Page coordinates +*/
 } O_Point;
 
 /*+ The output type type. +*/
 
 typedef enum O_OutType_ {
-  O_OUTTYPEINVMESH,                               /*+ Mesh SGI Open Inventor (3D) +*/
-  O_OUTTYPEPOSMATR,                               /*+ Matrix PostScript (2D)      +*/
-  O_OUTTYPEPOSMESH,                               /*+ Mesh PostScript (2D)        +*/
-  O_OUTTYPETULMESH,                               /*+ Mesh Tulip (3D)             +*/
-  O_OUTTYPENBR                                    /*+ Number of output types      +*/
+  O_OUTTYPEINVMESH, /*+ Mesh SGI Open Inventor (3D) +*/
+  O_OUTTYPEPOSMATR, /*+ Matrix PostScript (2D)      +*/
+  O_OUTTYPEPOSMESH, /*+ Mesh PostScript (2D)        +*/
+  O_OUTTYPETULMESH, /*+ Mesh Tulip (3D)             +*/
+  O_OUTTYPENBR      /*+ Number of output types      +*/
 } O_OutType;
 
 /*+ The output parameter data structure. +*/
 
 typedef struct O_OutParam_ {
-  O_OutType                 type;                 /*+ Output type              +*/
-  struct {                                        /*+ Inventor mesh structure  +*/
-    char                    color;                /*+ 'c' : color; 'g' : gray  +*/
-    char                    edge;                 /*+ 'r' : remove; 'v' : view +*/
+  O_OutType type; /*+ Output type              +*/
+  struct {        /*+ Inventor mesh structure  +*/
+    char color;   /*+ 'c' : color; 'g' : gray  +*/
+    char edge;    /*+ 'r' : remove; 'v' : view +*/
   } InvMesh;
-  struct {                                        /*+ PostScript matrix structure +*/
-    char                    type;                 /*+ 'f' : page; 'e' : EPSF      +*/
+  struct {     /*+ PostScript matrix structure +*/
+    char type; /*+ 'f' : page; 'e' : EPSF      +*/
   } PosMatr;
-  struct {                                        /*+ PostScript mesh structure +*/
-    char                    type;                 /*+ 'f' : page; 'e' : EPSF    +*/
-    char                    color;                /*+ 'c' : color; 'g' : gray   +*/
-    char                    edge;                 /*+ 'r' : remove; 'v' : view  +*/
-    char                    disk;                 /*+ 'd' : draw; 'a' : avoid   +*/
-    char                    clip;                 /*+ 'l' : large; 's' : short  +*/
-    O_Point                 min;                  /*+ Clipping ratios           +*/
-    O_Point                 max;
+  struct {       /*+ PostScript mesh structure +*/
+    char type;   /*+ 'f' : page; 'e' : EPSF    +*/
+    char color;  /*+ 'c' : color; 'g' : gray   +*/
+    char edge;   /*+ 'r' : remove; 'v' : view  +*/
+    char disk;   /*+ 'd' : draw; 'a' : avoid   +*/
+    char clip;   /*+ 'l' : large; 's' : short  +*/
+    O_Point min; /*+ Clipping ratios           +*/
+    O_Point max;
   } PosMesh;
-  struct {                                        /*+ Tulip graph structure    +*/
-    char                    color;                /*+ 'b' : b/w; 'c' : color   +*/
-    char                    edge;                 /*+ 'r' : remove; 'v' : view +*/
-    char                    disk;                 /*+ 'd' : draw; 'a' : avoid  +*/
+  struct {      /*+ Tulip graph structure    +*/
+    char color; /*+ 'b' : b/w; 'c' : color   +*/
+    char edge;  /*+ 'r' : remove; 'v' : view +*/
+    char disk;  /*+ 'd' : draw; 'a' : avoid  +*/
   } TulMesh;
 } O_OutParam;
 
 /*+ The Inventor path array element. +*/
 
 typedef struct O_InvMeshPath_ {
-  SCOTCH_Num                nbr;                  /*+ Number of output paths     +*/
-  SCOTCH_Num                idx;                  /*+ Index from which to search +*/
+  SCOTCH_Num nbr; /*+ Number of output paths     +*/
+  SCOTCH_Num idx; /*+ Index from which to search +*/
 } O_InvMeshPath;
 
 /*+ The PostScript path array element. +*/
 
 typedef struct O_PosMeshPath_ {
-  SCOTCH_Num                nbr;                  /*+ Number of output paths     +*/
-  SCOTCH_Num                idx;                  /*+ Index from which to search +*/
+  SCOTCH_Num nbr; /*+ Number of output paths     +*/
+  SCOTCH_Num idx; /*+ Index from which to search +*/
 } O_PosMeshPath;
 
 /*+ The PostScript mesh graph vertex. +*/
 
 typedef struct O_PosMeshVertex_ {
-  int                       vis;                  /*+ Visibility flag  +*/
-  O_Point                   pos;                  /*+ Point position   +*/
-  double                    rad;                  /*+ Disk radius      +*/
-  int                       col;                  /*+ Disk color index +*/
+  int vis;     /*+ Visibility flag  +*/
+  O_Point pos; /*+ Point position   +*/
+  double rad;  /*+ Disk radius      +*/
+  int col;     /*+ Disk color index +*/
 } O_PosMeshVertex;
 
 /*
 **  The function prototypes.
 */
 
-void                        outColorBlw         (const SCOTCH_Num, double[]);
-void                        outColorColor       (const SCOTCH_Num, double[]);
+void outColorBlw(const SCOTCH_Num, double[]);
+void outColorColor(const SCOTCH_Num, double[]);
 
-int                         outDrawParse        (char * const);
-void                        outDraw             (const C_Graph * const, const C_Geometry * const, const C_Mapping * const, FILE * const);
-int                         outDrawInvMesh      (const C_Graph * const, const C_Geometry * const, const C_Mapping * const, FILE * const);
-int                         outDrawPosMatr      (const C_Graph * const, const C_Geometry * const, const C_Mapping * const, FILE * const);
-int                         outDrawPosMesh      (const C_Graph * const, const C_Geometry * const, const C_Mapping * const, FILE * const);
-int                         outDrawTulMesh      (const C_Graph * const, const C_Geometry * const, const C_Mapping * const, FILE * const);
+int outDrawParse(char *const);
+void outDraw(const C_Graph *const, const C_Geometry *const,
+             const C_Mapping *const, FILE *const);
+int outDrawInvMesh(const C_Graph *const, const C_Geometry *const,
+                   const C_Mapping *const, FILE *const);
+int outDrawPosMatr(const C_Graph *const, const C_Geometry *const,
+                   const C_Mapping *const, FILE *const);
+int outDrawPosMesh(const C_Graph *const, const C_Geometry *const,
+                   const C_Mapping *const, FILE *const);
+int outDrawTulMesh(const C_Graph *const, const C_Geometry *const,
+                   const C_Mapping *const, FILE *const);

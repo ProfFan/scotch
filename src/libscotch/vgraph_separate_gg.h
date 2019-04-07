@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -56,12 +56,16 @@
 
 /*+ System-defined constants. +*/
 
-#define VGRAPHSEPAGGSUBBITS         4
+#define VGRAPHSEPAGGSUBBITS 4
 
-#define VGRAPHSEPAGGSTATEPART0      ((GainLink *) 0) /*+ Vertex in part 0 (initial state)  +*/
-#define VGRAPHSEPAGGSTATEPART1      ((GainLink *) 1) /*+ Vertex in part 1                  +*/
-#define VGRAPHSEPAGGSTATEPART2      ((GainLink *) 2) /*+ Vertex in part 2, chained         +*/
-#define VGRAPHSEPAGGSTATELINK       ((GainLink *) 3) /*+ Currently in gain table if higher +*/
+#define VGRAPHSEPAGGSTATEPART0                                                 \
+  ((GainLink *)0) /*+ Vertex in part 0 (initial state)  +*/
+#define VGRAPHSEPAGGSTATEPART1                                                 \
+  ((GainLink *)1) /*+ Vertex in part 1                  +*/
+#define VGRAPHSEPAGGSTATEPART2                                                 \
+  ((GainLink *)2) /*+ Vertex in part 2, chained         +*/
+#define VGRAPHSEPAGGSTATELINK                                                  \
+  ((GainLink *)3) /*+ Currently in gain table if higher +*/
 
 /*
 **  The type and structure definitions.
@@ -70,7 +74,7 @@
 /*+ Method parameters. +*/
 
 typedef struct VgraphSeparateGgParam_ {
-  INT                       passnbr;              /*+ Number of passes to do +*/
+  INT passnbr; /*+ Number of passes to do +*/
 } VgraphSeparateGgParam;
 
 /*+ The complementary vertex structure. For
@@ -78,12 +82,13 @@ typedef struct VgraphSeparateGgParam_ {
     must be the first field of the structure.    +*/
 
 typedef struct VgraphSeparateGgVertex_ {
-  GainLink                  gainlink;             /*+ Gain link: FIRST              +*/
-  Gnum                      compgain2;            /*+ Computation gain in separator +*/
+  GainLink gainlink; /*+ Gain link: FIRST              +*/
+  Gnum compgain2;    /*+ Computation gain in separator +*/
 } VgraphSeparateGgVertex;
 
 /*
 **  The function prototypes.
 */
 
-int                         vgraphSeparateGg    (Vgraph * restrict const, const VgraphSeparateGgParam * restrict const);
+int vgraphSeparateGg(Vgraph *restrict const,
+                     const VgraphSeparateGgParam *restrict const);

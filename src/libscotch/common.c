@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -71,51 +71,49 @@
 /*                 */
 /*******************/
 
-double
-clockGet (void)
-{
+double clockGet(void) {
 #ifdef MPI_INT
-  return (MPI_Wtime ());
+  return (MPI_Wtime());
 #else /* MPI_INT */
 #if defined COMMON_WINDOWS
-  double              res = 0.0;
-  LARGE_INTEGER       fq;
-  if (QueryPerformanceFrequency (&fq) == 0) {
-    FILETIME            ft;
-    ULARGE_INTEGER      t;
+  double res = 0.0;
+  LARGE_INTEGER fq;
+  if (QueryPerformanceFrequency(&fq) == 0) {
+    FILETIME ft;
+    ULARGE_INTEGER t;
 
-    GetSystemTimeAsFileTime (&ft);
-    t.LowPart  = ft.dwLowDateTime;
+    GetSystemTimeAsFileTime(&ft);
+    t.LowPart = ft.dwLowDateTime;
     t.HighPart = ft.dwHighDateTime;
-    res = (double) t.QuadPart / 10000000.0;
-  }
-  else {
-    LARGE_INTEGER       pc;
+    res = (double)t.QuadPart / 10000000.0;
+  } else {
+    LARGE_INTEGER pc;
 
-    QueryPerformanceCounter (&pc);
-    res = (double) pc.QuadPart / (double) fq.QuadPart;
+    QueryPerformanceCounter(&pc);
+    res = (double)pc.QuadPart / (double)fq.QuadPart;
   }
   return (res);
-#elif defined COMMON_TIMING_OLD                   /* Old Unix timing routine */
-  struct rusage       data;
+#elif defined COMMON_TIMING_OLD /* Old Unix timing routine */
+  struct rusage data;
 
-  getrusage (RUSAGE_SELF, &data);
+  getrusage(RUSAGE_SELF, &data);
 
-  return (((double) data.ru_utime.tv_sec  + (double) data.ru_stime.tv_sec) +
-          ((double) data.ru_utime.tv_usec + (double) data.ru_stime.tv_usec) * 1.0e-6L);
-#else /* COMMON_TIMING_OLD */
-#if defined (_POSIX_TIMERS) && (_POSIX_TIMERS >= 200112L)
-  struct timespec     tp;
+  return (((double)data.ru_utime.tv_sec + (double)data.ru_stime.tv_sec) +
+          ((double)data.ru_utime.tv_usec + (double)data.ru_stime.tv_usec) *
+              1.0e-6L);
+#else                           /* COMMON_TIMING_OLD */
+#if defined(_POSIX_TIMERS) && (_POSIX_TIMERS >= 200112L)
+  struct timespec tp;
 
-  clock_gettime (CLOCK_REALTIME, &tp);            /* Elapsed time */
+  clock_gettime(CLOCK_REALTIME, &tp); /* Elapsed time */
 
-  return ((double) tp.tv_sec + (double) tp.tv_nsec * 1.0e-9L);
-#else /* defined (_POSIX_TIMERS) && (_POSIX_TIMERS >= 200112L) */
-  struct timeval      tv;
+  return ((double)tp.tv_sec + (double)tp.tv_nsec * 1.0e-9L);
+#else  /* defined (_POSIX_TIMERS) && (_POSIX_TIMERS >= 200112L) */
+  struct timeval tv;
 
-  gettimeofday (&tv, NULL);
+  gettimeofday(&tv, NULL);
 
- return ((double) tv.tv_sec + (double) tv.tv_usec * 1.0e-6L);
+  return ((double)tv.tv_sec + (double)tv.tv_usec * 1.0e-6L);
 #endif /* defined (_POSIX_TIMERS) && (_POSIX_TIMERS >= 200112L) */
 #endif /* COMMON_TIMING_OLD */
 #endif /* MPI_INT */
@@ -127,14 +125,10 @@ clockGet (void)
 /*                         */
 /***************************/
 
-void
-usagePrint (
-FILE * const                stream,
-const char ** const         data)
-{
-  const char **       cptr;
+void usagePrint(FILE *const stream, const char **const data) {
+  const char **cptr;
 
-  fprintf (stream, "Usage is:\n");
-  for (cptr = data; *cptr != NULL; cptr ++)
-    fprintf (stream, "  %s\n", *cptr);
+  fprintf(stream, "Usage is:\n");
+  for (cptr = data; *cptr != NULL; cptr++)
+    fprintf(stream, "  %s\n", *cptr);
 }

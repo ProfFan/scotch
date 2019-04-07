@@ -19,13 +19,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -36,7 +36,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -66,13 +66,13 @@
 #ifndef __parmetis_h__
 #define __parmetis_h__
 
-#include <mpi.h>                                  /* Since ParMeTiS does it, do it too */
+#include <mpi.h> /* Since ParMeTiS does it, do it too */
 
 #endif /* __parmetis_h__ */
 
 #ifdef SCOTCH_METIS_PREFIX
-#define SCOTCH_METIS_PREFIXL        scotch_
-#define SCOTCH_METIS_PREFIXU        SCOTCH_
+#define SCOTCH_METIS_PREFIXL scotch_
+#define SCOTCH_METIS_PREFIXU SCOTCH_
 #endif /* SCOTCH_METIS_PREFIX */
 
 #ifndef SCOTCH_METIS_PREFIXL
@@ -84,28 +84,28 @@
 #endif /* SCOTCH_METIS_PREFIXU */
 
 #ifndef METISNAMEL
-#define METISNAMEL(s)               METISNAME2(METISNAME3(SCOTCH_METIS_PREFIXL),s)
-#define METISNAMEU(s)               METISNAME2(METISNAME3(SCOTCH_METIS_PREFIXU),s)
-#define METISNAME2(p,s)             METISNAME4(p,s)
-#define METISNAME3(s)               s
-#define METISNAME4(p,s)             p##s
+#define METISNAMEL(s) METISNAME2(METISNAME3(SCOTCH_METIS_PREFIXL), s)
+#define METISNAMEU(s) METISNAME2(METISNAME3(SCOTCH_METIS_PREFIXU), s)
+#define METISNAME2(p, s) METISNAME4(p, s)
+#define METISNAME3(s) s
+#define METISNAME4(p, s) p##s
 #endif /* METISNAMEL */
 
 #ifndef SCOTCH_METIS_RETURN
 #define SCOTCH_METIS_RETURN
 typedef enum {
-  METIS_OK           = 1,
-  METIS_ERROR_INPUT  = -2,
+  METIS_OK = 1,
+  METIS_ERROR_INPUT = -2,
   METIS_ERROR_MEMORY = -3,
-  METIS_ERROR        = -4
-} rstatus_et; 
+  METIS_ERROR = -4
+} rstatus_et;
 #endif /* SCOTCH_METIS_RETURN */
 
 /*
 **  The type and structure definitions.
 */
 
-#ifndef SCOTCH_H                                  /* In case "scotch.h" not included before */
+#ifndef SCOTCH_H /* In case "scotch.h" not included before */
 typedef DUMMYINT SCOTCH_Num;
 #endif /* SCOTCH_H */
 
@@ -113,6 +113,20 @@ typedef DUMMYINT SCOTCH_Num;
 **  The function prototypes.
 */
 
-int                         METISNAMEU(ParMETIS_V3_NodeND) (const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, MPI_Comm * const);
-int                         METISNAMEU(ParMETIS_V3_PartGeomKway) (const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const float * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const float * const, const float * const, const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, MPI_Comm * const);
-int                         METISNAMEU(ParMETIS_V3_PartKway) (const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const SCOTCH_Num * const, const float * const, const float * const, const SCOTCH_Num * const, SCOTCH_Num * const, SCOTCH_Num * const, MPI_Comm * const);
+int METISNAMEU(ParMETIS_V3_NodeND)(const SCOTCH_Num *const, SCOTCH_Num *const,
+                                   SCOTCH_Num *const, const SCOTCH_Num *const,
+                                   const SCOTCH_Num *const, SCOTCH_Num *const,
+                                   SCOTCH_Num *const, MPI_Comm *const);
+int METISNAMEU(ParMETIS_V3_PartGeomKway)(
+    const SCOTCH_Num *const, SCOTCH_Num *const, SCOTCH_Num *const,
+    SCOTCH_Num *const, SCOTCH_Num *const, const SCOTCH_Num *const,
+    const SCOTCH_Num *const, const SCOTCH_Num *const, const float *const,
+    const SCOTCH_Num *const, const SCOTCH_Num *const, const float *const,
+    const float *const, const SCOTCH_Num *const, SCOTCH_Num *const,
+    SCOTCH_Num *const, MPI_Comm *const);
+int METISNAMEU(ParMETIS_V3_PartKway)(
+    const SCOTCH_Num *const, SCOTCH_Num *const, SCOTCH_Num *const,
+    SCOTCH_Num *const, SCOTCH_Num *const, const SCOTCH_Num *const,
+    const SCOTCH_Num *const, const SCOTCH_Num *const, const SCOTCH_Num *const,
+    const float *const, const float *const, const SCOTCH_Num *const,
+    SCOTCH_Num *const, SCOTCH_Num *const, MPI_Comm *const);

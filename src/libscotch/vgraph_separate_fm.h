@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -56,18 +56,22 @@
 
 /*+ Gain table subbits. +*/
 
-#define VGRAPHSEPAFMGAINBITS        4
+#define VGRAPHSEPAFMGAINBITS 4
 
 /*+ Prime number for hashing vertex numbers. +*/
 
-#define VGRAPHSEPAFMHASHPRIME       17            /*+ Prime number for hashing +*/
+#define VGRAPHSEPAFMHASHPRIME 17 /*+ Prime number for hashing +*/
 
 /*+ Gain table vertex status. +*/
 
-#define VGRAPHSEPAFMSTATEFREE       ((GainLink *) 0) /*+ Vertex is free or separator-chained  +*/
-#define VGRAPHSEPAFMSTATESUCH       ((GainLink *) 1) /*+ Separator vertex is used and chained +*/
-#define VGRAPHSEPAFMSTATEUSED       ((GainLink *) 2) /*+ Vertex already swapped once          +*/
-#define VGRAPHSEPAFMSTATELINK       ((GainLink *) 3) /*+ Currently in gain table if higher    +*/
+#define VGRAPHSEPAFMSTATEFREE                                                  \
+  ((GainLink *)0) /*+ Vertex is free or separator-chained  +*/
+#define VGRAPHSEPAFMSTATESUCH                                                  \
+  ((GainLink *)1) /*+ Separator vertex is used and chained +*/
+#define VGRAPHSEPAFMSTATEUSED                                                  \
+  ((GainLink *)2) /*+ Vertex already swapped once          +*/
+#define VGRAPHSEPAFMSTATELINK                                                  \
+  ((GainLink *)3) /*+ Currently in gain table if higher    +*/
 
 /*
 **  The type and structure definitions.
@@ -76,9 +80,9 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct VgraphSeparateFmParam_ {
-  INT                       movenbr;              /*+ Maximum number of uneffective moves that can be done +*/
-  INT                       passnbr;              /*+ Number of passes to be performed (-1 : infinite)     +*/
-  double                    deltrat;              /*+ Maximum weight imbalance ratio                       +*/
+  INT movenbr;    /*+ Maximum number of uneffective moves that can be done +*/
+  INT passnbr;    /*+ Number of passes to be performed (-1 : infinite)     +*/
+  double deltrat; /*+ Maximum weight imbalance ratio                       +*/
 } VgraphSeparateFmParam;
 
 /*+ The hash vertex structure. For trick reasons,
@@ -100,21 +104,23 @@ typedef struct VgraphSeparateFmParam_ {
       (gainlink0.next == VGRAPHSEPAFMSTATEUSED)).        +*/
 
 typedef struct VgraphSeparateFmVertex_ {
-  GainLink                  gainlink0;            /*+ Gain link if moved to part 0; FIRST                     +*/
-  Gnum                      veloval;              /*+ TRICK: opposite of vertex load                          +*/
-  GainLink                  gainlink1;            /*+ Gain link if moved to part 1; TRICK: before vertpart    +*/
-  Gnum                      partval;              /*+ Vertex part TRICK: same type as vertload                +*/
-  Gnum                      compgain[2];          /*+ Separator gain if moved to given part; TRICK: not first +*/
-  Gnum                      mswpnum;              /*+ Number of move sweep when data recorded                 +*/
-  Gnum                      vertnum;              /*+ Number of vertex in hash table                          +*/
+  GainLink gainlink0; /*+ Gain link if moved to part 0; FIRST +*/
+  Gnum veloval; /*+ TRICK: opposite of vertex load                          +*/
+  GainLink
+      gainlink1; /*+ Gain link if moved to part 1; TRICK: before vertpart    +*/
+  Gnum partval;  /*+ Vertex part TRICK: same type as vertload                +*/
+  Gnum compgain[2]; /*+ Separator gain if moved to given part; TRICK: not first
+                       +*/
+  Gnum mswpnum; /*+ Number of move sweep when data recorded                 +*/
+  Gnum vertnum; /*+ Number of vertex in hash table                          +*/
 } VgraphSeparateFmVertex;
 
 /*+ The move recording structure. +*/
 
 typedef struct VgraphSeparateFmSave_ {
-  Gnum                      hashnum;              /*+ Number of hash slot for saved vertex +*/
-  int                       partval;              /*+ Saved vertex part value              +*/
-  Gnum                      compgain[2];          /*+ Saved vertex gain                    +*/
+  Gnum hashnum;     /*+ Number of hash slot for saved vertex +*/
+  int partval;      /*+ Saved vertex part value              +*/
+  Gnum compgain[2]; /*+ Saved vertex gain                    +*/
 } VgraphSeparateFmSave;
 
 /*
@@ -123,12 +129,18 @@ typedef struct VgraphSeparateFmSave_ {
 
 #ifdef VGRAPH_SEPARATE_FM
 
-static int                  vgraphSeparateFmResize (VgraphSeparateFmVertex * restrict * hashtabptr, Gnum * const, Gnum * const, VgraphSeparateFmSave * restrict *, const Gnum, GainTabl * const, GainLink * const);
-static GainLink *           vgraphSeparateFmTablGet (GainTabl * const, const Gnum, const Gnum, const int);
+static int vgraphSeparateFmResize(VgraphSeparateFmVertex *restrict *hashtabptr,
+                                  Gnum *const, Gnum *const,
+                                  VgraphSeparateFmSave *restrict *, const Gnum,
+                                  GainTabl *const, GainLink *const);
+static GainLink *vgraphSeparateFmTablGet(GainTabl *const, const Gnum,
+                                         const Gnum, const int);
 #ifdef SCOTCH_DEBUG_VGRAPH3
-static int                  vgraphSeparateFmCheck (const Vgraph * const, const VgraphSeparateFmVertex * restrict const, const Gnum, const Gnum, const Gnum);
+static int vgraphSeparateFmCheck(const Vgraph *const,
+                                 const VgraphSeparateFmVertex *restrict const,
+                                 const Gnum, const Gnum, const Gnum);
 #endif /* SCOTCH_DEBUG_VGRAPH3 */
 
 #endif /* VGRAPH_SEPARATE_FM */
 
-int                         vgraphSeparateFm    (Vgraph * const, const VgraphSeparateFmParam * const);
+int vgraphSeparateFm(Vgraph *const, const VgraphSeparateFmParam *const);

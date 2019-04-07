@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2011,2014-2016,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2011,2014-2016,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -74,9 +75,9 @@
 
 /*+ Decomposition architecture flags. +*/
 
-#define ARCHDECONONE                0x0000        /*+ No options set +*/
+#define ARCHDECONONE 0x0000 /*+ No options set +*/
 
-#define ARCHDECOFREE                0x0001        /*+ Free arrays    +*/
+#define ARCHDECOFREE 0x0001 /*+ Free arrays    +*/
 
 /*
 **  The type and structure definitions.
@@ -85,33 +86,33 @@
 /*+ The decomposition-described terminal vertex definition. +*/
 
 typedef struct ArchDecoTermVert_ {
-  ArchDomNum                labl;                 /*+ Number for terminals, or ARCHDOMNOTTERM +*/
-  Anum                      wght;                 /*+ Weight of the domain (processor load)   +*/
-  Anum                      num;                  /*+ Number of the terminal                  +*/
+  ArchDomNum labl; /*+ Number for terminals, or ARCHDOMNOTTERM +*/
+  Anum wght;       /*+ Weight of the domain (processor load)   +*/
+  Anum num;        /*+ Number of the terminal                  +*/
 } ArchDecoTermVert;
 
 /*+ The decomposition-described architecture definitions. +*/
 
 typedef struct ArchDecoVert_ {
-  ArchDomNum                labl;                 /*+ Smallest number of included terminal  +*/
-  Anum                      size;                 /*+ Number of processors in the domain    +*/
-  Anum                      wght;                 /*+ Weight of the domain (processor load) +*/
+  ArchDomNum labl; /*+ Smallest number of included terminal  +*/
+  Anum size;       /*+ Number of processors in the domain    +*/
+  Anum wght;       /*+ Weight of the domain (processor load) +*/
 } ArchDecoVert;
 
 typedef struct ArchDeco_ {
-  int                       flagval;              /*+ Flag value                 +*/
-  Anum                      domtermnbr;           /*+ Number of terminal domains +*/
-  Anum                      domvertnbr;           /*+ Number of domains          +*/
-  ArchDecoVert *            domverttab;           /*+ Table of domain "vertices" +*/
-  Anum *                    domdisttab;           /*+ Table of domain distances  +*/
+  int flagval;              /*+ Flag value                 +*/
+  Anum domtermnbr;          /*+ Number of terminal domains +*/
+  Anum domvertnbr;          /*+ Number of domains          +*/
+  ArchDecoVert *domverttab; /*+ Table of domain "vertices" +*/
+  Anum *domdisttab;         /*+ Table of domain distances  +*/
 } ArchDeco;
 
 typedef struct ArchDecoDom_ {
-  Anum                      num;                  /*+ Domain number in the decomposition +*/
+  Anum num; /*+ Domain number in the decomposition +*/
 } ArchDecoDom;
 
 typedef struct ArchDecoMatch_ {
-  Anum                      num;                  /*+ Domain number in the decomposition +*/
+  Anum num; /*+ Domain number in the decomposition +*/
 } ArchDecoMatch;
 
 #endif /* ARCH_DECO_H_STRUCT */
@@ -124,40 +125,49 @@ typedef struct ArchDecoMatch_ {
 #ifndef ARCH_DECO_H_PROTO
 #define ARCH_DECO_H_PROTO
 
-int                         archDecoArchBuild2  (ArchDeco * const, const Anum, const Anum, const ArchDecoTermVert * const, const Anum  * const);
-int                         archDecoArchLoad    (ArchDeco * const, FILE * restrict const);
-int                         archDecoArchSave    (const ArchDeco * const, FILE * restrict const);
-int                         archDecoArchFree    (ArchDeco * const);
+int archDecoArchBuild2(ArchDeco *const, const Anum, const Anum,
+                       const ArchDecoTermVert *const, const Anum *const);
+int archDecoArchLoad(ArchDeco *const, FILE *restrict const);
+int archDecoArchSave(const ArchDeco *const, FILE *restrict const);
+int archDecoArchFree(ArchDeco *const);
 
-#define archDecoMatchInit           NULL
-#define archDecoMatchExit           NULL
-#define archDecoMatchMate           NULL
+#define archDecoMatchInit NULL
+#define archDecoMatchExit NULL
+#define archDecoMatchMate NULL
 
-Anum                        archDecoArchSize    (ArchDeco * const, const Anum);
-Anum                        archDecoArchDist    (ArchDeco * const, const Anum, const Anum);
-Anum                        archDecoArchDistE   (ArchDeco * const, const Anum, const Anum);
-ArchDomNum                  archDecoDomNum      (const ArchDeco * const, const ArchDecoDom * const);
-int                         archDecoDomTerm     (const ArchDeco * const, ArchDecoDom * restrict const, const ArchDomNum);
-Anum                        archDecoDomSize     (const ArchDeco * const, const ArchDecoDom * const);
-Anum                        archDecoDomWght     (const ArchDeco * const, const ArchDecoDom * const);
-Anum                        archDecoDomDist     (const ArchDeco * const, const ArchDecoDom * const, const ArchDecoDom * const);
-int                         archDecoDomFrst     (const ArchDeco * const, ArchDecoDom * restrict const);
-int                         archDecoDomLoad     (const ArchDeco * const, ArchDecoDom * restrict const, FILE * restrict const);
-int                         archDecoDomSave     (const ArchDeco * const, const ArchDecoDom * const, FILE * restrict const);
-int                         archDecoDomBipart   (const ArchDeco * const, const ArchDecoDom * const, ArchDecoDom * restrict const, ArchDecoDom * restrict const);
-int                         archDecoDomIncl     (const ArchDeco * const, const ArchDecoDom * const, const ArchDecoDom * const);
+Anum archDecoArchSize(ArchDeco *const, const Anum);
+Anum archDecoArchDist(ArchDeco *const, const Anum, const Anum);
+Anum archDecoArchDistE(ArchDeco *const, const Anum, const Anum);
+ArchDomNum archDecoDomNum(const ArchDeco *const, const ArchDecoDom *const);
+int archDecoDomTerm(const ArchDeco *const, ArchDecoDom *restrict const,
+                    const ArchDomNum);
+Anum archDecoDomSize(const ArchDeco *const, const ArchDecoDom *const);
+Anum archDecoDomWght(const ArchDeco *const, const ArchDecoDom *const);
+Anum archDecoDomDist(const ArchDeco *const, const ArchDecoDom *const,
+                     const ArchDecoDom *const);
+int archDecoDomFrst(const ArchDeco *const, ArchDecoDom *restrict const);
+int archDecoDomLoad(const ArchDeco *const, ArchDecoDom *restrict const,
+                    FILE *restrict const);
+int archDecoDomSave(const ArchDeco *const, const ArchDecoDom *const,
+                    FILE *restrict const);
+int archDecoDomBipart(const ArchDeco *const, const ArchDecoDom *const,
+                      ArchDecoDom *restrict const, ArchDecoDom *restrict const);
+int archDecoDomIncl(const ArchDeco *const, const ArchDecoDom *const,
+                    const ArchDecoDom *const);
 #ifdef SCOTCH_PTSCOTCH
-int                         archDecoDomMpiType  (const ArchDeco * const, MPI_Datatype * const);
+int archDecoDomMpiType(const ArchDeco *const, MPI_Datatype *const);
 #endif /* SCOTCH_PTSCOTCH */
 
 /*
 **  The macro definitions.
 */
 
-#define archDecoArchSize(d,i)       ((d)->domverttab[(i) - 1].size)
-#define archDecoArchDist(d,i,j)     ((d)->domdisttab[((i) >= (j)) ? (((i) - 1) * ((i) - 2)) / 2 + (j) - 1 \
-                                                                  : (((j) - 1) * ((j) - 2)) / 2 + (i) - 1])
-#define archDecoArchDistE(d,i,j)    (((i) == (j)) ? 0 : archDecoArchDist ((d), (i), (j)))
+#define archDecoArchSize(d, i) ((d)->domverttab[(i)-1].size)
+#define archDecoArchDist(d, i, j)                                              \
+  ((d)->domdisttab[((i) >= (j)) ? (((i)-1) * ((i)-2)) / 2 + (j)-1              \
+                                : (((j)-1) * ((j)-2)) / 2 + (i)-1])
+#define archDecoArchDistE(d, i, j)                                             \
+  (((i) == (j)) ? 0 : archDecoArchDist((d), (i), (j)))
 
 #endif /* ARCH_DECO_H_PROTO */
 #endif /* ARCH_NOPROTO      */

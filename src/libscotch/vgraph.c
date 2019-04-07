@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -69,19 +69,16 @@
 ** - VOID  : in all cases.
 */
 
-void
-vgraphExit (
-Vgraph * const              grafptr)
-{
+void vgraphExit(Vgraph *const grafptr) {
   if (grafptr->parttax != NULL)
-    memFree (grafptr->parttax + grafptr->s.baseval);
+    memFree(grafptr->parttax + grafptr->s.baseval);
   if (grafptr->frontab != NULL)
-    memFree (grafptr->frontab);
+    memFree(grafptr->frontab);
 
-  graphFree (&grafptr->s);                        /* Free source graph */
+  graphFree(&grafptr->s); /* Free source graph */
 
 #ifdef SCOTCH_DEBUG_VGRAPH2
-  memSet (grafptr, ~0, sizeof (Vgraph));
+  memSet(grafptr, ~0, sizeof(Vgraph));
 #endif /* SCOTCH_DEBUG_VGRAPH2 */
 }
 
@@ -91,17 +88,14 @@ Vgraph * const              grafptr)
 ** - VOID  : in all cases.
 */
 
-void
-vgraphZero (
-Vgraph * const              grafptr)
-{
-  memSet (grafptr->parttax + grafptr->s.baseval, 0, grafptr->s.vertnbr * sizeof (GraphPart)); /* Set all vertices to part 0 */
+void vgraphZero(Vgraph *const grafptr) {
+  memSet(grafptr->parttax + grafptr->s.baseval, 0,
+         grafptr->s.vertnbr *
+             sizeof(GraphPart)); /* Set all vertices to part 0 */
 
-  grafptr->compload[0] = grafptr->s.velosum;      /* No frontier vertices */
-  grafptr->compload[1] =
-  grafptr->compload[2] = 0;
+  grafptr->compload[0] = grafptr->s.velosum; /* No frontier vertices */
+  grafptr->compload[1] = grafptr->compload[2] = 0;
   grafptr->comploaddlt = grafptr->s.velosum;
   grafptr->compsize[0] = grafptr->s.vertnbr;
-  grafptr->compsize[1] =
-  grafptr->fronnbr     = 0;
+  grafptr->compsize[1] = grafptr->fronnbr = 0;
 }

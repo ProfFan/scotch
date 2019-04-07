@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -64,16 +65,15 @@
 **  The static definitions.
 */
 
-static int                  C_fileNum = 0;        /* Number of file in arg list */
-static File                 C_fileTab[C_FILENBR] = { /* The file array          */
-                              { FILEMODER },
-                              { FILEMODEW } };
+static int C_fileNum = 0;           /* Number of file in arg list */
+static File C_fileTab[C_FILENBR] = {/* The file array          */
+                                    {FILEMODER},
+                                    {FILEMODEW}};
 
-static const char *         C_usageList[] = {
-  "mtst [<input mesh file> [<output data file>]] <options>",
-  "  -h  : Display this help",
-  "  -V  : Print program version and copyright",
-  NULL };
+static const char *C_usageList[] = {
+    "mtst [<input mesh file> [<output data file>]] <options>",
+    "  -h  : Display this help", "  -V  : Print program version and copyright",
+    NULL};
 
 /******************************/
 /*                            */
@@ -81,93 +81,101 @@ static const char *         C_usageList[] = {
 /*                            */
 /******************************/
 
-int
-main (
-int                         argc,
-char *                      argv[])
-{
-  SCOTCH_Mesh         meshdat;
-  SCOTCH_Num          velmnbr;
-  SCOTCH_Num          vnodnbr;
-  SCOTCH_Num          vnlomin;
-  SCOTCH_Num          vnlomax;
-  SCOTCH_Num          vnlosum;
-  double              vnloavg;
-  double              vnlodlt;
-  SCOTCH_Num          edegmin;
-  SCOTCH_Num          edegmax;
-  double              edegavg;
-  double              edegdlt;
-  SCOTCH_Num          ndegmin;
-  SCOTCH_Num          ndegmax;
-  double              ndegavg;
-  double              ndegdlt;
-  SCOTCH_Num          edgenbr;
-  int                 i;
+int main(int argc, char *argv[]) {
+  SCOTCH_Mesh meshdat;
+  SCOTCH_Num velmnbr;
+  SCOTCH_Num vnodnbr;
+  SCOTCH_Num vnlomin;
+  SCOTCH_Num vnlomax;
+  SCOTCH_Num vnlosum;
+  double vnloavg;
+  double vnlodlt;
+  SCOTCH_Num edegmin;
+  SCOTCH_Num edegmax;
+  double edegavg;
+  double edegdlt;
+  SCOTCH_Num ndegmin;
+  SCOTCH_Num ndegmax;
+  double ndegavg;
+  double ndegdlt;
+  SCOTCH_Num edgenbr;
+  int i;
 
-  errorProg ("mtst");
+  errorProg("mtst");
 
-  if ((argc >= 2) && (argv[1][0] == '?')) {       /* If need for help */
-    usagePrint (stdout, C_usageList);
-    exit       (0);
+  if ((argc >= 2) && (argv[1][0] == '?')) { /* If need for help */
+    usagePrint(stdout, C_usageList);
+    exit(0);
   }
 
-  fileBlockInit (C_fileTab, C_FILENBR);           /* Set default stream pointers */
+  fileBlockInit(C_fileTab, C_FILENBR); /* Set default stream pointers */
 
-  for (i = 1; i < argc; i ++) {                   /* Loop for all option codes                        */
-    if ((argv[i][0] != '-') || (argv[i][1] == '\0') || (argv[i][1] == '.')) { /* If found a file name */
-      if (C_fileNum < C_FILEARGNBR)               /* File name has been given                         */
-        fileBlockName (C_fileTab, C_fileNum ++) = argv[i];
+  for (i = 1; i < argc; i++) { /* Loop for all option codes */
+    if ((argv[i][0] != '-') || (argv[i][1] == '\0') ||
+        (argv[i][1] == '.')) {      /* If found a file name */
+      if (C_fileNum < C_FILEARGNBR) /* File name has been given */
+        fileBlockName(C_fileTab, C_fileNum++) = argv[i];
       else {
-        errorPrint ("main: too many file names given");
-        exit       (1);
+        errorPrint("main: too many file names given");
+        exit(1);
       }
-    }
-    else {                                        /* If found an option name */
+    } else { /* If found an option name */
       switch (argv[i][1]) {
-        case 'H' :                                /* Give the usage message */
-        case 'h' :
-          usagePrint (stdout, C_usageList);
-          exit       (0);
-        case 'V' :
-          fprintf (stderr, "mtst, version " SCOTCH_VERSION_STRING "\n");
-          fprintf (stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS, France\n");
-          fprintf (stderr, "This software is libre/free software under CeCILL-C -- see the user's manual for more information\n");
-          return  (0);
-        default :
-          errorPrint ("main: unprocessed option '%s'", argv[i]);
-          exit       (1);
+      case 'H': /* Give the usage message */
+      case 'h':
+        usagePrint(stdout, C_usageList);
+        exit(0);
+      case 'V':
+        fprintf(stderr, "mtst, version " SCOTCH_VERSION_STRING "\n");
+        fprintf(stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, "
+                        "Universite de Bordeaux, INRIA & CNRS, France\n");
+        fprintf(stderr, "This software is libre/free software under CeCILL-C "
+                        "-- see the user's manual for more information\n");
+        return (0);
+      default:
+        errorPrint("main: unprocessed option '%s'", argv[i]);
+        exit(1);
       }
     }
   }
 
-  fileBlockOpen (C_fileTab, C_FILENBR);           /* Open all files */
+  fileBlockOpen(C_fileTab, C_FILENBR); /* Open all files */
 
-  SCOTCH_meshInit  (&meshdat);
-  SCOTCH_meshLoad  (&meshdat, C_filepntrsrcinp, -1);
-  SCOTCH_meshCheck (&meshdat);
+  SCOTCH_meshInit(&meshdat);
+  SCOTCH_meshLoad(&meshdat, C_filepntrsrcinp, -1);
+  SCOTCH_meshCheck(&meshdat);
 
-  SCOTCH_meshSize  (&meshdat, &velmnbr, &vnodnbr, &edgenbr);
-  SCOTCH_meshStat  (&meshdat, &vnlomin, &vnlomax, &vnlosum, &vnloavg, &vnlodlt,
-                    &edegmin, &edegmax, &edegavg, &edegdlt,
-                    &ndegmin, &ndegmax, &ndegavg, &ndegdlt);
+  SCOTCH_meshSize(&meshdat, &velmnbr, &vnodnbr, &edgenbr);
+  SCOTCH_meshStat(&meshdat, &vnlomin, &vnlomax, &vnlosum, &vnloavg, &vnlodlt,
+                  &edegmin, &edegmax, &edegavg, &edegdlt, &ndegmin, &ndegmax,
+                  &ndegavg, &ndegdlt);
 
-  fprintf (C_filepntrdatout, "S\tElements\tnbr=" SCOTCH_NUMSTRING "\n",
-           (SCOTCH_Num) velmnbr);
-  fprintf (C_filepntrdatout, "S\tNodes\tnbr=" SCOTCH_NUMSTRING "\n",
-           (SCOTCH_Num) vnodnbr);
-  fprintf (C_filepntrdatout, "S\tNode load\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
-           (SCOTCH_Num) vnlomin, (SCOTCH_Num) vnlomax, (SCOTCH_Num) vnlosum, vnloavg, vnlodlt);
-  fprintf (C_filepntrdatout, "S\tElement degree\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
-           (SCOTCH_Num) edegmin, (SCOTCH_Num) edegmax, (SCOTCH_Num) (edgenbr / 2), edegavg, edegdlt);
-  fprintf (C_filepntrdatout, "S\tNode degree\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
-           (SCOTCH_Num) ndegmin, (SCOTCH_Num) ndegmax, (SCOTCH_Num) (edgenbr / 2), ndegavg, ndegdlt);
-  fprintf (C_filepntrdatout, "S\tEdge\tnbr=" SCOTCH_NUMSTRING "\n",
-           (SCOTCH_Num) (edgenbr / 2));
+  fprintf(C_filepntrdatout, "S\tElements\tnbr=" SCOTCH_NUMSTRING "\n",
+          (SCOTCH_Num)velmnbr);
+  fprintf(C_filepntrdatout, "S\tNodes\tnbr=" SCOTCH_NUMSTRING "\n",
+          (SCOTCH_Num)vnodnbr);
+  fprintf(C_filepntrdatout,
+          "S\tNode load\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING
+          "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
+          (SCOTCH_Num)vnlomin, (SCOTCH_Num)vnlomax, (SCOTCH_Num)vnlosum,
+          vnloavg, vnlodlt);
+  fprintf(C_filepntrdatout,
+          "S\tElement degree\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING
+          "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
+          (SCOTCH_Num)edegmin, (SCOTCH_Num)edegmax, (SCOTCH_Num)(edgenbr / 2),
+          edegavg, edegdlt);
+  fprintf(C_filepntrdatout,
+          "S\tNode degree\tmin=" SCOTCH_NUMSTRING "\tmax=" SCOTCH_NUMSTRING
+          "\tsum=" SCOTCH_NUMSTRING "\tavg=%g\tdlt=%g\n",
+          (SCOTCH_Num)ndegmin, (SCOTCH_Num)ndegmax, (SCOTCH_Num)(edgenbr / 2),
+          ndegavg, ndegdlt);
+  fprintf(C_filepntrdatout, "S\tEdge\tnbr=" SCOTCH_NUMSTRING "\n",
+          (SCOTCH_Num)(edgenbr / 2));
 
-  fileBlockClose (C_fileTab, C_FILENBR);          /* Always close explicitely to end eventual (un)compression tasks */
+  fileBlockClose(C_fileTab, C_FILENBR); /* Always close explicitely to end
+                                           eventual (un)compression tasks */
 
-  SCOTCH_meshExit (&meshdat);
+  SCOTCH_meshExit(&meshdat);
 
   return (0);
 }

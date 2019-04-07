@@ -55,18 +55,19 @@
 /*+ Method types. +*/
 
 typedef enum KdgraphMapStMethodType_ {
-  KDGRAPHMAPSTMETHRB = 0,                         /*+ Dual Recursive Bipartitioning +*/
-  KDGRAPHMAPSTMETHNBR                             /*+ Number of methods             +*/
+  KDGRAPHMAPSTMETHRB = 0, /*+ Dual Recursive Bipartitioning +*/
+  KDGRAPHMAPSTMETHNBR     /*+ Number of methods             +*/
 } KdgraphMapStMethodType;
 
 /*
 **  The external declarations.
 */
 
-extern StratTab             kdgraphmapststratab;
+extern StratTab kdgraphmapststratab;
 
 /*
 **  The function prototypes.
 */
 
-int                         kdgraphMapSt         (Kdgraph * restrict const, Kdmapping * restrict const, const Strat * restrict const);
+int kdgraphMapSt(Kdgraph *restrict const, Kdmapping *restrict const,
+                 const Strat *restrict const);

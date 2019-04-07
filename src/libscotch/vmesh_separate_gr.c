@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -72,48 +72,50 @@
 ** - !0  : on error.
 */
 
-int
-vmeshSeparateGr (
-Vmesh * restrict const                      meshptr, /*+ Node separation mesh +*/
-const VmeshSeparateGrParam * restrict const paraptr) /*+ Method parameters    +*/
+int vmeshSeparateGr(Vmesh *restrict const meshptr, /*+ Node separation mesh +*/
+                    const VmeshSeparateGrParam
+                        *restrict const paraptr) /*+ Method parameters    +*/
 {
-  Vgraph                            grafdat;
-  Gnum                              fronnum;
-  Gnum                              velmnum;
-  Gnum                              ecmpsize1;
+  Vgraph grafdat;
+  Gnum fronnum;
+  Gnum velmnum;
+  Gnum ecmpsize1;
 
-  graphInit (&grafdat.s);
-  if (meshGraph (&meshptr->m, &grafdat.s) != 0) {
-    errorPrint ("vmeshSeparateGr: cannot build graph");
-    return     (1);
+  graphInit(&grafdat.s);
+  if (meshGraph(&meshptr->m, &grafdat.s) != 0) {
+    errorPrint("vmeshSeparateGr: cannot build graph");
+    return (1);
   }
-  grafdat.parttax     = meshptr->parttax + (meshptr->m.vnodbas - grafdat.s.baseval); /* Get node area of part array */
+  grafdat.parttax =
+      meshptr->parttax + (meshptr->m.vnodbas -
+                          grafdat.s.baseval); /* Get node area of part array */
   grafdat.compload[0] = meshptr->ncmpload[0];
   grafdat.compload[1] = meshptr->ncmpload[1];
   grafdat.compload[2] = meshptr->ncmpload[2];
   grafdat.comploaddlt = meshptr->ncmploaddlt;
   grafdat.compsize[0] = meshptr->ncmpsize[0];
   grafdat.compsize[1] = meshptr->ncmpsize[1];
-  grafdat.fronnbr     = meshptr->fronnbr;
-  grafdat.frontab     = meshptr->frontab;         /* Re-use frontier array */
-  grafdat.levlnum     = meshptr->levlnum;
+  grafdat.fronnbr = meshptr->fronnbr;
+  grafdat.frontab = meshptr->frontab; /* Re-use frontier array */
+  grafdat.levlnum = meshptr->levlnum;
 
-  for (fronnum = 0; fronnum < grafdat.fronnbr; fronnum ++)
+  for (fronnum = 0; fronnum < grafdat.fronnbr; fronnum++)
     grafdat.frontab[fronnum] -= (meshptr->m.vnodbas - grafdat.s.baseval);
 
 #ifdef SCOTCH_DEBUG_VMESH2
-  if (vgraphCheck (&grafdat) != 0) {
-    errorPrint ("vmeshSeparateGr: internal error (1)");
-    return     (1);
+  if (vgraphCheck(&grafdat) != 0) {
+    errorPrint("vmeshSeparateGr: internal error (1)");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VMESH2 */
 
-  if (vgraphSeparateSt (&grafdat, paraptr->stratptr) != 0) {
-    errorPrint ("vmeshSeparateGr: cannot separate graph");
-    return     (1);
+  if (vgraphSeparateSt(&grafdat, paraptr->stratptr) != 0) {
+    errorPrint("vmeshSeparateGr: cannot separate graph");
+    return (1);
   }
 
-  for (fronnum = 0; fronnum < grafdat.fronnbr; fronnum ++) /* Restore mesh-based frontier array */
+  for (fronnum = 0; fronnum < grafdat.fronnbr;
+       fronnum++) /* Restore mesh-based frontier array */
     grafdat.frontab[fronnum] += (meshptr->m.vnodbas - grafdat.s.baseval);
   meshptr->ncmpload[0] = grafdat.compload[0];
   meshptr->ncmpload[1] = grafdat.compload[1];
@@ -121,34 +123,35 @@ const VmeshSeparateGrParam * restrict const paraptr) /*+ Method parameters    +*
   meshptr->ncmploaddlt = grafdat.comploaddlt;
   meshptr->ncmpsize[0] = grafdat.compsize[0];
   meshptr->ncmpsize[1] = grafdat.compsize[1];
-  meshptr->fronnbr     = grafdat.fronnbr;
+  meshptr->fronnbr = grafdat.fronnbr;
 
   for (velmnum = meshptr->m.velmbas, ecmpsize1 = 0;
-       velmnum < meshptr->m.velmnnd; velmnum ++) { /* Compute part of all elements */
-    Gnum                              eelmnum;
-    GraphPart                         partval;
+       velmnum < meshptr->m.velmnnd;
+       velmnum++) { /* Compute part of all elements */
+    Gnum eelmnum;
+    GraphPart partval;
 
-    partval = 0;                                  /* Empty elements move to part 0 */
+    partval = 0; /* Empty elements move to part 0 */
     for (eelmnum = meshptr->m.verttax[velmnum];
-         eelmnum < meshptr->m.vendtax[velmnum]; eelmnum ++) {
-      Gnum                              vnodnum;
+         eelmnum < meshptr->m.vendtax[velmnum]; eelmnum++) {
+      Gnum vnodnum;
 
       vnodnum = meshptr->m.edgetax[eelmnum];
       partval = meshptr->parttax[vnodnum];
       if (partval != 2)
         break;
     }
-    partval   &= 1;                               /* In case all nodes in separator */
-    ecmpsize1 += (Gnum) partval;                  /* Count elements in part 1       */
-    meshptr->parttax[velmnum] = partval;          /* Set part of element            */
+    partval &= 1;                        /* In case all nodes in separator */
+    ecmpsize1 += (Gnum)partval;          /* Count elements in part 1       */
+    meshptr->parttax[velmnum] = partval; /* Set part of element            */
   }
   meshptr->ecmpsize[0] = meshptr->m.velmnbr - ecmpsize1;
   meshptr->ecmpsize[1] = ecmpsize1;
 
 #ifdef SCOTCH_DEBUG_VMESH2
-  if (vmeshCheck (meshptr) != 0) {
-    errorPrint ("vmeshSeparateGr: internal error (2)");
-    return     (1);
+  if (vmeshCheck(meshptr) != 0) {
+    errorPrint("vmeshSeparateGr: internal error (2)");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VMESH2 */
 

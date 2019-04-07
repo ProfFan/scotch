@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -88,7 +88,7 @@
 /**       All 3 sets are disjoint, Ve and V1 can be empty                **/
 /**                                                                      **/
 /**  Modifications w.r.t. previous version :                             **/
-/**                                                                      **/  
+/**                                                                      **/
 /**  New Input:                                                          **/
 /**  ---------                                                           **/
 /**         nbelts : integer holding size of Ve                          **/
@@ -120,374 +120,368 @@
 /** End remarks done on December 8th 2003                                **/
 /** ---------------------------------------------------------------------**/
 
-void
-hallOrderHdHalmd (
-const Gnum          n,                            /* Matrix order                             */
-const Gnum          nbelts,                       /* Number of elements                       */
-const Gnum          iwlen,                        /* Length of array iw                       */
-Gnum * restrict     pe,                           /* Array of indexes in iw of start of row i */
-Gnum                pfree,                        /* Useful size in iw                        */
-Gnum * restrict     len,                          /* Array of lengths of adjacency lists      */
-Gnum * restrict     iw,                           /* Adjacency list array                     */
-Gnum * restrict     nv,                           /* Array of element degrees                 */
-Gnum * restrict     elen,                         /* Array that holds the inverse permutation */
-Gnum * restrict     last,                         /* Array that holds the permutation         */
-Gnum * restrict     ncmpa,                        /* Number of times array iw was compressed  */
-Gnum * restrict     degree,                       /* Array that holds degree data             */
-Gnum * restrict     head,                         /* Linked list structure                    */
-Gnum * restrict     next,                         /* Linked list structure                    */
-Gnum * restrict     w)                            /* Flag array                               */
+void hallOrderHdHalmd(
+    const Gnum n,          /* Matrix order                             */
+    const Gnum nbelts,     /* Number of elements                       */
+    const Gnum iwlen,      /* Length of array iw                       */
+    Gnum *restrict pe,     /* Array of indexes in iw of start of row i */
+    Gnum pfree,            /* Useful size in iw                        */
+    Gnum *restrict len,    /* Array of lengths of adjacency lists      */
+    Gnum *restrict iw,     /* Adjacency list array                     */
+    Gnum *restrict nv,     /* Array of element degrees                 */
+    Gnum *restrict elen,   /* Array that holds the inverse permutation */
+    Gnum *restrict last,   /* Array that holds the permutation         */
+    Gnum *restrict ncmpa,  /* Number of times array iw was compressed  */
+    Gnum *restrict degree, /* Array that holds degree data             */
+    Gnum *restrict head,   /* Linked list structure                    */
+    Gnum *restrict next,   /* Linked list structure                    */
+    Gnum *restrict w)      /* Flag array                               */
 {
-  Gnum                deg, degme, dext, dmax, e, elenme, eln, hash, hmod, i,
-                      ilast, inext, j, jlast, jnext, k, knt1, knt2, knt3,
-                      lenj, ln, me = 0, mem, mindeg, nel, newmem,
-                      nleft, nvi, nvj, nvpiv, slenme, we, wflg, wnvi, x,
-                      nbflag, nreal, lastd, nelme;
-  Gnum                p, p1, p2, p3, pdst, pend, pj, pme, pme1, pme2, pn, psrc;
+  Gnum deg, degme, dext, dmax, e, elenme, eln, hash, hmod, i, ilast, inext, j,
+      jlast, jnext, k, knt1, knt2, knt3, lenj, ln,
+      me = 0, mem, mindeg, nel, newmem, nleft, nvi, nvj, nvpiv, slenme, we,
+      wflg, wnvi, x, nbflag, nreal, lastd, nelme;
+  Gnum p, p1, p2, p3, pdst, pend, pj, pme, pme1, pme2, pn, psrc;
 
-/** -------------------------------------------------------------------- **/
-/** HALOAMD_V6: (January 1999, P. Amestoy)                               **/
-/** ***********                                                          **/
-/**  1/ ERROR 2 detection followed by stop statement suppressed.         **/
-/**  2/ Pb 1  identified in V5 was not correctly solved.                 **/
-/**                                                                      **/
-/** HALOAMD_V5: (December 1998, P. Amestoy)                              **/
-/** ***********                                                          **/
-/**  1/ Solved problem with matrix psmigr 1, because upper bound degree  **/
-/**     DEG>N was considered as a node of V1.                            **/
-/**                                                                      **/
-/** HALOAMD_V4: (October 1998, P. Amestoy)                               **/
-/** ***********                                                          **/
-/**  Only MA41 interface (ok for both scotch and MA41) is included in    **/
-/**  this file.                                                          **/
-/**                                                                      **/
-/** HALOAMD_V3: (August 1998, P. Amestoy)                                **/
-/** **********                                                           **/
-/**  Solved problem in version 2: variables of V1 with len(i)=0 were not **/
-/**  well processed. See modification of the input to characterize those **/
-/**  variables.                                                          **/
-/**  Problem detected by Jacko Koster while experimenting with C version **/
-/**  2 of haloAMD in the context of multiple front method based on       **/
-/**  MA27: "if for an interface variable i, row i in the matrix has only **/
-/**  a nonzero entry on the diagonal, we first remove this entry and     **/
-/**  len(i) is set to zero on input to HALOAMD. However, this means that **/
-/**  HALOAMD will treat variable i as an interior variable (in V0)       **/
-/**  instead as an interface variable (in V1). It is indeed a bit        **/
-/**  strange to have such interface variables but we encountered some    **/
-/**  in our debugging experiments with some random partitionings.        **/
-/**  Solution:                                                           **/
-/**  IF on input i \in V1 and len(i)=0 (that is adjlist(i)={}) THEN      **/
-/**  len(i) must be set on input to -N-1.                                **/
-/**  ENDIF                                                               **/
-/**  Therefore, all variables i / len(i) < 0 and only those are in V1.   **/
-/**  Variables with len(i) = -N-1 are then processed differently at the  **/
-/**  beginning of the code.                                              **/
-/**                                                                      **/
-/** HALOAMD_V2: (April 1998)                                             **/
-/** **********                                                           **/
-/**  The end of the tree (including links to block of flagged indices    **/
-/**  is built) . The list of flagged indices is considered as a dense    **/
-/**  amalgamated node.                                                   **/
-/**  Tested on rosanna: ~amestoy/MA41_NEW/SUN_RISC_dbl/SOFT              **/
-/**                                                                      **/
-/**  Comments on the OUTPUT:                                             **/
-/**  ----------------------                                              **/
-/**                                                                      **/
-/**  Let V= V0 U V1 the nodes of the initial graph (|V|=n).              **/
-/**  The assembly tree corresponds to the tree of the supernodes (or     **/
-/**  supervariables). Each node of the assembly tree is then composed of **/
-/**  one principal variable and a list of secondary variables. The list  **/
-/**  of variable of a node (principal + secondary variables) then        **/
-/**  describes the structure of the diagonal bloc of the supernode.      **/
-/**  The elimination tree denotes the tree of all the variables(=nodes)  **/
-/**  and is therefore of order n. The arrays NV(N) and PE(N) give a      **/
-/**  description of the assembly tree.                                   **/
-/**                                                                      **/
-/**   1/ Description of array nv(N) (on OUPUT)                           **/
-/**    nv(i)=0 i is a secondary variable.                                **/
-/**    N+1> nv(i) >0 i is a principal variable, nv(i) holds the number   **/
-/**    of elements in column i of L (true degree of i)                   **/
-/**    nv(i) = N+1 then i is a flagged variable (belonging to V1)        **/
-/**                                                                      **/
-/**   2/ Description of array PE(N) (on OUPUT)                           **/
-/**    pe(i) = -(father of variable/node i) in the elimination tree.     **/
-/**    If nv (i) .gt. 0, then i represents a node in the assembly tree,  **/
-/**    and the parent of i is -pe (i), or zero if i is a root.           **/
-/**    If nv (i) = 0, then (i,-pe (i)) represents an edge in a           **/
-/**    subtree, the root of which is a node in the assembly tree.        **/
-/**                                                                      **/
-/**   3/ Example:                                                        **/
-/**    Let If be a root node father of Is in the assembly tree.          **/
-/**    If is the principal variable of the node If and let If1, If2, If3 **/
-/**    be the secondary variables of node If. Is is the principal        **/
-/**    variable of the node Is and let Is1, Is2 be the secondary         **/
-/**    variables of node Is.                                             **/
-/**    Then:                                                             **/
-/**        NV(If1)=NV(If2)=NV(If3) = 0  (secondary variables)            **/
-/**        NV(Is1)=NV(Is2) = 0  (secondary variables)                    **/
-/**        NV(If) > 0  (principal variable)                              **/
-/**        NV(Is) > 0  (principal variable)                              **/
-/**        PE(If)  = 0 (root node)                                       **/
-/**        PE(Is)  = -If (If is the father of Is in the assembly tree)   **/
-/**        PE(If1)=PE(If2)=PE(If3)= -If  (If is the principal variable)  **/
-/**        PE(Is1)=PE(Is2)= -Is  (Is is the principal variable)          **/
-/**                                                                      **/
-/** HALOAMD_V1: (September 1997)                                         **/
-/** **********                                                           **/
-/**  Initial version designed to experiment the numerical (fill-in)      **/
-/**  impact of taking into account the halo. This code should be able to **/
-/**  experiment no-halo, partial halo, complete halo.                    **/
-/** -------------------------------------------------------------------- **/
-/** HALOAMD is designed to process a graph composed of two types         **/
-/**            of nodes, V0 and V1, extracted from a larger gragh.       **/
-/**            V0^V1 = {},                                               **/
-/**            We used Min. degree heuristic to order only               **/
-/**            nodes in V0, but the adjacency to nodes                   **/
-/**            in V1 is taken into account during ordering.              **/
-/**            Nodes in V1 are odered at last.                           **/
-/**            Adjacency between nodes of V1 need not be provided,       **/
-/**            however |len(i)| must always corresponds to the number of **/
-/**            edges effectively provided in the adjacency list of i.    **/
-/**          On input :                                                  **/
-/**          ********                                                    **/
-/**            Nodes INODE in V1 are flagged with len(INODE) = -degree   **/
-/**            Update version HALO V3 (August 1998):                     **/
-/**            if len(i)=0 and i \in V1 then len(i) must be set          **/
-/**            on input to -N-1.                                         **/
-/**          ERROR return :                                              **/
-/**          ************                                                **/
-/**            Negative value in ncmpa indicates an error detected       **/
-/**            by HALOAMD.                                               **/
-/**                                                                      **/
-/**            The graph provided MUST follow the rule:                  **/
-/**             if (i,j) is an edge in the gragh then                    **/
-/**             j must be in the adjacency list of i AND                 **/
-/**             i must be in the adjacency list of j.                    **/
-/**                                                                      **/
-/**    REMARKS :                                                         **/
-/**    -------                                                           **/
-/**        1/  Providing edges between nodes of V1 should not            **/
-/**            affect the final ordering, only the amount of edges       **/
-/**            of the halo should effectively affect the solution.       **/
-/**            This code should work in the following cases:             **/
-/**              1/ halo not provided                                    **/
-/**              2/ halo partially provided                              **/
-/**              3/ complete halo                                        **/
-/**              4/ complete halo+interconnection between nodes of V1.   **/
-/**                                                                      **/
-/**             1/ should run and provide identical results (w.r.t to    **/
-/**                current implementation of AMD in SCOTCH).             **/
-/**             3/ and 4/ should provide identical results.              **/
-/**                                                                      **/
-/**        2/ All modifications of the MC47 initial code are indicated   **/
-/**           with begin HALO .. end HALO                                **/
-/**                                                                      **/
-/** Ordering of nodes in V0 is based on Approximate Minimum Degree       **/
-/** ordering algorithm, with aggressive absorption:                      **/
-/** Given a representation of the nonzero pattern of a symmetric matrix, **/
-/**       A, (excluding the diagonal) perform an approximate minimum     **/
-/**       (UMFPACK/MA38-style) degree ordering to compute a pivot order  **/
-/**       such that fill-in in the Cholesky                              **/
-/**       factors A = LL^T is kept low.  At each step, the pivot         **/
-/**       selected is the one with the minimum UMFPACK/MA38-style        **/
-/**       upper-bound on the external degree.  Aggresive absorption is   **/
-/**       used to tighten the bound on the degree.  This can result an   **/
-/**       significant improvement in the quality of the ordering for     **/
-/**       some matrices.                                                 **/
-/**       The approximate degree algorithm implemented here is the       **/
-/**       symmetric analogue of the degree update algorithm in MA38, by  **/
-/**       Davis and Duff, also in the Harwell Subroutine Library.        **/
-/**                                                                      **/
-/** **** CAUTION:  ARGUMENTS ARE NOT CHECKED FOR ERRORS ON INPUT.  ***** **/
-/** ** If you want error checking, a more versatile input format, and ** **/
-/** ** a simpler user interface, then use MC47A/AD in the Harwell     ** **/
-/** ** Subroutine Library, which checks for errors, transforms the    ** **/
-/** ** input, and calls MC47B/BD.                                     ** **/
-/** ******************************************************************** **/
-/**       References:  (UF Tech Reports are available via anonymous ftp  **/
-/**       to ftp.cis.ufl.edu:cis/tech-reports).                          **/
-/**       [1] Timothy A. Davis and Iain Duff, "An unsymmetric-pattern    **/
-/**               multifrontal method for sparse LU factorization",      **/
-/**               SIAM J. Matrix Analysis and Applications, to appear.   **/
-/**               also Univ. of Florida Technical Report TR-94-038.      **/
-/**               Discuss UMFPACK / MA38.                                **/
-/**       [2] Patrick Amestoy, Timothy A. Davis, and Iain S. Duff,       **/
-/**               "An approximate minimum degree ordering algorithm,"    **/
-/**               SIAM J. Matrix Analysis and Applications (to appear),  **/
-/**               also Univ. of Florida Technical Report TR-94-039.      **/
-/**               Discusses this routine.                                **/
-/**       [3] Alan George and Joseph Liu, "The evolution of the          **/
-/**               minimum degree ordering algorithm," SIAM Review, vol.  **/
-/**               31, no. 1, pp. 1-19, March 1989.  We list below the    **/
-/**               features mentioned in that paper that this code        **/
-/**               includes:                                              **/
-/**       mass elimination:                                              **/
-/**               Yes.  MA27 relied on supervariable detection for mass  **/
-/**               elimination.                                           **/
-/**       indistinguishable nodes:                                       **/
-/**               Yes (we call these "supervariables").  This was also   **/
-/**               in the MA27 code - although we modified the method of  **/
-/**               detecting them (the previous hash was the true degree, **/
-/**               which we no longer keep track of).  A supervariable is **/
-/**               a set of rows with identical nonzero pattern.  All     **/
-/**               variables in a supervariable are eliminated together.  **/
-/**               Each supervariable has as its numerical name that of   **/
-/**               one of its variables (its principal variable).         **/
-/**       quotient graph representation:                                 **/
-/**               Yes.  We use the term "element" for the cliques formed **/
-/**               during elimination.  This was also in the MA27 code.   **/
-/**               The algorithm can operate in place, but it will work   **/
-/**               more efficiently if given some "elbow room."           **/
-/**       element absorption:                                            **/
-/**               Yes.  This was also in the MA27 code.                  **/
-/**       external degree:                                               **/
-/**               Yes.  The MA27 code was based on the true degree.      **/
-/**       incomplete degree update and multiple elimination:             **/
-/**               No.  This was not in MA27, either.  Our method of      **/
-/**               degree update within MC47B/BD is element-based, not    **/
-/**               variable-based.  It is thus not well-suited for use    **/
-/**               with incomplete degree update or multiple elimination. **/
-/** -------------------------------------------------------------------- **/
-/** Authors, and Copyright (C) 1995 by:                                  **/
-/**       Timothy A. Davis, Patrick Amestoy, Iain S. Duff, &             **/
-/**       John K. Reid.                                                  **/
-/** Modified (V1) by P.R. Amestoy ENSEEIHT (1997)                        **/
-/** Modified (V2) by P.R. Amestoy ENSEEIHT (1998)                        **/
-/** Modified (V3) by P.R. Amestoy ENSEEIHT (1998)                        **/
-/** Modified (V4) by P.R. Amestoy ENSEEIHT (1998)                        **/
-/** Modified (V5) by P.R. Amestoy ENSEEIHT (1998)                        **/
-/** Modified (V6) by P.R. Amestoy ENSEEIHT (1999)                        **/
-/**                                                                      **/
-/** Dates: September, 1995                                               **/
-/**        September, 1997 (halo AMD V1)                                 **/
-/**        April, 1998 (halo AMD V2)                                     **/
-/**        August, 1998 (halo AMD V3)                                    **/
+  /** -------------------------------------------------------------------- **/
+  /** HALOAMD_V6: (January 1999, P. Amestoy)                               **/
+  /** ***********                                                          **/
+  /**  1/ ERROR 2 detection followed by stop statement suppressed.         **/
+  /**  2/ Pb 1  identified in V5 was not correctly solved.                 **/
+  /**                                                                      **/
+  /** HALOAMD_V5: (December 1998, P. Amestoy)                              **/
+  /** ***********                                                          **/
+  /**  1/ Solved problem with matrix psmigr 1, because upper bound degree  **/
+  /**     DEG>N was considered as a node of V1.                            **/
+  /**                                                                      **/
+  /** HALOAMD_V4: (October 1998, P. Amestoy)                               **/
+  /** ***********                                                          **/
+  /**  Only MA41 interface (ok for both scotch and MA41) is included in    **/
+  /**  this file.                                                          **/
+  /**                                                                      **/
+  /** HALOAMD_V3: (August 1998, P. Amestoy)                                **/
+  /** **********                                                           **/
+  /**  Solved problem in version 2: variables of V1 with len(i)=0 were not **/
+  /**  well processed. See modification of the input to characterize those **/
+  /**  variables.                                                          **/
+  /**  Problem detected by Jacko Koster while experimenting with C version **/
+  /**  2 of haloAMD in the context of multiple front method based on       **/
+  /**  MA27: "if for an interface variable i, row i in the matrix has only **/
+  /**  a nonzero entry on the diagonal, we first remove this entry and     **/
+  /**  len(i) is set to zero on input to HALOAMD. However, this means that **/
+  /**  HALOAMD will treat variable i as an interior variable (in V0)       **/
+  /**  instead as an interface variable (in V1). It is indeed a bit        **/
+  /**  strange to have such interface variables but we encountered some    **/
+  /**  in our debugging experiments with some random partitionings.        **/
+  /**  Solution:                                                           **/
+  /**  IF on input i \in V1 and len(i)=0 (that is adjlist(i)={}) THEN      **/
+  /**  len(i) must be set on input to -N-1.                                **/
+  /**  ENDIF                                                               **/
+  /**  Therefore, all variables i / len(i) < 0 and only those are in V1.   **/
+  /**  Variables with len(i) = -N-1 are then processed differently at the  **/
+  /**  beginning of the code.                                              **/
+  /**                                                                      **/
+  /** HALOAMD_V2: (April 1998)                                             **/
+  /** **********                                                           **/
+  /**  The end of the tree (including links to block of flagged indices    **/
+  /**  is built) . The list of flagged indices is considered as a dense    **/
+  /**  amalgamated node.                                                   **/
+  /**  Tested on rosanna: ~amestoy/MA41_NEW/SUN_RISC_dbl/SOFT              **/
+  /**                                                                      **/
+  /**  Comments on the OUTPUT:                                             **/
+  /**  ----------------------                                              **/
+  /**                                                                      **/
+  /**  Let V= V0 U V1 the nodes of the initial graph (|V|=n).              **/
+  /**  The assembly tree corresponds to the tree of the supernodes (or     **/
+  /**  supervariables). Each node of the assembly tree is then composed of **/
+  /**  one principal variable and a list of secondary variables. The list  **/
+  /**  of variable of a node (principal + secondary variables) then        **/
+  /**  describes the structure of the diagonal bloc of the supernode.      **/
+  /**  The elimination tree denotes the tree of all the variables(=nodes)  **/
+  /**  and is therefore of order n. The arrays NV(N) and PE(N) give a      **/
+  /**  description of the assembly tree.                                   **/
+  /**                                                                      **/
+  /**   1/ Description of array nv(N) (on OUPUT)                           **/
+  /**    nv(i)=0 i is a secondary variable.                                **/
+  /**    N+1> nv(i) >0 i is a principal variable, nv(i) holds the number   **/
+  /**    of elements in column i of L (true degree of i)                   **/
+  /**    nv(i) = N+1 then i is a flagged variable (belonging to V1)        **/
+  /**                                                                      **/
+  /**   2/ Description of array PE(N) (on OUPUT)                           **/
+  /**    pe(i) = -(father of variable/node i) in the elimination tree.     **/
+  /**    If nv (i) .gt. 0, then i represents a node in the assembly tree,  **/
+  /**    and the parent of i is -pe (i), or zero if i is a root.           **/
+  /**    If nv (i) = 0, then (i,-pe (i)) represents an edge in a           **/
+  /**    subtree, the root of which is a node in the assembly tree.        **/
+  /**                                                                      **/
+  /**   3/ Example:                                                        **/
+  /**    Let If be a root node father of Is in the assembly tree.          **/
+  /**    If is the principal variable of the node If and let If1, If2, If3 **/
+  /**    be the secondary variables of node If. Is is the principal        **/
+  /**    variable of the node Is and let Is1, Is2 be the secondary         **/
+  /**    variables of node Is.                                             **/
+  /**    Then:                                                             **/
+  /**        NV(If1)=NV(If2)=NV(If3) = 0  (secondary variables)            **/
+  /**        NV(Is1)=NV(Is2) = 0  (secondary variables)                    **/
+  /**        NV(If) > 0  (principal variable)                              **/
+  /**        NV(Is) > 0  (principal variable)                              **/
+  /**        PE(If)  = 0 (root node)                                       **/
+  /**        PE(Is)  = -If (If is the father of Is in the assembly tree)   **/
+  /**        PE(If1)=PE(If2)=PE(If3)= -If  (If is the principal variable)  **/
+  /**        PE(Is1)=PE(Is2)= -Is  (Is is the principal variable)          **/
+  /**                                                                      **/
+  /** HALOAMD_V1: (September 1997)                                         **/
+  /** **********                                                           **/
+  /**  Initial version designed to experiment the numerical (fill-in)      **/
+  /**  impact of taking into account the halo. This code should be able to **/
+  /**  experiment no-halo, partial halo, complete halo.                    **/
+  /** -------------------------------------------------------------------- **/
+  /** HALOAMD is designed to process a graph composed of two types         **/
+  /**            of nodes, V0 and V1, extracted from a larger gragh.       **/
+  /**            V0^V1 = {},                                               **/
+  /**            We used Min. degree heuristic to order only               **/
+  /**            nodes in V0, but the adjacency to nodes                   **/
+  /**            in V1 is taken into account during ordering.              **/
+  /**            Nodes in V1 are odered at last.                           **/
+  /**            Adjacency between nodes of V1 need not be provided,       **/
+  /**            however |len(i)| must always corresponds to the number of **/
+  /**            edges effectively provided in the adjacency list of i.    **/
+  /**          On input :                                                  **/
+  /**          ********                                                    **/
+  /**            Nodes INODE in V1 are flagged with len(INODE) = -degree   **/
+  /**            Update version HALO V3 (August 1998):                     **/
+  /**            if len(i)=0 and i \in V1 then len(i) must be set          **/
+  /**            on input to -N-1.                                         **/
+  /**          ERROR return :                                              **/
+  /**          ************                                                **/
+  /**            Negative value in ncmpa indicates an error detected       **/
+  /**            by HALOAMD.                                               **/
+  /**                                                                      **/
+  /**            The graph provided MUST follow the rule:                  **/
+  /**             if (i,j) is an edge in the gragh then                    **/
+  /**             j must be in the adjacency list of i AND                 **/
+  /**             i must be in the adjacency list of j.                    **/
+  /**                                                                      **/
+  /**    REMARKS :                                                         **/
+  /**    -------                                                           **/
+  /**        1/  Providing edges between nodes of V1 should not            **/
+  /**            affect the final ordering, only the amount of edges       **/
+  /**            of the halo should effectively affect the solution.       **/
+  /**            This code should work in the following cases:             **/
+  /**              1/ halo not provided                                    **/
+  /**              2/ halo partially provided                              **/
+  /**              3/ complete halo                                        **/
+  /**              4/ complete halo+interconnection between nodes of V1.   **/
+  /**                                                                      **/
+  /**             1/ should run and provide identical results (w.r.t to    **/
+  /**                current implementation of AMD in SCOTCH).             **/
+  /**             3/ and 4/ should provide identical results.              **/
+  /**                                                                      **/
+  /**        2/ All modifications of the MC47 initial code are indicated   **/
+  /**           with begin HALO .. end HALO                                **/
+  /**                                                                      **/
+  /** Ordering of nodes in V0 is based on Approximate Minimum Degree       **/
+  /** ordering algorithm, with aggressive absorption:                      **/
+  /** Given a representation of the nonzero pattern of a symmetric matrix, **/
+  /**       A, (excluding the diagonal) perform an approximate minimum     **/
+  /**       (UMFPACK/MA38-style) degree ordering to compute a pivot order  **/
+  /**       such that fill-in in the Cholesky                              **/
+  /**       factors A = LL^T is kept low.  At each step, the pivot         **/
+  /**       selected is the one with the minimum UMFPACK/MA38-style        **/
+  /**       upper-bound on the external degree.  Aggresive absorption is   **/
+  /**       used to tighten the bound on the degree.  This can result an   **/
+  /**       significant improvement in the quality of the ordering for     **/
+  /**       some matrices.                                                 **/
+  /**       The approximate degree algorithm implemented here is the       **/
+  /**       symmetric analogue of the degree update algorithm in MA38, by  **/
+  /**       Davis and Duff, also in the Harwell Subroutine Library.        **/
+  /**                                                                      **/
+  /** **** CAUTION:  ARGUMENTS ARE NOT CHECKED FOR ERRORS ON INPUT.  ***** **/
+  /** ** If you want error checking, a more versatile input format, and ** **/
+  /** ** a simpler user interface, then use MC47A/AD in the Harwell     ** **/
+  /** ** Subroutine Library, which checks for errors, transforms the    ** **/
+  /** ** input, and calls MC47B/BD.                                     ** **/
+  /** ******************************************************************** **/
+  /**       References:  (UF Tech Reports are available via anonymous ftp  **/
+  /**       to ftp.cis.ufl.edu:cis/tech-reports).                          **/
+  /**       [1] Timothy A. Davis and Iain Duff, "An unsymmetric-pattern    **/
+  /**               multifrontal method for sparse LU factorization",      **/
+  /**               SIAM J. Matrix Analysis and Applications, to appear.   **/
+  /**               also Univ. of Florida Technical Report TR-94-038.      **/
+  /**               Discuss UMFPACK / MA38.                                **/
+  /**       [2] Patrick Amestoy, Timothy A. Davis, and Iain S. Duff,       **/
+  /**               "An approximate minimum degree ordering algorithm,"    **/
+  /**               SIAM J. Matrix Analysis and Applications (to appear),  **/
+  /**               also Univ. of Florida Technical Report TR-94-039.      **/
+  /**               Discusses this routine.                                **/
+  /**       [3] Alan George and Joseph Liu, "The evolution of the          **/
+  /**               minimum degree ordering algorithm," SIAM Review, vol.  **/
+  /**               31, no. 1, pp. 1-19, March 1989.  We list below the    **/
+  /**               features mentioned in that paper that this code        **/
+  /**               includes:                                              **/
+  /**       mass elimination:                                              **/
+  /**               Yes.  MA27 relied on supervariable detection for mass  **/
+  /**               elimination.                                           **/
+  /**       indistinguishable nodes:                                       **/
+  /**               Yes (we call these "supervariables").  This was also   **/
+  /**               in the MA27 code - although we modified the method of  **/
+  /**               detecting them (the previous hash was the true degree, **/
+  /**               which we no longer keep track of).  A supervariable is **/
+  /**               a set of rows with identical nonzero pattern.  All     **/
+  /**               variables in a supervariable are eliminated together.  **/
+  /**               Each supervariable has as its numerical name that of   **/
+  /**               one of its variables (its principal variable).         **/
+  /**       quotient graph representation:                                 **/
+  /**               Yes.  We use the term "element" for the cliques formed **/
+  /**               during elimination.  This was also in the MA27 code.   **/
+  /**               The algorithm can operate in place, but it will work   **/
+  /**               more efficiently if given some "elbow room."           **/
+  /**       element absorption:                                            **/
+  /**               Yes.  This was also in the MA27 code.                  **/
+  /**       external degree:                                               **/
+  /**               Yes.  The MA27 code was based on the true degree.      **/
+  /**       incomplete degree update and multiple elimination:             **/
+  /**               No.  This was not in MA27, either.  Our method of      **/
+  /**               degree update within MC47B/BD is element-based, not    **/
+  /**               variable-based.  It is thus not well-suited for use    **/
+  /**               with incomplete degree update or multiple elimination. **/
+  /** -------------------------------------------------------------------- **/
+  /** Authors, and Copyright (C) 1995 by:                                  **/
+  /**       Timothy A. Davis, Patrick Amestoy, Iain S. Duff, &             **/
+  /**       John K. Reid.                                                  **/
+  /** Modified (V1) by P.R. Amestoy ENSEEIHT (1997)                        **/
+  /** Modified (V2) by P.R. Amestoy ENSEEIHT (1998)                        **/
+  /** Modified (V3) by P.R. Amestoy ENSEEIHT (1998)                        **/
+  /** Modified (V4) by P.R. Amestoy ENSEEIHT (1998)                        **/
+  /** Modified (V5) by P.R. Amestoy ENSEEIHT (1998)                        **/
+  /** Modified (V6) by P.R. Amestoy ENSEEIHT (1999)                        **/
+  /**                                                                      **/
+  /** Dates: September, 1995                                               **/
+  /**        September, 1997 (halo AMD V1)                                 **/
+  /**        April, 1998 (halo AMD V2)                                     **/
+  /**        August, 1998 (halo AMD V3)                                    **/
 
-  -- w;                                           /* Parameter adjustments */
-  -- next;
-  -- head;
-  -- degree;
-  -- last;
-  -- elen;
-  -- nv;
-  -- len;
-  -- pe;
-  -- iw;
+  --w; /* Parameter adjustments */
+  --next;
+  --head;
+  --degree;
+  --last;
+  --elen;
+  --nv;
+  --len;
+  --pe;
+  --iw;
 
   wflg = 2;
   mindeg = 1;
   *ncmpa = 0;
   nel = 0;
-  hmod = MAX (1, (n - 1));
+  hmod = MAX(1, (n - 1));
   dmax = 0;
   mem = pfree - 1;
   nbflag = 0;
   lastd = 0;
 
-  memSet (last + 1, 0, n * sizeof (Gnum));
-  memSet (head + 1, 0, n * sizeof (Gnum));
-  
-  if (nbelts == 0) {                              /* Patch 8/12/03 <PA> */
-    memSet (elen + 1, 0, n * sizeof (Gnum));      
-    for (i = 1; i <= n; i ++) {
+  memSet(last + 1, 0, n * sizeof(Gnum));
+  memSet(head + 1, 0, n * sizeof(Gnum));
+
+  if (nbelts == 0) { /* Patch 8/12/03 <PA> */
+    memSet(elen + 1, 0, n * sizeof(Gnum));
+    for (i = 1; i <= n; i++) {
       w[i] = 1;
       if (len[i] < 0) {
         degree[i] = n + 1;
-        nbflag ++;
-        if (len[i] == - (n + 1)) {                /* Patch 09/08/98 <PA+FP> */
+        nbflag++;
+        if (len[i] == -(n + 1)) { /* Patch 09/08/98 <PA+FP> */
           len[i] = 0;
-          pe[i]  = 0;                             /* Patch 12/12/03 <PA>: Because of compress, we force skipping those entries (which are anyway empty) */
-        }
-        else
-          len[i] = - len[i];
-      }
-      else
+          pe[i] = 0; /* Patch 12/12/03 <PA>: Because of compress, we force
+                        skipping those entries (which are anyway empty) */
+        } else
+          len[i] = -len[i];
+      } else
         degree[i] = len[i];
     }
-  }
-  else  {                                         /* Patch 08/12/03 <PA>: Duplicate part of previous loop to avoid sytematic testing for elements */
-    for (i = 1; i <= n; i ++) {
+  } else { /* Patch 08/12/03 <PA>: Duplicate part of previous loop to avoid
+              sytematic testing for elements */
+    for (i = 1; i <= n; i++) {
       w[i] = 1;
-      if (len[i] < 0) {                           /* i \in V1 */
+      if (len[i] < 0) { /* i \in V1 */
         degree[i] = n + 1;
-        nbflag ++;
-        if (len[i] == - (n + 1)) {                /* Patch 09/08/98 <PA+FP> */
-          len[i]  = 0;
-          pe[i]   = 0;                            /* Patch 12/12/03 <PA>: because of compress, we force skipping those entries (which are anyway empty) */
-          elen[i] = 0;                            /* Patch 16/12/03 <PA> */
+        nbflag++;
+        if (len[i] == -(n + 1)) { /* Patch 09/08/98 <PA+FP> */
+          len[i] = 0;
+          pe[i] = 0;   /* Patch 12/12/03 <PA>: because of compress, we force
+                          skipping those entries (which are anyway empty) */
+          elen[i] = 0; /* Patch 16/12/03 <PA> */
+        } else {
+          len[i] = -len[i];
+          elen[i] = len[i]; /* Patch 16/12/03 <PA>: only elements are adjacent
+                               to a variable */
         }
-        else {
-          len[i]  = - len[i];
-          elen[i] = len[i];                       /* Patch 16/12/03 <PA>: only elements are adjacent to a variable */
-        }
-      }
-      else {                                      /* i \in Ve or V0 */
-        if (elen[i] < 0) {                        /* i \in Ve       */
-          nel ++;
+      } else {             /* i \in Ve or V0 */
+        if (elen[i] < 0) { /* i \in Ve       */
+          nel++;
           degree[i] = len[i];
-          elen[i]   = - nel;
-          dmax      = MAX (dmax, degree[i]);      /* Patch 11/03/04 <PA> */
-        }
-        else {
+          elen[i] = -nel;
+          dmax = MAX(dmax, degree[i]); /* Patch 11/03/04 <PA> */
+        } else {
           degree[i] = elen[i];
-          elen[i]   = len[i];                     /* Patch 16/12/03 <PA>: only elements are adjacent to a variable */
+          elen[i] = len[i]; /* Patch 16/12/03 <PA>: only elements are adjacent
+                               to a variable */
         }
       }
     }
   }
 
 #ifdef SCOTCH_DEBUG_ORDER2
-  if (nbelts != nel)                              /* Temporary Patch 8/12/03 <PA> */
-    printf ("error 8Dec2003\n");
+  if (nbelts != nel) /* Temporary Patch 8/12/03 <PA> */
+    printf("error 8Dec2003\n");
 #endif /* SCOTCH_DEBUG_ORDER2 */
 
   nreal = n - nbflag;
 
-  for (i = 1; i <= n; i ++) {
-    if (elen[i] < 0 )                             /* Patch 16/12/03 <PA>: Skip elements */
+  for (i = 1; i <= n; i++) {
+    if (elen[i] < 0) /* Patch 16/12/03 <PA>: Skip elements */
       continue;
 
     deg = degree[i];
     if (deg == (n + 1)) {
       deg = n;
       if (lastd == 0) {
-        lastd     = i;
+        lastd = i;
         head[deg] = i;
-        next[i]   = 0;
-        last[i]   = 0;
-      }
-      else {
+        next[i] = 0;
+        last[i] = 0;
+      } else {
         next[lastd] = i;
-        last[i]     = lastd;
-        lastd       = i;
-        next[i]     = 0;
+        last[i] = lastd;
+        lastd = i;
+        next[i] = 0;
       }
-    }
-    else if (deg > 0) {
+    } else if (deg > 0) {
       inext = head[deg];
       if (inext != 0)
         last[inext] = i;
-      next[i]   = inext;
+      next[i] = inext;
       head[deg] = i;
+    } else {
+      nel++;
+      elen[i] = -nel;
+      pe[i] = 0;
+      w[i] = 0;
     }
-    else {
-      nel ++;
-      elen[i] = - nel;
-      pe[i]   = 0;
-      w[i]    = 0;
-    }
-  }                                               /* L20: */
+  } /* L20: */
 
-  nleft = n - nel;                                /* Patch v5 12/12/98 <PA+FP> */
+  nleft = n - nel; /* Patch v5 12/12/98 <PA+FP> */
 
-  while (nel < nreal) {                           /* WHILE (selecting pivots) DO */
-    for (deg = mindeg; deg <= n; deg ++) {        /* Patch 17/11/97 <PA+FP>      */
-       me = head[deg];
-       if (me > 0)
-         break;                                   /* GO to 50 */
-    }                                             /* L40:     */
+  while (nel < nreal) {                   /* WHILE (selecting pivots) DO */
+    for (deg = mindeg; deg <= n; deg++) { /* Patch 17/11/97 <PA+FP>      */
+      me = head[deg];
+      if (me > 0)
+        break; /* GO to 50 */
+    }          /* L40:     */
     mindeg = deg;
-    if (me <= 0) {                                /* Error 1 */
+    if (me <= 0) { /* Error 1 */
       *ncmpa = -n;
       return;
     }
@@ -497,24 +491,24 @@ Gnum * restrict     w)                            /* Flag array                 
       last[inext] = 0;
     head[deg] = inext;
 
-    elenme   = elen[me];
-    elen[me] = - (nel + 1);
-    nvpiv    = nv[me];
-    nel     += nvpiv;
+    elenme = elen[me];
+    elen[me] = -(nel + 1);
+    nvpiv = nv[me];
+    nel += nvpiv;
 
-    nv[me] = - nvpiv;
-    degme  = 0;
+    nv[me] = -nvpiv;
+    degme = 0;
     if (elenme == 0) {
       pme1 = pe[me];
       pme2 = pme1 - 1;
 
-      for (p = pme1; p <= pme1 + len[me] - 1; p ++) {
-        i   = iw[p];
+      for (p = pme1; p <= pme1 + len[me] - 1; p++) {
+        i = iw[p];
         nvi = nv[i];
         if (nvi > 0) {
-          degme +=   nvi;
-          nv[i]  = - nvi;
-          pme2 ++;
+          degme += nvi;
+          nv[i] = -nvi;
+          pme2++;
           iw[pme2] = i;
 
           if (degree[i] <= n) {
@@ -528,60 +522,58 @@ Gnum * restrict     w)                            /* Flag array                 
               head[degree[i]] = inext;
           }
         }
-      }                                           /* L60: */
+      } /* L60: */
 
       newmem = 0;
-    }
-    else {
-      p    = pe[me];
+    } else {
+      p = pe[me];
       pme1 = pfree;
       slenme = len[me] - elenme;
-      for (knt1 = 1; knt1 <= elenme + 1; knt1 ++) {
+      for (knt1 = 1; knt1 <= elenme + 1; knt1++) {
         if (knt1 > elenme) {
-          e  = me;
+          e = me;
           pj = p;
           ln = slenme;
-        }
-        else {
-          e  = iw[p ++];
+        } else {
+          e = iw[p++];
           pj = pe[e];
           ln = len[e];
         }
 
-        for (knt2 = 1; knt2 <= ln; knt2 ++) {
-          i   = iw[pj ++];
+        for (knt2 = 1; knt2 <= ln; knt2++) {
+          i = iw[pj++];
           nvi = nv[i];
           if (nvi > 0) {
             if (pfree > iwlen) {
-              pe[me]   = p;
+              pe[me] = p;
               len[me] -= knt1;
               if (len[me] == 0)
                 pe[me] = 0;
-              pe[e]  = pj;
+              pe[e] = pj;
               len[e] = ln - knt2;
               if (len[e] == 0)
                 pe[e] = 0;
-              (*ncmpa) ++;
+              (*ncmpa)++;
 
-              for (j = 1; j <= n; j ++) {
+              for (j = 1; j <= n; j++) {
                 pn = pe[j];
                 if (pn > 0) {
-                  pe[j]  = iw[pn];
-                  iw[pn] = - j;
+                  pe[j] = iw[pn];
+                  iw[pn] = -j;
                 }
-              }                                   /* L70: */
+              } /* L70: */
 
               pdst = 1;
               psrc = 1;
               pend = pme1 - 1;
 
-              while (psrc <= pend) {              /* L80: */
-                j = - iw[psrc ++];
+              while (psrc <= pend) { /* L80: */
+                j = -iw[psrc++];
                 if (j > 0) {
                   iw[pdst] = pe[j];
-                  pe[j]    = pdst ++;
-                  lenj     = len[j];
-                  for (knt3 = 0; knt3 <= lenj - 2; knt3 ++)
+                  pe[j] = pdst++;
+                  lenj = len[j];
+                  for (knt3 = 0; knt3 <= lenj - 2; knt3++)
                     iw[pdst + knt3] = iw[psrc + knt3];
                   pdst = pdst + (lenj - 1);
                   psrc = psrc + (lenj - 1);
@@ -589,18 +581,18 @@ Gnum * restrict     w)                            /* Flag array                 
               }
 
               p1 = pdst;
-              for (psrc = pme1; psrc <= pfree - 1; psrc ++, pdst ++) /* L100: */
+              for (psrc = pme1; psrc <= pfree - 1; psrc++, pdst++) /* L100: */
                 iw[pdst] = iw[psrc];
               pme1 = p1;
               pfree = pdst;
               pj = pe[e];
-              p  = pe[me];
+              p = pe[me];
             }
 
-            degme +=   nvi;
-            nv[i]  = - nvi;
+            degme += nvi;
+            nv[i] = -nvi;
             iw[pfree] = i;
-            pfree ++;
+            pfree++;
 
             if (degree[i] <= n) {
               ilast = last[i];
@@ -613,98 +605,96 @@ Gnum * restrict     w)                            /* Flag array                 
                 head[degree[i]] = inext;
             }
           }
-        }                                         /* L110: */
+        } /* L110: */
 
         if (e != me) {
           pe[e] = -me;
-          w[e]  = 0;
+          w[e] = 0;
         }
-      }                                           /* L120: */
+      } /* L120: */
       pme2 = pfree - 1;
 
       newmem = pfree - pme1;
-      mem   += newmem;
+      mem += newmem;
     }
 
     degree[me] = degme;
-    pe[me]     = pme1;
-    len[me]    = pme2 - pme1 + 1;
+    pe[me] = pme1;
+    len[me] = pme2 - pme1 + 1;
 
     if (wflg + n <= wflg) {
-      for (x = 1; x <= n; x ++) {
+      for (x = 1; x <= n; x++) {
         if (w[x] != 0)
           w[x] = 1;
-      }                                           /* L130: */
+      } /* L130: */
       wflg = 2;
     }
 
-    for (pme = pme1; pme <= pme2; pme ++) {
-      i   = iw[pme];
+    for (pme = pme1; pme <= pme2; pme++) {
+      i = iw[pme];
       eln = elen[i];
       if (eln > 0) {
-        nvi  = - nv[i];
+        nvi = -nv[i];
         wnvi = wflg - nvi;
-        for (p = pe[i]; p < pe[i] + eln; p ++) {
-          e  = iw[p];
+        for (p = pe[i]; p < pe[i] + eln; p++) {
+          e = iw[p];
           we = w[e];
           if (we >= wflg)
             we -= nvi;
           else if (we != 0)
             we = degree[e] + wnvi;
           w[e] = we;
-        }                                         /* L140: */
+        } /* L140: */
       }
-    }                                             /* L150: */
+    } /* L150: */
 
-    for (pme = pme1; pme <= pme2; pme ++) {
-      i  = iw[pme];
+    for (pme = pme1; pme <= pme2; pme++) {
+      i = iw[pme];
       p1 = pe[i];
       p2 = p1 + elen[i] - 1;
       pn = p1;
       hash = 0;
-      deg  = 0;
+      deg = 0;
 
-      for (p = p1; p <= p2; p ++) {
-        e    = iw[p];
+      for (p = p1; p <= p2; p++) {
+        e = iw[p];
         dext = w[e] - wflg;
         if (dext > 0) {
-          deg      += dext;
-          iw[pn ++] = e;
-          hash     += e;
-        }
-        else if (dext == 0) {
+          deg += dext;
+          iw[pn++] = e;
+          hash += e;
+        } else if (dext == 0) {
           pe[e] = -me;
-          w[e]  = 0;
+          w[e] = 0;
         }
-      }                                           /* L160: */
+      } /* L160: */
       elen[i] = pn - p1 + 1;
 
       p3 = pn;
-      for (p = p2 + 1; p < p1 + len[i]; p ++) {
-        j   = iw[p];
+      for (p = p2 + 1; p < p1 + len[i]; p++) {
+        j = iw[p];
         nvj = nv[j];
         if (nvj > 0) {
           deg += nvj;
-          iw[pn ++] = j;
+          iw[pn++] = j;
           hash += j;
         }
-      }                                           /* L170: */
+      } /* L170: */
 
       if (degree[i] == (n + 1))
         deg = n + 1;
       if (deg == 0) {
-        pe[i]   = - me;
-        nvi     = - nv[i];
-        degme  -= nvi;
-        nvpiv  += nvi;
-        nel    += nvi;
-        nv[i]   = 0;
+        pe[i] = -me;
+        nvi = -nv[i];
+        degme -= nvi;
+        nvpiv += nvi;
+        nel += nvi;
+        nv[i] = 0;
         elen[i] = 0;
-      }
-      else {
-        if (degree[i] != (n + 1)) {               /* Patch v6 05/01/99 <PA+FP> */
-          deg       = MIN (nleft,     deg);       /* Patch v5 12/12/98 <PA+FP> */
-          degree[i] = MIN (degree[i], deg);
+      } else {
+        if (degree[i] != (n + 1)) { /* Patch v6 05/01/99 <PA+FP> */
+          deg = MIN(nleft, deg);    /* Patch v5 12/12/98 <PA+FP> */
+          degree[i] = MIN(degree[i], deg);
         }
 
         iw[pn] = iw[p3];
@@ -716,86 +706,84 @@ Gnum * restrict     w)                            /* Flag array                 
           hash = (hash % hmod) + 1;
           j = head[hash];
           if (j <= 0) {
-            next[i]    = - j;
-            head[hash] = - i;
-          }
-          else {
+            next[i] = -j;
+            head[hash] = -i;
+          } else {
             next[i] = last[j];
             last[j] = i;
           }
           last[i] = hash;
         }
       }
-    }                                             /* L180: */
+    } /* L180: */
     degree[me] = degme;
 
-    dmax  = MAX (dmax, degme);
+    dmax = MAX(dmax, degme);
     wflg += dmax;
 
     if (wflg + n <= wflg) {
-      for (x = 1; x <= n; x ++) {
+      for (x = 1; x <= n; x++) {
         if (w[x] != 0)
           w[x] = 1;
       }
       wflg = 2;
     }
 
-    for (pme = pme1; pme <= pme2; pme ++) {
+    for (pme = pme1; pme <= pme2; pme++) {
       i = iw[pme];
       if ((nv[i] < 0) && (degree[i] <= n)) {
         hash = last[i];
-        j    = head[hash];
+        j = head[hash];
         if (j == 0)
           continue;
         if (j < 0) {
-          i = - j;
+          i = -j;
           head[hash] = 0;
-        }
-        else {
-          i       = last[j];
+        } else {
+          i = last[j];
           last[j] = 0;
         }
         if (i == 0)
           continue;
 
-L200:                                             /* WHILE LOOP: */
+      L200: /* WHILE LOOP: */
         if (next[i] != 0) {
-          ln  = len[i];
+          ln = len[i];
           eln = elen[i];
-          for (p = pe[i] + 1; p < pe[i] + ln; p ++)
+          for (p = pe[i] + 1; p < pe[i] + ln; p++)
             w[iw[p]] = wflg;
 
           jlast = i;
           j = next[i];
 
-L220:                                             /* WHILE LOOP: */
+        L220: /* WHILE LOOP: */
           if (j != 0) {
             if (len[j] != ln)
               goto L240;
             if (elen[j] != eln)
               goto L240;
 
-            for (p = pe[j] + 1; p < pe[j] + ln; p ++) {
+            for (p = pe[j] + 1; p < pe[j] + ln; p++) {
               if (w[iw[p]] != wflg)
                 goto L240;
-            }                                     /* L230: */
+            } /* L230: */
 
-            pe[j]   = -i;
-            nv[i]  += nv[j];
-            nv[j]   = 0;
+            pe[j] = -i;
+            nv[i] += nv[j];
+            nv[j] = 0;
             elen[j] = 0;
 
-            j           = next[j];
+            j = next[j];
             next[jlast] = j;
             goto L220;
 
-L240:
+          L240:
             jlast = j;
-            j     = next[j];
+            j = next[j];
             goto L220;
           }
 
-          wflg ++;
+          wflg++;
           i = next[i];
           if (i != 0)
             goto L200;
@@ -803,99 +791,99 @@ L240:
       }
     }
 
-    p     = pme1;
+    p = pme1;
     nleft = n - nel;
-    for (pme = pme1; pme <= pme2; pme ++) {
-      i   = iw[pme];
-      nvi = - nv[i];
+    for (pme = pme1; pme <= pme2; pme++) {
+      i = iw[pme];
+      nvi = -nv[i];
       if (nvi > 0) {
         nv[i] = nvi;
         if (degree[i] <= n) {
-          deg = MIN (degree[i] + degme, nleft) - nvi;
+          deg = MIN(degree[i] + degme, nleft) - nvi;
 
           inext = head[deg];
           if (inext != 0)
             last[inext] = i;
-          next[i]   = inext;
-          last[i]   = 0;
+          next[i] = inext;
+          last[i] = 0;
           head[deg] = i;
 
-          mindeg    = MIN (mindeg, deg);
+          mindeg = MIN(mindeg, deg);
           degree[i] = deg;
         }
 
-        iw[p ++] = i;
+        iw[p++] = i;
       }
     } /* L260: */
 
-    nv[me]  = nvpiv + degme;
+    nv[me] = nvpiv + degme;
     len[me] = p - pme1;
     if (len[me] == 0) {
       pe[me] = 0;
-      w[me]  = 0;
+      w[me] = 0;
     }
     if (newmem != 0) {
       pfree = p;
-      mem   = mem - newmem + len[me];
+      mem = mem - newmem + len[me];
     }
-  }                                             /* END WHILE (selecting pivots) */
+  } /* END WHILE (selecting pivots) */
 
-  if (nel < n) {                                /* Patch 12/12/98 <PA+FP> (old: nreal < n) */
-    for (deg = mindeg; deg <= n; deg ++) {
+  if (nel < n) { /* Patch 12/12/98 <PA+FP> (old: nreal < n) */
+    for (deg = mindeg; deg <= n; deg++) {
       me = head[deg];
       if (me > 0)
         break;
     }
 
     mindeg = deg;
-    nelme  = - (nel + 1);
-    for (x = 1; x <= n; x ++) {
+    nelme = -(nel + 1);
+    for (x = 1; x <= n; x++) {
       if ((pe[x] > 0) && (elen[x] < 0))
-        pe[x] = - me;
+        pe[x] = -me;
       else if (degree[x] == (n + 1)) {
-        nel    += nv[x];
-        pe[x]   = - me;
+        nel += nv[x];
+        pe[x] = -me;
         elen[x] = 0;
-        nv[x]   = 0;                              /* Patch 12/12/98 <PA+FP> (old: n + 1) */
+        nv[x] = 0; /* Patch 12/12/98 <PA+FP> (old: n + 1) */
       }
     }
 
     elen[me] = nelme;
-    nv[me]   = n - nreal;                         /* Patch 12/12/98 <PA+FP> (old: n + 1) */
-    pe[me]   = 0;
-    if (nel != n) {                               /* Error 2 */
-      *ncmpa = - (n + 1);
+    nv[me] = n - nreal; /* Patch 12/12/98 <PA+FP> (old: n + 1) */
+    pe[me] = 0;
+    if (nel != n) { /* Error 2 */
+      *ncmpa = -(n + 1);
       return;
     }
   }
 
-  for (i = 1; i <= n; i ++) {
+  for (i = 1; i <= n; i++) {
     if (elen[i] == 0) {
-      j = - pe[i];
+      j = -pe[i];
 
-      while (elen[j] >= 0)                        /* L270: */
-        j = - pe[j];
+      while (elen[j] >= 0) /* L270: */
+        j = -pe[j];
       e = j;
 
-      k = - elen[e];
+      k = -elen[e];
       j = i;
 
-      while (elen[j] >= 0) {                      /* L280: */
-        jnext = - pe[j];
-        pe[j] = - e;
+      while (elen[j] >= 0) { /* L280: */
+        jnext = -pe[j];
+        pe[j] = -e;
         if (elen[j] == 0)
-          elen[j] = k ++;
+          elen[j] = k++;
         j = jnext;
       }
-      elen[e] = - k;
+      elen[e] = -k;
     }
-  }                                               /* L290: */
+  } /* L290: */
 
-#ifdef DEAD_CODE                                  /* No need for permutations */
-  for (i = 1; i <= n; i ++) {                     /* Patch 19/10/98 <PA+FP>   */
-    k = abs (elen[i]);
+#ifdef DEAD_CODE             /* No need for permutations */
+  for (i = 1; i <= n; i++) { /* Patch 19/10/98 <PA+FP>   */
+    k = abs(elen[i]);
     last[k] = i;
     elen[i] = k;
-  }                                               /* L300: */
+  }    /* L300: */
 #endif /* DEAD_CODE */
 }

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -65,7 +65,7 @@
 **  The static variables.
 */
 
-static int                  vgraphseparatevwfilenum = 0; /* Number of file to output */
+static int vgraphseparatevwfilenum = 0; /* Number of file to output */
 
 /*****************************/
 /*                           */
@@ -79,33 +79,37 @@ static int                  vgraphseparatevwfilenum = 0; /* Number of file to ou
 ** - !0  : on error.
 */
 
-int
-vgraphSeparateVw (
-Vgraph * restrict const             grafptr)      /*+ Separation graph +*/
+int vgraphSeparateVw(Vgraph *restrict const grafptr) /*+ Separation graph +*/
 {
-  char                nametab[64];                /* File name */
-  FILE * restrict     fileptr;
-  Gnum                vertnum;                    /* Vertex number */
+  char nametab[64]; /* File name */
+  FILE *restrict fileptr;
+  Gnum vertnum; /* Vertex number */
 
-  sprintf (nametab, "vgraphseparatevw_output_%08d.map", vgraphseparatevwfilenum ++);
-  if ((fileptr = fopen (nametab, "w+")) == NULL) {
-    errorPrint ("vgraphSeparateVw: cannot open partition file");
-    return     (1);
+  sprintf(nametab, "vgraphseparatevw_output_%08d.map",
+          vgraphseparatevwfilenum++);
+  if ((fileptr = fopen(nametab, "w+")) == NULL) {
+    errorPrint("vgraphSeparateVw: cannot open partition file");
+    return (1);
   }
 
-  fprintf (fileptr, GNUMSTRING "\n",              /* Output size of mapping; test if failure later, in main loop */
-           (Gnum) grafptr->s.vertnbr);
+  fprintf(
+      fileptr,
+      GNUMSTRING
+      "\n", /* Output size of mapping; test if failure later, in main loop */
+      (Gnum)grafptr->s.vertnbr);
 
-  for (vertnum = grafptr->s.baseval; vertnum < grafptr->s.vertnnd; vertnum ++) {
-    if (fprintf (fileptr, GNUMSTRING "\t%d\n",
-                 (Gnum) ((grafptr->s.vnumtax != NULL) ? grafptr->s.vnumtax[vertnum] : vertnum),
-                 (int) grafptr->parttax[vertnum]) <= 0) {
-      errorPrint ("vgraphSeparateVw: bad output");
-      fclose     (fileptr);
-      return     (1);
+  for (vertnum = grafptr->s.baseval; vertnum < grafptr->s.vertnnd; vertnum++) {
+    if (fprintf(fileptr, GNUMSTRING "\t%d\n",
+                (Gnum)((grafptr->s.vnumtax != NULL)
+                           ? grafptr->s.vnumtax[vertnum]
+                           : vertnum),
+                (int)grafptr->parttax[vertnum]) <= 0) {
+      errorPrint("vgraphSeparateVw: bad output");
+      fclose(fileptr);
+      return (1);
     }
   }
 
-  fclose (fileptr);
+  fclose(fileptr);
   return (0);
 }

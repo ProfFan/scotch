@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -51,13 +51,14 @@
 
 /* Buffer size. */
 
-#define FILECOMPRESSDATASIZE        (128 * 1024) /* Size of (un)compressing buffers */
+#define FILECOMPRESSDATASIZE (128 * 1024) /* Size of (un)compressing buffers   \
+                                           */
 
 /* Available types of (un)compression. */
 
 typedef enum FileCompressType_ {
-  FILECOMPRESSTYPENOTIMPL = -1,                   /* Error code     */
-  FILECOMPRESSTYPENONE    = 0,                    /* No compression */
+  FILECOMPRESSTYPENOTIMPL = -1, /* Error code     */
+  FILECOMPRESSTYPENONE = 0,     /* No compression */
   FILECOMPRESSTYPEBZ2,
   FILECOMPRESSTYPEGZ,
   FILECOMPRESSTYPELZMA
@@ -66,8 +67,8 @@ typedef enum FileCompressType_ {
 /* (Un)compression type slot. */
 
 typedef struct FileCompressTab_ {
-  char *                    name;                 /* File extension name  */
-  FileCompressType          type;                 /* (Un)compression type */
+  char *name;            /* File extension name  */
+  FileCompressType type; /* (Un)compression type */
 } FileCompressTab;
 
 /*
@@ -75,15 +76,15 @@ typedef struct FileCompressTab_ {
 */
 
 typedef struct FileCompress_ {
-  FileCompressType          typeval;              /*+ Type of (un)compression      +*/
-  int                       infdnum;              /*+ Inner file handle (pipe end) +*/
-  FILE *                    oustptr;              /*+ Outer stream                 +*/
-  byte *                    bufftab;              /*+ Data buffer                  +*/
+  FileCompressType typeval; /*+ Type of (un)compression      +*/
+  int infdnum;              /*+ Inner file handle (pipe end) +*/
+  FILE *oustptr;            /*+ Outer stream                 +*/
+  byte *bufftab;            /*+ Data buffer                  +*/
 #ifdef COMMON_PTHREAD_FILE
-  pthread_t                 thrdval;              /*+ Spawned thread ID            +*/
-#else /* COMMON_PTHREAD_FILE */
-  int                       procval;              /*+ Forked process ID            +*/
-#endif /* COMMON_PTHREAD_FILE */
+  pthread_t thrdval; /*+ Spawned thread ID            +*/
+#else                /* COMMON_PTHREAD_FILE */
+  int procval; /*+ Forked process ID            +*/
+#endif               /* COMMON_PTHREAD_FILE */
 } FileCompress;
 
 /*
@@ -92,25 +93,25 @@ typedef struct FileCompress_ {
 
 #ifdef COMMON_FILE_COMPRESS_BZ2
 #ifdef COMMON_FILE_COMPRESS
-static void                 fileCompressBz2     (FileCompress * const  dataptr);
+static void fileCompressBz2(FileCompress *const dataptr);
 #endif /* COMMON_FILE_COMPRESS */
 #ifdef COMMON_FILE_DECOMPRESS
-static void                 fileDecompressBz2   (FileCompress * const  dataptr);
+static void fileDecompressBz2(FileCompress *const dataptr);
 #endif /* COMMON_FILE_DECOMPRESS */
 #endif /* COMMON_FILE_COMPRESS_Bz2 */
 #ifdef COMMON_FILE_COMPRESS_GZ
 #ifdef COMMON_FILE_COMPRESS
-static void                 fileCompressGz      (FileCompress * const  dataptr);
+static void fileCompressGz(FileCompress *const dataptr);
 #endif /* COMMON_FILE_COMPRESS */
 #ifdef COMMON_FILE_DECOMPRESS
-static void                 fileDecompressGz    (FileCompress * const  dataptr);
+static void fileDecompressGz(FileCompress *const dataptr);
 #endif /* COMMON_FILE_DECOMPRESS */
 #endif /* COMMON_FILE_COMPRESS_GZ */
 #ifdef COMMON_FILE_COMPRESS_LZMA
 #ifdef COMMON_FILE_COMPRESS
-static void                 fileCompressLzma    (FileCompress * const  dataptr);
+static void fileCompressLzma(FileCompress *const dataptr);
 #endif /* COMMON_FILE_COMPRESS */
 #ifdef COMMON_FILE_DECOMPRESS
-static void                 fileDecompressLzma  (FileCompress * const  dataptr);
+static void fileDecompressLzma(FileCompress *const dataptr);
 #endif /* COMMON_FILE_DECOMPRESS */
 #endif /* COMMON_FILE_COMPRESS_LZMA */

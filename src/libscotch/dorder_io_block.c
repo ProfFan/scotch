@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -73,58 +73,52 @@
 ** - !0  : on error.
 */
 
-static
-int
-dorderSaveBlock2 (
-const Order * const           cordptr,
-const Gnum * const            vlbltab,
-FILE * const                  stream)
-{
-  Gnum              vertnum;
-  Gnum * restrict   rangtab;
-  Gnum              cblknum;
-  int               o;
+static int dorderSaveBlock2(const Order *const cordptr,
+                            const Gnum *const vlbltab, FILE *const stream) {
+  Gnum vertnum;
+  Gnum *restrict rangtab;
+  Gnum cblknum;
+  int o;
 
-  if ((rangtab = memAlloc ((cordptr->vnodnbr + 1) * sizeof (Gnum))) == NULL) {
-    errorPrint ("dorderSaveBlock2: out of memory");
-    return     (1);
+  if ((rangtab = memAlloc((cordptr->vnodnbr + 1) * sizeof(Gnum))) == NULL) {
+    errorPrint("dorderSaveBlock2: out of memory");
+    return (1);
   }
-  orderRang (cordptr, rangtab);
+  orderRang(cordptr, rangtab);
 
-  if (fprintf (stream, "0\n" GNUMSTRING "\t" GNUMSTRING "\n",
-               (Gnum) cordptr->cblknbr,
-               (Gnum) cordptr->vnodnbr) < 0) {
-    errorPrint ("dorderSaveBlock2: bad output (1)");
-    return     (1);
+  if (fprintf(stream, "0\n" GNUMSTRING "\t" GNUMSTRING "\n",
+              (Gnum)cordptr->cblknbr, (Gnum)cordptr->vnodnbr) < 0) {
+    errorPrint("dorderSaveBlock2: bad output (1)");
+    return (1);
   }
 
-  for (cblknum = 0, o = 1; (o == 1) && (cblknum < cordptr->cblknbr); cblknum ++) { /* Save column-block range array */
-    o = intSave (stream, rangtab[cblknum]);
-    putc (((cblknum & 7) == 7) ? '\n' : '\t', stream);
+  for (cblknum = 0, o = 1; (o == 1) && (cblknum < cordptr->cblknbr);
+       cblknum++) { /* Save column-block range array */
+    o = intSave(stream, rangtab[cblknum]);
+    putc(((cblknum & 7) == 7) ? '\n' : '\t', stream);
   }
-  o = intSave (stream, rangtab[cblknum]);
-  putc ('\n', stream);
+  o = intSave(stream, rangtab[cblknum]);
+  putc('\n', stream);
 
-  orderPeri (cordptr->peritab, cordptr->baseval, cordptr->vnodnbr, rangtab, cordptr->baseval); /* TRICK: re-use rangtab as permtab */
+  orderPeri(cordptr->peritab, cordptr->baseval, cordptr->vnodnbr, rangtab,
+            cordptr->baseval); /* TRICK: re-use rangtab as permtab */
 
-  for (vertnum = 0; (o == 1) && (vertnum < (cordptr->vnodnbr - 1)); vertnum ++) { /* Save direct permutation */
-    o = intSave (stream, rangtab[vertnum]);
-    putc (((vertnum & 7) == 7) ? '\n' : '\t', stream);
+  for (vertnum = 0; (o == 1) && (vertnum < (cordptr->vnodnbr - 1));
+       vertnum++) { /* Save direct permutation */
+    o = intSave(stream, rangtab[vertnum]);
+    putc(((vertnum & 7) == 7) ? '\n' : '\t', stream);
   }
-  o = intSave (stream, rangtab[vertnum]);
-  putc ('\n', stream);
+  o = intSave(stream, rangtab[vertnum]);
+  putc('\n', stream);
 
   if (o != 1)
-    errorPrint ("dorderSaveBlock2: bad output (2)");
+    errorPrint("dorderSaveBlock2: bad output (2)");
 
   return (1 - o);
 }
 
-int
-dorderSaveBlock (
-const Dorder * restrict const ordeptr,
-const Dgraph * restrict const grafptr,
-FILE * restrict const         stream)
-{
-  return (dorderSaveTree2 (ordeptr, grafptr, stream, dorderSaveBlock2));
+int dorderSaveBlock(const Dorder *restrict const ordeptr,
+                    const Dgraph *restrict const grafptr,
+                    FILE *restrict const stream) {
+  return (dorderSaveTree2(ordeptr, grafptr, stream, dorderSaveBlock2));
 }

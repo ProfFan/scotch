@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -69,20 +69,15 @@
 ** - !0  : on error.
 */
 
-int
-dmapInit (
-Dmapping * restrict const     dmapptr,
-const Arch * restrict const   archptr)
-{
-  dmapptr->fragptr    = NULL;
-  dmapptr->fragnbr    =
-  dmapptr->vertlocmax =
-  dmapptr->vertlocnbr = 0;
-  dmapptr->archdat    = *archptr;
+int dmapInit(Dmapping *restrict const dmapptr,
+             const Arch *restrict const archptr) {
+  dmapptr->fragptr = NULL;
+  dmapptr->fragnbr = dmapptr->vertlocmax = dmapptr->vertlocnbr = 0;
+  dmapptr->archdat = *archptr;
 
 #ifdef SCOTCH_PTHREAD
-  pthread_mutex_init (&dmapptr->mutelocdat, NULL); /* Initialize local mutex */
-#endif /* SCOTCH_PTHREAD */
+  pthread_mutex_init(&dmapptr->mutelocdat, NULL); /* Initialize local mutex */
+#endif                                            /* SCOTCH_PTHREAD */
 
   return (0);
 }
@@ -95,27 +90,24 @@ const Arch * restrict const   archptr)
 ** - VOID  : in all cases.
 */
 
-void
-dmapExit (
-Dmapping * const             dmapptr)
-{
-  DmappingFrag *      fragptr;
-  DmappingFrag *      fragtmp;
+void dmapExit(Dmapping *const dmapptr) {
+  DmappingFrag *fragptr;
+  DmappingFrag *fragtmp;
 
   for (fragptr = dmapptr->fragptr; fragptr != NULL; fragptr = fragtmp) {
-    memFree (fragptr->vnumtab);
-    memFree (fragptr->parttab);
-    memFree (fragptr->domntab);
+    memFree(fragptr->vnumtab);
+    memFree(fragptr->parttab);
+    memFree(fragptr->domntab);
     fragtmp = fragptr->nextptr;
-    memFree (fragptr);
+    memFree(fragptr);
   }
 
 #ifdef SCOTCH_PTHREAD
-  pthread_mutex_destroy (&dmapptr->mutelocdat);   /* Destroy local mutex */
-#endif /* SCOTCH_PTHREAD */
+  pthread_mutex_destroy(&dmapptr->mutelocdat); /* Destroy local mutex */
+#endif                                         /* SCOTCH_PTHREAD */
 
 #ifdef SCOTCH_DEBUG_DMAP2
-  memSet (dmapptr, ~0, sizeof (Dmapping));
+  memSet(dmapptr, ~0, sizeof(Dmapping));
 #endif /* SCOTCH_DEBUG_DMAP2 */
 }
 
@@ -125,26 +117,23 @@ Dmapping * const             dmapptr)
 ** - void  : in all cases.
 */
 
-void
-dmapAdd (
-Dmapping * restrict const     dmapptr,
-DmappingFrag * restrict const fragptr)
-{
+void dmapAdd(Dmapping *restrict const dmapptr,
+             DmappingFrag *restrict const fragptr) {
 #ifdef SCOTCH_PTHREAD
-  pthread_mutex_lock (&dmapptr->mutelocdat);      /* Lock local mutex */
-#endif /* SCOTCH_PTHREAD */
+  pthread_mutex_lock(&dmapptr->mutelocdat); /* Lock local mutex */
+#endif                                      /* SCOTCH_PTHREAD */
 
   if (dmapptr->vertlocmax < fragptr->vertnbr)
     dmapptr->vertlocmax = fragptr->vertnbr;
   dmapptr->vertlocnbr += fragptr->vertnbr;
 
-  dmapptr->fragnbr ++;
-  fragptr->nextptr = dmapptr->fragptr;            /* Link fragment to mapping */
+  dmapptr->fragnbr++;
+  fragptr->nextptr = dmapptr->fragptr; /* Link fragment to mapping */
   dmapptr->fragptr = fragptr;
 
 #ifdef SCOTCH_PTHREAD
-  pthread_mutex_unlock (&dmapptr->mutelocdat);    /* Unlock local mutex */
-#endif /* SCOTCH_PTHREAD */
+  pthread_mutex_unlock(&dmapptr->mutelocdat); /* Unlock local mutex */
+#endif                                        /* SCOTCH_PTHREAD */
 }
 
 /* This routine propagates back distributed mapping
@@ -155,150 +144,169 @@ DmappingFrag * restrict const fragptr)
 ** - !0  : on error.
 */
 
-int
-dmapTerm (
-const Dmapping * restrict const dmapptr,
-const Dgraph * restrict const   grafptr,
-Gnum * restrict const           termloctab)
-{
-  Gnum * restrict             termloctax;
-  int * restrict              sendcnttab;
-  int * restrict              senddsptab;
-  int * restrict              recvcnttab;
-  int * restrict              recvdsptab;
-  DmappingTermSort * restrict sortsndtab;
-  DmappingTermSort * restrict sortrcvtab;
-  Gnum                        vertlocnum;
-  int                         vertrcvnbr;
-  int                         vertsndnbr;
-  int                         procnum;
-  DmappingFrag * restrict     fragptr;
-  Gnum                        reduloctab[2];
-  Gnum                        reduglbtab[2];
+int dmapTerm(const Dmapping *restrict const dmapptr,
+             const Dgraph *restrict const grafptr,
+             Gnum *restrict const termloctab) {
+  Gnum *restrict termloctax;
+  int *restrict sendcnttab;
+  int *restrict senddsptab;
+  int *restrict recvcnttab;
+  int *restrict recvdsptab;
+  DmappingTermSort *restrict sortsndtab;
+  DmappingTermSort *restrict sortrcvtab;
+  Gnum vertlocnum;
+  int vertrcvnbr;
+  int vertsndnbr;
+  int procnum;
+  DmappingFrag *restrict fragptr;
+  Gnum reduloctab[2];
+  Gnum reduglbtab[2];
 
   reduloctab[0] = dmapptr->vertlocnbr;
   reduloctab[1] = 0;
-  if (memAllocGroup ((void **) (void *)
-                     &senddsptab, (size_t) (grafptr->procglbnbr       * sizeof (int)),
-                     &sendcnttab, (size_t) (grafptr->procglbnbr       * sizeof (int)),
-                     &recvdsptab, (size_t) (grafptr->procglbnbr       * sizeof (int)),
-                     &recvcnttab, (size_t) (grafptr->procglbnbr       * sizeof (int)),
-                     &sortsndtab, (size_t) ((dmapptr->vertlocnbr + 1) * sizeof (DmappingTermSort)), /* "+1" for end marker */
-                     &sortrcvtab, (size_t) (grafptr->vertlocnbr       * sizeof (DmappingTermSort)), NULL) == NULL) {
-    errorPrint ("dmapTerm: out of memory");
+  if (memAllocGroup(
+          (void **)(void *)&senddsptab,
+          (size_t)(grafptr->procglbnbr * sizeof(int)), &sendcnttab,
+          (size_t)(grafptr->procglbnbr * sizeof(int)), &recvdsptab,
+          (size_t)(grafptr->procglbnbr * sizeof(int)), &recvcnttab,
+          (size_t)(grafptr->procglbnbr * sizeof(int)), &sortsndtab,
+          (size_t)((dmapptr->vertlocnbr + 1) *
+                   sizeof(DmappingTermSort)), /* "+1" for end marker */
+          &sortrcvtab, (size_t)(grafptr->vertlocnbr * sizeof(DmappingTermSort)),
+          NULL) == NULL) {
+    errorPrint("dmapTerm: out of memory");
     reduloctab[1] = 1;
   }
 
-  if (MPI_Allreduce (reduloctab, reduglbtab, 2, GNUM_MPI, MPI_SUM, grafptr->proccomm) != MPI_SUCCESS) {
-    errorPrint ("dmapTerm: communication error (1)");
+  if (MPI_Allreduce(reduloctab, reduglbtab, 2, GNUM_MPI, MPI_SUM,
+                    grafptr->proccomm) != MPI_SUCCESS) {
+    errorPrint("dmapTerm: communication error (1)");
     reduglbtab[1] = 1;
   }
   if (reduglbtab[1] != 0) {
     if (senddsptab != NULL)
-      memFree (senddsptab);                       /* Free group leader */
+      memFree(senddsptab); /* Free group leader */
     return (1);
   }
 
-  if (reduglbtab[0] == 0) {                       /* If mapping structure is empty, create an empty mapping */
-    memSet  (termloctab, 0, grafptr->vertlocnbr * sizeof (Gnum));
-    memFree (senddsptab);                         /* Free group leader */
+  if (reduglbtab[0] ==
+      0) { /* If mapping structure is empty, create an empty mapping */
+    memSet(termloctab, 0, grafptr->vertlocnbr * sizeof(Gnum));
+    memFree(senddsptab); /* Free group leader */
     return (0);
   }
   if (reduglbtab[0] != grafptr->vertglbnbr) {
-    errorPrint ("dmapTerm: invalid mapping (1)");
-    memFree    (senddsptab);                      /* Free group leader */
-    return     (1);
+    errorPrint("dmapTerm: invalid mapping (1)");
+    memFree(senddsptab); /* Free group leader */
+    return (1);
   }
 
-  for (fragptr = dmapptr->fragptr, vertlocnum = 0; fragptr != NULL; fragptr = fragptr->nextptr) {
-    Gnum                      fraglocnum;
+  for (fragptr = dmapptr->fragptr, vertlocnum = 0; fragptr != NULL;
+       fragptr = fragptr->nextptr) {
+    Gnum fraglocnum;
 
-    for (fraglocnum = 0; fraglocnum < fragptr->vertnbr; fraglocnum ++, vertlocnum ++) {
+    for (fraglocnum = 0; fraglocnum < fragptr->vertnbr;
+         fraglocnum++, vertlocnum++) {
 #ifdef SCOTCH_DEBUG_DMAP2
-      if ((vertlocnum >= dmapptr->vertlocnbr) || (fragptr->parttab[fraglocnum] < 0) || (fragptr->parttab[fraglocnum] >= fragptr->domnnbr)) {
-        errorPrint ("dmapTerm: invalid mapping (2)");
-        return     (1);
+      if ((vertlocnum >= dmapptr->vertlocnbr) ||
+          (fragptr->parttab[fraglocnum] < 0) ||
+          (fragptr->parttab[fraglocnum] >= fragptr->domnnbr)) {
+        errorPrint("dmapTerm: invalid mapping (2)");
+        return (1);
       }
 #endif /* SCOTCH_DEBUG_DMAP2 */
       sortsndtab[vertlocnum].vertnum = fragptr->vnumtab[fraglocnum];
-      sortsndtab[vertlocnum].termnum = (Gnum) archDomNum (&dmapptr->archdat, &fragptr->domntab[fragptr->parttab[fraglocnum]]);
+      sortsndtab[vertlocnum].termnum = (Gnum)archDomNum(
+          &dmapptr->archdat, &fragptr->domntab[fragptr->parttab[fraglocnum]]);
     }
   }
 #ifdef SCOTCH_DEBUG_DMAP2
   if (vertlocnum != dmapptr->vertlocnbr) {
-    errorPrint ("dmapTerm: invalid mapping (3)");
-    return     (1);
+    errorPrint("dmapTerm: invalid mapping (3)");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_DMAP2 */
 
-  sortsndtab[vertlocnum].vertnum =                /* Set end marker */
-  sortsndtab[vertlocnum].termnum = GNUMMAX;
-  intSort2asc1 (sortsndtab, dmapptr->vertlocnbr); /* Sort mapping array by original vertex numbers, without marker */
+  sortsndtab[vertlocnum].vertnum = /* Set end marker */
+      sortsndtab[vertlocnum].termnum = GNUMMAX;
+  intSort2asc1(sortsndtab,
+               dmapptr->vertlocnbr); /* Sort mapping array by original vertex
+                                        numbers, without marker */
 
-  for (vertlocnum = 0, procnum = 0; procnum < grafptr->procglbnbr; ) {
-    Gnum                  vertsndnbr;
-    Gnum                  procvrtval;
+  for (vertlocnum = 0, procnum = 0; procnum < grafptr->procglbnbr;) {
+    Gnum vertsndnbr;
+    Gnum procvrtval;
 
     vertsndnbr = 0;
     procvrtval = grafptr->procvrttab[procnum + 1];
     while (sortsndtab[vertlocnum].vertnum < procvrtval) {
-      vertsndnbr ++;
-      vertlocnum ++;
+      vertsndnbr++;
+      vertlocnum++;
 #ifdef SCOTCH_DEBUG_DMAP2
-      if (vertlocnum > dmapptr->vertlocnbr) {     /* If beyond regular indices plus end marker */
-        errorPrint ("dmapTerm: internal error (1)");
-        return     (1);
+      if (vertlocnum >
+          dmapptr->vertlocnbr) { /* If beyond regular indices plus end marker */
+        errorPrint("dmapTerm: internal error (1)");
+        return (1);
       }
 #endif /* SCOTCH_DEBUG_DMAP2 */
     }
-    sendcnttab[procnum ++] = (int) (vertsndnbr * 2); /* Communication array for MPI, so (int), and "*2" because a Sort is 2 Gnums */
+    sendcnttab[procnum++] =
+        (int)(vertsndnbr * 2); /* Communication array for MPI, so (int), and
+                                  "*2" because a Sort is 2 Gnums */
   }
 #ifdef SCOTCH_DEBUG_DMAP2
   if (vertlocnum != dmapptr->vertlocnbr) {
-    errorPrint ("dmapTerm: internal error (2)");
-    return     (1);
+    errorPrint("dmapTerm: internal error (2)");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_DMAP2 */
 
-  if (MPI_Alltoall (sendcnttab, 1, MPI_INT, recvcnttab, 1, MPI_INT, grafptr->proccomm) != MPI_SUCCESS) {
-    errorPrint ("dmapTerm: communication error (2)");
-    return     (1);
+  if (MPI_Alltoall(sendcnttab, 1, MPI_INT, recvcnttab, 1, MPI_INT,
+                   grafptr->proccomm) != MPI_SUCCESS) {
+    errorPrint("dmapTerm: communication error (2)");
+    return (1);
   }
 
-  for (procnum = 0, vertrcvnbr = vertsndnbr = 0; procnum < grafptr->procglbnbr; procnum ++) { /* Accumulate send and receive indices */
+  for (procnum = 0, vertrcvnbr = vertsndnbr = 0; procnum < grafptr->procglbnbr;
+       procnum++) { /* Accumulate send and receive indices */
     recvdsptab[procnum] = vertrcvnbr;
-    vertrcvnbr += recvcnttab[procnum];            /* Accumulate "*2" values as counts */
+    vertrcvnbr += recvcnttab[procnum]; /* Accumulate "*2" values as counts */
     senddsptab[procnum] = vertsndnbr;
     vertsndnbr += sendcnttab[procnum];
   }
 
-  if (MPI_Alltoallv (sortsndtab, sendcnttab, senddsptab, GNUM_MPI, sortrcvtab, recvcnttab, recvdsptab, GNUM_MPI, grafptr->proccomm) != MPI_SUCCESS) {
-    errorPrint ("dmapTerm: communication error (3)");
-    return     (1);
+  if (MPI_Alltoallv(sortsndtab, sendcnttab, senddsptab, GNUM_MPI, sortrcvtab,
+                    recvcnttab, recvdsptab, GNUM_MPI,
+                    grafptr->proccomm) != MPI_SUCCESS) {
+    errorPrint("dmapTerm: communication error (3)");
+    return (1);
   }
 
-  memSet (termloctab, ~0, grafptr->vertlocnbr * sizeof (Gnum));
+  memSet(termloctab, ~0, grafptr->vertlocnbr * sizeof(Gnum));
 
-  termloctax = termloctab - grafptr->procvrttab[grafptr->proclocnum]; /* Base local array through global indices */
-  for (vertlocnum = 0; vertlocnum < grafptr->vertlocnbr; vertlocnum ++) {
+  termloctax =
+      termloctab -
+      grafptr->procvrttab[grafptr->proclocnum]; /* Base local array through
+                                                   global indices */
+  for (vertlocnum = 0; vertlocnum < grafptr->vertlocnbr; vertlocnum++) {
 #ifdef SCOTCH_DEBUG_DMAP2
     if (termloctax[sortrcvtab[vertlocnum].vertnum] != ~0) {
-      errorPrint ("dmapTerm: internal error (3)");
-      return     (1);
+      errorPrint("dmapTerm: internal error (3)");
+      return (1);
     }
 #endif /* SCOTCH_DEBUG_DMAP2 */
     termloctax[sortrcvtab[vertlocnum].vertnum] = sortrcvtab[vertlocnum].termnum;
   }
 #ifdef SCOTCH_DEBUG_DMAP2
-  for (vertlocnum = 0; vertlocnum < grafptr->vertlocnbr; vertlocnum ++) {
+  for (vertlocnum = 0; vertlocnum < grafptr->vertlocnbr; vertlocnum++) {
     if (termloctab[vertlocnum] == ~0) {
-      errorPrint ("dmapTerm: internal error (4)");
-      return     (1);
+      errorPrint("dmapTerm: internal error (4)");
+      return (1);
     }
   }
 #endif /* SCOTCH_DEBUG_DMAP2 */
 
-  memFree (senddsptab);                           /* Free group leader */
+  memFree(senddsptab); /* Free group leader */
 
   return (0);
 }

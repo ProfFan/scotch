@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -61,10 +61,10 @@
 /** Method parameters. **/
 
 typedef struct BgraphBipartGgParam_ {
-  INT                       passnbr;              /*+ Number of passes to do +*/
+  INT passnbr; /*+ Number of passes to do +*/
 } BgraphBipartGgParam;
 
-#ifdef BGRAPH_BIPART_GG                           /* Private part of the module */
+#ifdef BGRAPH_BIPART_GG /* Private part of the module */
 
 /*+ The complementary vertex structure. For
     trick reasons, the gain table data structure
@@ -72,7 +72,7 @@ typedef struct BgraphBipartGgParam_ {
 
 #ifdef SCOTCH_TABLE_GAIN
 
-typedef GainTabl * BgraphBipartGgTabl;
+typedef GainTabl *BgraphBipartGgTabl;
 typedef GainLink BgraphBipartGgLink;
 
 #else /* SCOTCH_TABLE_GAIN */
@@ -83,9 +83,9 @@ typedef FiboNode BgraphBipartGgLink;
 #endif /* SCOTCH_TABLE_GAIN */
 
 typedef struct BgraphBipartGgVertex_ {
-  BgraphBipartGgLink        gainlink;             /*+ Gain link: FIRST                       +*/
-  Gnum                      commgain0;            /*+ Gain if vertex and neighbors in part 0 +*/
-  Gnum                      commgain;             /*+ Gain value                             +*/
+  BgraphBipartGgLink gainlink; /*+ Gain link: FIRST                       +*/
+  Gnum commgain0;              /*+ Gain if vertex and neighbors in part 0 +*/
+  Gnum commgain;               /*+ Gain value                             +*/
 } BgraphBipartGgVertex;
 
 #endif /* BGRAPH_BIPART_GG */
@@ -94,7 +94,7 @@ typedef struct BgraphBipartGgVertex_ {
 **  The function prototypes.
 */
 
-int                         bgraphBipartGg      (Bgraph * restrict const, const BgraphBipartGgParam * const);
+int bgraphBipartGg(Bgraph *restrict const, const BgraphBipartGgParam *const);
 
 /*
 **  The macro definitions.
@@ -108,49 +108,63 @@ int                         bgraphBipartGg      (Bgraph * restrict const, const 
 
 /** Gain table vertex status. **/
 
-#define BGRAPHBIPARTGGSTATEFREE     ((GainLink *) 0) /*+ Vertex in initial state (TRICK: must be 0) +*/
-#define BGRAPHBIPARTGGSTATEUSED     ((GainLink *) 1) /*+ Swapped vertex                             +*/
-#define BGRAPHBIPARTGGSTATELINK     ((GainLink *) 2) /*+ Currently in gain table if higher          +*/
+#define BGRAPHBIPARTGGSTATEFREE                                                \
+  ((GainLink *)0) /*+ Vertex in initial state (TRICK: must be 0) +*/
+#define BGRAPHBIPARTGGSTATEUSED                                                \
+  ((GainLink *)1) /*+ Swapped vertex                             +*/
+#define BGRAPHBIPARTGGSTATELINK                                                \
+  ((GainLink *)2) /*+ Currently in gain table if higher          +*/
 
 /*+ Service routines. +*/
 
-#define bgraphBipartGgTablInit(t)   (((*(t)) = gainTablInit (GAIN_LINMAX, BGRAPHBIPARTGGGAINTABLSUBBITS)) == NULL)
-#define bgraphBipartGgTablFree(t)   gainTablFree (*(t))
-#define bgraphBipartGgTablExit(t)   do {                     \
-                                      if (*(t) != NULL)      \
-                                        gainTablExit (*(t)); \
-                                    } while (0)
-#define bgraphBipartGgTablAdd(t,v)  gainTablAdd ((*(t)), &(v)->gainlink, (v)->commgain)
-#define bgraphBipartGgTablDel(t,v)  gainTablDel ((*(t)), &(v)->gainlink)
-#define bgraphBipartGgTablFrst(t)   gainTablFrst (*(t))
-#define bgraphBipartGgIsFree(v)     ((v)->gainlink.next == BGRAPHBIPARTGGSTATEFREE)
-#define bgraphBipartGgIsTabl(v)     ((v)->gainlink.next >= BGRAPHBIPARTGGSTATELINK)
-#define bgraphBipartGgIsUsed(v)     ((v)->gainlink.next == BGRAPHBIPARTGGSTATEUSED)
-#define bgraphBipartGgSetFree(v)    ((v)->gainlink.next = BGRAPHBIPARTGGSTATEFREE)
-#define bgraphBipartGgSetUsed(v)    ((v)->gainlink.next = BGRAPHBIPARTGGSTATEUSED)
-#define bgraphBipartGgNext(v)       ((v)->gainlink.next)
+#define bgraphBipartGgTablInit(t)                                              \
+  (((*(t)) = gainTablInit(GAIN_LINMAX, BGRAPHBIPARTGGGAINTABLSUBBITS)) == NULL)
+#define bgraphBipartGgTablFree(t) gainTablFree(*(t))
+#define bgraphBipartGgTablExit(t)                                              \
+  do {                                                                         \
+    if (*(t) != NULL)                                                          \
+      gainTablExit(*(t));                                                      \
+  } while (0)
+#define bgraphBipartGgTablAdd(t, v)                                            \
+  gainTablAdd((*(t)), &(v)->gainlink, (v)->commgain)
+#define bgraphBipartGgTablDel(t, v) gainTablDel((*(t)), &(v)->gainlink)
+#define bgraphBipartGgTablFrst(t) gainTablFrst(*(t))
+#define bgraphBipartGgIsFree(v) ((v)->gainlink.next == BGRAPHBIPARTGGSTATEFREE)
+#define bgraphBipartGgIsTabl(v) ((v)->gainlink.next >= BGRAPHBIPARTGGSTATELINK)
+#define bgraphBipartGgIsUsed(v) ((v)->gainlink.next == BGRAPHBIPARTGGSTATEUSED)
+#define bgraphBipartGgSetFree(v) ((v)->gainlink.next = BGRAPHBIPARTGGSTATEFREE)
+#define bgraphBipartGgSetUsed(v) ((v)->gainlink.next = BGRAPHBIPARTGGSTATEUSED)
+#define bgraphBipartGgNext(v) ((v)->gainlink.next)
 
 #else /* SCOTCH_TABLE_GAIN */
 
 /*+ Gain table vertex status. +*/
 
-#define BGRAPHBIPARTGGSTATEFREE     ((FiboNode *) 0) /*+ Vertex in initial state (TRICK: must be 0) +*/
-#define BGRAPHBIPARTGGSTATEUSED     ((FiboNode *) 1) /*+ Swapped vertex                             +*/
-#define BGRAPHBIPARTGGSTATELINK     ((FiboNode *) 2) /*+ Currently in gain table if higher          +*/
+#define BGRAPHBIPARTGGSTATEFREE                                                \
+  ((FiboNode *)0) /*+ Vertex in initial state (TRICK: must be 0) +*/
+#define BGRAPHBIPARTGGSTATEUSED                                                \
+  ((FiboNode *)1) /*+ Swapped vertex                             +*/
+#define BGRAPHBIPARTGGSTATELINK                                                \
+  ((FiboNode *)2) /*+ Currently in gain table if higher          +*/
 
 /*+ Service routines. +*/
 
-#define bgraphBipartGgTablInit(t)   (fiboHeapInit ((t), bgraphBipartGgCmpFunc))
-#define bgraphBipartGgTablFree(t)   fiboHeapFree (t)
-#define bgraphBipartGgTablExit(t)   fiboHeapExit (t)
-#define bgraphBipartGgTablAdd(t,v)  fiboHeapAdd ((t), &(v)->gainlink)
-#define bgraphBipartGgTablDel(t,v)  fiboHeapDel ((t), &(v)->gainlink)
-#define bgraphBipartGgTablFrst(t)   fiboHeapMin ((t))
-#define bgraphBipartGgIsFree(v)     ((v)->gainlink.linkdat.nextptr == BGRAPHBIPARTGGSTATEFREE)
-#define bgraphBipartGgIsTabl(v)     ((v)->gainlink.linkdat.nextptr >= BGRAPHBIPARTGGSTATELINK)
-#define bgraphBipartGgIsUsed(v)     ((v)->gainlink.linkdat.nextptr == BGRAPHBIPARTGGSTATEUSED)
-#define bgraphBipartGgSetFree(v)    ((v)->gainlink.linkdat.nextptr = BGRAPHBIPARTGGSTATEFREE)
-#define bgraphBipartGgSetUsed(v)    ((v)->gainlink.linkdat.nextptr = BGRAPHBIPARTGGSTATEUSED)
-#define bgraphBipartGgNext(v)       ((v)->gainlink.linkdat.nextptr)
+#define bgraphBipartGgTablInit(t) (fiboHeapInit((t), bgraphBipartGgCmpFunc))
+#define bgraphBipartGgTablFree(t) fiboHeapFree(t)
+#define bgraphBipartGgTablExit(t) fiboHeapExit(t)
+#define bgraphBipartGgTablAdd(t, v) fiboHeapAdd((t), &(v)->gainlink)
+#define bgraphBipartGgTablDel(t, v) fiboHeapDel((t), &(v)->gainlink)
+#define bgraphBipartGgTablFrst(t) fiboHeapMin((t))
+#define bgraphBipartGgIsFree(v)                                                \
+  ((v)->gainlink.linkdat.nextptr == BGRAPHBIPARTGGSTATEFREE)
+#define bgraphBipartGgIsTabl(v)                                                \
+  ((v)->gainlink.linkdat.nextptr >= BGRAPHBIPARTGGSTATELINK)
+#define bgraphBipartGgIsUsed(v)                                                \
+  ((v)->gainlink.linkdat.nextptr == BGRAPHBIPARTGGSTATEUSED)
+#define bgraphBipartGgSetFree(v)                                               \
+  ((v)->gainlink.linkdat.nextptr = BGRAPHBIPARTGGSTATEFREE)
+#define bgraphBipartGgSetUsed(v)                                               \
+  ((v)->gainlink.linkdat.nextptr = BGRAPHBIPARTGGSTATEUSED)
+#define bgraphBipartGgNext(v) ((v)->gainlink.linkdat.nextptr)
 
 #endif /* SCOTCH_TABLE_GAIN */

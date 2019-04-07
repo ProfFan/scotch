@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -61,63 +61,67 @@
 
 /*+ File name aliases. +*/
 
-#define C_FILENBR                   1             /* Number of files in list */
+#define C_FILENBR 1 /* Number of files in list */
 
-#define C_filenamearcout            fileBlockName (C_fileTab, 0) /* Architecture output file name */
+#define C_filenamearcout                                                       \
+  fileBlockName(C_fileTab, 0) /* Architecture output file name */
 
-#define C_filepntrarcout            fileBlockFile (C_fileTab, 0) /* Architecture output file */
+#define C_filepntrarcout                                                       \
+  fileBlockFile(C_fileTab, 0) /* Architecture output file */
 
 /*+ This structure defines an FFT vertex. +*/
 
 typedef struct C_Vertex_ {
-  SCOTCH_Num           lvl;                       /*+ Vertex level    +*/
-  SCOTCH_Num           pos;                       /*+ Vertex position +*/
+  SCOTCH_Num lvl; /*+ Vertex level    +*/
+  SCOTCH_Num pos; /*+ Vertex position +*/
 } C_Vertex;
 
 /*+ This structure defines a vertex distance information. +*/
 
 typedef struct C_VertDist_ {
-  int                       queued;               /*+ Flag set if vertex queued  +*/
-  SCOTCH_Num                dist;                 /*+ Distance to initial vertex +*/
+  int queued;      /*+ Flag set if vertex queued  +*/
+  SCOTCH_Num dist; /*+ Distance to initial vertex +*/
 } C_VertDist;
 
 /*+ This is a neighbor queue element. +*/
 
 typedef struct C_QueueElem_ {
-  C_Vertex                  vert;                 /*+ Vertex number    +*/
-  SCOTCH_Num                dist;                 /*+ Distance reached +*/
+  C_Vertex vert;   /*+ Vertex number    +*/
+  SCOTCH_Num dist; /*+ Distance reached +*/
 } C_QueueElem;
 
 /*+ This is the distance queue. +*/
 
 typedef struct C_Queue_ {
-  C_QueueElem *             tab;                  /*+ Pointer to queue data    +*/
-  SCOTCH_Num                min;                  /*+ Pointer to first element +*/
-  SCOTCH_Num                max;                  /*+ Pointer to last element  +*/
+  C_QueueElem *tab; /*+ Pointer to queue data    +*/
+  SCOTCH_Num min;   /*+ Pointer to first element +*/
+  SCOTCH_Num max;   /*+ Pointer to last element  +*/
 } C_Queue;
 
 /*
 **  The macro definitions.
 */
 
-#define C_vertLabl(v)               (((v)->lvl << fdim) | (v)->pos)
+#define C_vertLabl(v) (((v)->lvl << fdim) | (v)->pos)
 
-#define C_queueInit(q,n)            ((((q)->tab = (C_QueueElem *) memAlloc ((n) * sizeof (C_QueueElem))) == NULL) ? 1 : 0)
-#define C_queueExit(q)              memFree ((q)->tab)
-#define C_queueFlush(q)             (q)->min = \
-                                    (q)->max = 0
-#define C_queuePut(q,v,d)           ((q)->tab[(q)->max].vert    = *(v),  \
-                                     (q)->tab[(q)->max ++].dist = (d))
-#define C_queueGet(q,v,d)           (((q)->min < (q)->max) ? (*(v) = (q)->tab[(q)->min].vert,    \
-                                                              *(d) = (q)->tab[(q)->min ++].dist, \
-                                                              1)                                 \
-                                                           : 0)
+#define C_queueInit(q, n)                                                      \
+  ((((q)->tab = (C_QueueElem *)memAlloc((n) * sizeof(C_QueueElem))) == NULL)   \
+       ? 1                                                                     \
+       : 0)
+#define C_queueExit(q) memFree((q)->tab)
+#define C_queueFlush(q) (q)->min = (q)->max = 0
+#define C_queuePut(q, v, d)                                                    \
+  ((q)->tab[(q)->max].vert = *(v), (q)->tab[(q)->max++].dist = (d))
+#define C_queueGet(q, v, d)                                                    \
+  (((q)->min < (q)->max)                                                       \
+       ? (*(v) = (q)->tab[(q)->min].vert, *(d) = (q)->tab[(q)->min++].dist, 1) \
+       : 0)
 
-#define C_distaRoot(v)              (C_queueFlush (&C_distaQueue),         \
-                                     C_queuePut   (&C_distaQueue, (v), 0), \
-                                     C_distaTab[C_vertLabl (v)].queued = 1)
-#define C_distaGet(v,d)             (C_queueGet (&C_distaQueue, (v), (d)))
-#define C_distaPut(v,d)             ((C_distaTab[C_vertLabl (v)].queued == 0) \
-                                     ? C_queuePut (&C_distaQueue, (v), d),    \
-                                       C_distaTab[C_vertLabl (v)].queued = 1  \
-                                     : 0)
+#define C_distaRoot(v)                                                         \
+  (C_queueFlush(&C_distaQueue), C_queuePut(&C_distaQueue, (v), 0),             \
+   C_distaTab[C_vertLabl(v)].queued = 1)
+#define C_distaGet(v, d) (C_queueGet(&C_distaQueue, (v), (d)))
+#define C_distaPut(v, d)                                                       \
+  ((C_distaTab[C_vertLabl(v)].queued == 0)                                     \
+   ? C_queuePut(&C_distaQueue, (v), d),                                        \
+   C_distaTab[C_vertLabl(v)].queued = 1 : 0)

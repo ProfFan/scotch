@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -82,17 +82,16 @@
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_stratGraphBipart (
-SCOTCH_Strat * const        stratptr,
-const char * const          string)
-{
-  if (*((Strat **) stratptr) != NULL)
-    stratExit (*((Strat **) stratptr));
+int SCOTCH_stratGraphBipart(SCOTCH_Strat *const stratptr,
+                            const char *const string) {
+  if (*((Strat **)stratptr) != NULL)
+    stratExit(*((Strat **)stratptr));
 
-  if ((*((Strat **) stratptr) = stratInit (&bgraphbipartststratab, string)) == NULL) {
-    errorPrint (STRINGIFY (SCOTCH_stratBipart) ": error in bipartitioning strategy");
-    return     (1);
+  if ((*((Strat **)stratptr) = stratInit(&bgraphbipartststratab, string)) ==
+      NULL) {
+    errorPrint(
+        STRINGIFY(SCOTCH_stratBipart) ": error in bipartitioning strategy");
+    return (1);
   }
 
   return (0);
@@ -105,13 +104,10 @@ const char * const          string)
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_stratArchBuild (
-SCOTCH_Strat * const        stratptr,
-const char * const          string)
-{
-  if (*((Strat **) stratptr) != NULL)
-    stratExit (*((Strat **) stratptr));
+int SCOTCH_stratArchBuild(SCOTCH_Strat *const stratptr,
+                          const char *const string) {
+  if (*((Strat **)stratptr) != NULL)
+    stratExit(*((Strat **)stratptr));
 
 #if 0
   if ((*((Strat **) stratptr) = stratInit (&archbuildststratab, "")) == NULL) {
@@ -133,83 +129,87 @@ const char * const          string)
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_archBuild0 (
-SCOTCH_Arch * const         archptr,              /*+ Target architecture to build    +*/
-const SCOTCH_Graph * const  grafptr,              /*+ Graph to turn into architecture +*/
-const SCOTCH_Num            listnbr,              /*+ Number of elements in sublist   +*/
-const SCOTCH_Num * const    listptr,              /*+ Pointer to sublist              +*/
-const SCOTCH_Strat * const  stratptr)             /*+ Bipartitoning strategy          +*/
+int SCOTCH_archBuild0(
+    SCOTCH_Arch *const archptr,         /*+ Target architecture to build    +*/
+    const SCOTCH_Graph *const grafptr,  /*+ Graph to turn into architecture +*/
+    const SCOTCH_Num listnbr,           /*+ Number of elements in sublist   +*/
+    const SCOTCH_Num *const listptr,    /*+ Pointer to sublist              +*/
+    const SCOTCH_Strat *const stratptr) /*+ Bipartitoning strategy          +*/
 {
-  Strat *             bipstratptr;
-  VertList            graflistdat;
-  VertList *          graflistptr;
-  int                 o;
+  Strat *bipstratptr;
+  VertList graflistdat;
+  VertList *graflistptr;
+  int o;
 
-  if ((sizeof (SCOTCH_Num) != sizeof (Gnum)) ||
-      (sizeof (SCOTCH_Num) != sizeof (Anum))) {
-    errorPrint (STRINGIFY (SCOTCH_archBuild0) ": internal error");
-    return     (1);
+  if ((sizeof(SCOTCH_Num) != sizeof(Gnum)) ||
+      (sizeof(SCOTCH_Num) != sizeof(Anum))) {
+    errorPrint(STRINGIFY(SCOTCH_archBuild0) ": internal error");
+    return (1);
   }
 
-  if (*((Strat **) stratptr) == NULL)             /* Set default mapping strategy if necessary */
-    *((Strat **) stratptr) = stratInit (&bgraphbipartststratab, "(m{vert=50,low=h{pass=10},asc=f{move=100,bal=0.1}}f{move=100,bal=0.05})(/((load0=load)|(load0=0))?x;)");
-  bipstratptr = *((Strat **) stratptr);
+  if (*((Strat **)stratptr) ==
+      NULL) /* Set default mapping strategy if necessary */
+    *((Strat **)stratptr) =
+        stratInit(&bgraphbipartststratab,
+                  "(m{vert=50,low=h{pass=10},asc=f{move=100,bal=0.1}}f{move="
+                  "100,bal=0.05})(/((load0=load)|(load0=0))?x;)");
+  bipstratptr = *((Strat **)stratptr);
   if (bipstratptr->tabl != &bgraphbipartststratab) {
-    errorPrint (STRINGIFY (SCOTCH_archBuild0) ": not a bipartitioning strategy");
-    return     (1);
+    errorPrint(STRINGIFY(SCOTCH_archBuild0) ": not a bipartitioning strategy");
+    return (1);
   }
 
-  if ((listnbr == ((Graph *) grafptr)->vertnbr) || (listnbr == 0) || (listptr == NULL))
+  if ((listnbr == ((Graph *)grafptr)->vertnbr) || (listnbr == 0) ||
+      (listptr == NULL))
     graflistptr = NULL;
   else {
     graflistptr = &graflistdat;
-    graflistdat.vnumnbr = (Gnum)   listnbr;
-    graflistdat.vnumtab = (Gnum *) listptr;
+    graflistdat.vnumnbr = (Gnum)listnbr;
+    graflistdat.vnumtab = (Gnum *)listptr;
   }
 
-  o = archDecoArchBuild ((Arch * const) archptr, (const Graph * const) grafptr, graflistptr, bipstratptr);
+  o = archDecoArchBuild((Arch *const)archptr, (const Graph *const)grafptr,
+                        graflistptr, bipstratptr);
 
   return (o);
 }
 
-int
-SCOTCH_archBuild2 (
-SCOTCH_Arch * const         archptr,              /*+ Target architecture to build    +*/
-const SCOTCH_Graph * const  grafptr,              /*+ Graph to turn into architecture +*/
-const SCOTCH_Num            vnumnbr,              /*+ Number of elements in sublist   +*/
-const SCOTCH_Num * const    vnumtab)              /*+ Pointer to sublist              +*/
+int SCOTCH_archBuild2(
+    SCOTCH_Arch *const archptr,        /*+ Target architecture to build    +*/
+    const SCOTCH_Graph *const grafptr, /*+ Graph to turn into architecture +*/
+    const SCOTCH_Num vnumnbr,          /*+ Number of elements in sublist   +*/
+    const SCOTCH_Num *const vnumtab)   /*+ Pointer to sublist              +*/
 {
-  Gnum                vertnbr;
-  Gnum                listnbr;
-  Gnum *              listtab;
+  Gnum vertnbr;
+  Gnum listnbr;
+  Gnum *listtab;
 
-  if ((sizeof (SCOTCH_Num) != sizeof (Gnum)) ||
-      (sizeof (SCOTCH_Num) != sizeof (Anum))) {
-    errorPrint (STRINGIFY (SCOTCH_archBuild2) ": internal error");
-    return     (1);
+  if ((sizeof(SCOTCH_Num) != sizeof(Gnum)) ||
+      (sizeof(SCOTCH_Num) != sizeof(Anum))) {
+    errorPrint(STRINGIFY(SCOTCH_archBuild2) ": internal error");
+    return (1);
   }
 
-  vertnbr = ((Graph *) grafptr)->vertnbr;
+  vertnbr = ((Graph *)grafptr)->vertnbr;
   if ((vnumnbr == vertnbr) || (vnumnbr == 0) || (vnumtab == NULL)) {
     listnbr = vertnbr;
     listtab = NULL;
-  }
-  else {
-    listnbr = (Gnum)   vnumnbr;
-    listtab = (Gnum *) vnumtab;
+  } else {
+    listnbr = (Gnum)vnumnbr;
+    listtab = (Gnum *)vnumtab;
   }
 
-  return (archDeco2ArchBuild ((Arch * const) archptr, (const Graph * const) grafptr, listnbr, listtab));
+  return (archDeco2ArchBuild((Arch *const)archptr, (const Graph *const)grafptr,
+                             listnbr, listtab));
 }
 
-int
-SCOTCH_archBuild (
-SCOTCH_Arch * const         archptr,              /*+ Target architecture to build    +*/
-const SCOTCH_Graph * const  grafptr,              /*+ Graph to turn into architecture +*/
-const SCOTCH_Num            listnbr,              /*+ Number of elements in sublist   +*/
-const SCOTCH_Num * const    listptr,              /*+ Pointer to sublist              +*/
-const SCOTCH_Strat * const  stratptr)             /*+ Bipartitoning strategy          +*/
+int SCOTCH_archBuild(
+    SCOTCH_Arch *const archptr,         /*+ Target architecture to build    +*/
+    const SCOTCH_Graph *const grafptr,  /*+ Graph to turn into architecture +*/
+    const SCOTCH_Num listnbr,           /*+ Number of elements in sublist   +*/
+    const SCOTCH_Num *const listptr,    /*+ Pointer to sublist              +*/
+    const SCOTCH_Strat *const stratptr) /*+ Bipartitoning strategy          +*/
 {
-  return (SCOTCH_archBuild0 (archptr, grafptr, listnbr, listptr, stratptr)); /* Old-style behavior */
+  return (SCOTCH_archBuild0(archptr, grafptr, listnbr, listptr,
+                            stratptr)); /* Old-style behavior */
 }

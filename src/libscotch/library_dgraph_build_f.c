@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -67,29 +67,21 @@
 **
 */
 
-SCOTCH_FORTRAN (                           \
-DGRAPHBUILD, dgraphbuild, (                \
-SCOTCH_Dgraph * const       grafptr,       \
-const SCOTCH_Num * const    baseval,       \
-const SCOTCH_Num * const    vertlocnbr,    \
-const SCOTCH_Num * const    vertlocmax,    \
-SCOTCH_Num * const          vertloctab,    \
-SCOTCH_Num * const          vendloctab,    \
-SCOTCH_Num * const          veloloctab,    \
-SCOTCH_Num * const          vlblloctab,    \
-const SCOTCH_Num * const    edgelocnbr,    \
-const SCOTCH_Num * const    edgelocsiz,    \
-SCOTCH_Num * const          edgeloctab,    \
-SCOTCH_Num * const          edgegsttab,    \
-SCOTCH_Num * const          edloloctab,    \
-int * const                 revaptr),      \
-(grafptr, baseval, vertlocnbr, vertlocmax, \
- vertloctab, vendloctab, veloloctab,       \
- vlblloctab, edgelocnbr, edgelocsiz,       \
- edgeloctab, edgegsttab, edloloctab,       \
- revaptr))
-{
-  *revaptr = SCOTCH_dgraphBuild (grafptr, *baseval, *vertlocnbr, *vertlocmax, vertloctab,
-                                 vendloctab, veloloctab, vlblloctab,
-                                 *edgelocnbr, *edgelocsiz, edgeloctab, edgegsttab, edloloctab);
+SCOTCH_FORTRAN(DGRAPHBUILD, dgraphbuild,
+               (SCOTCH_Dgraph *const grafptr, const SCOTCH_Num *const baseval,
+                const SCOTCH_Num *const vertlocnbr,
+                const SCOTCH_Num *const vertlocmax,
+                SCOTCH_Num *const vertloctab, SCOTCH_Num *const vendloctab,
+                SCOTCH_Num *const veloloctab, SCOTCH_Num *const vlblloctab,
+                const SCOTCH_Num *const edgelocnbr,
+                const SCOTCH_Num *const edgelocsiz,
+                SCOTCH_Num *const edgeloctab, SCOTCH_Num *const edgegsttab,
+                SCOTCH_Num *const edloloctab, int *const revaptr),
+               (grafptr, baseval, vertlocnbr, vertlocmax, vertloctab,
+                vendloctab, veloloctab, vlblloctab, edgelocnbr, edgelocsiz,
+                edgeloctab, edgegsttab, edloloctab, revaptr)) {
+  *revaptr = SCOTCH_dgraphBuild(grafptr, *baseval, *vertlocnbr, *vertlocmax,
+                                vertloctab, vendloctab, veloloctab, vlblloctab,
+                                *edgelocnbr, *edgelocsiz, edgeloctab,
+                                edgegsttab, edloloctab);
 }

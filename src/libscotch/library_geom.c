@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -77,10 +77,8 @@
 *** - NULL   : on error.
 +*/
 
-SCOTCH_Geom *
-SCOTCH_geomAlloc ()
-{
-  return ((SCOTCH_Geom *) memAlloc (sizeof (SCOTCH_Geom)));
+SCOTCH_Geom *SCOTCH_geomAlloc() {
+  return ((SCOTCH_Geom *)memAlloc(sizeof(SCOTCH_Geom)));
 }
 
 /*+ This routine initializes the opaque
@@ -91,20 +89,17 @@ SCOTCH_geomAlloc ()
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_geomInit (
-SCOTCH_Geom * const         geomptr)
-{
-  if (sizeof (SCOTCH_Num) != sizeof (Gnum)) {
-    errorPrint (STRINGIFY (SCOTCH_geomInit) ": internal error (1)");
-    return     (1);
+int SCOTCH_geomInit(SCOTCH_Geom *const geomptr) {
+  if (sizeof(SCOTCH_Num) != sizeof(Gnum)) {
+    errorPrint(STRINGIFY(SCOTCH_geomInit) ": internal error (1)");
+    return (1);
   }
-  if (sizeof (SCOTCH_Geom) < sizeof (Geom)) {
-    errorPrint (STRINGIFY (SCOTCH_geomInit) ": internal error (2)");
-    return     (1);
+  if (sizeof(SCOTCH_Geom) < sizeof(Geom)) {
+    errorPrint(STRINGIFY(SCOTCH_geomInit) ": internal error (2)");
+    return (1);
   }
 
-  return (geomInit ((Geom *) geomptr));
+  return (geomInit((Geom *)geomptr));
 }
 
 /*+ This routine frees the contents of the
@@ -113,12 +108,7 @@ SCOTCH_Geom * const         geomptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_geomExit (
-SCOTCH_Geom * const         geomptr)
-{
-  geomExit ((Geom *) geomptr);
-}
+void SCOTCH_geomExit(SCOTCH_Geom *const geomptr) { geomExit((Geom *)geomptr); }
 
 /*+ This routine accesses all of the geometry data.
 *** NULL pointers on input indicate unwanted
@@ -128,18 +118,17 @@ SCOTCH_Geom * const         geomptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_geomData (
-const SCOTCH_Geom * const   geomptr,              /* Geometry structure to read */
-SCOTCH_Num * const          dimnptr,              /* Number of dimensions       */
-double ** const             geomtab)              /* Geometry array [vertnbr]   */
+void SCOTCH_geomData(
+    const SCOTCH_Geom *const geomptr, /* Geometry structure to read */
+    SCOTCH_Num *const dimnptr,        /* Number of dimensions       */
+    double **const geomtab)           /* Geometry array [vertnbr]   */
 {
-  const Geom *        srcgeomptr;                 /* Pointer to source geometry structure */
+  const Geom *srcgeomptr; /* Pointer to source geometry structure */
 
-  srcgeomptr = (const Geom *) geomptr;
+  srcgeomptr = (const Geom *)geomptr;
 
   if (dimnptr != NULL)
     *dimnptr = srcgeomptr->dimnnbr;
   if (geomtab != NULL)
-    *geomtab = (double *) srcgeomptr->geomtab;
+    *geomtab = (double *)srcgeomptr->geomtab;
 }

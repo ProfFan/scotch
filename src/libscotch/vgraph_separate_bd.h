@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -54,30 +54,32 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct VgraphSeparateBdParam_ {
-  Gnum                      distmax;              /*+ Maximum distance to separator +*/
-  Strat *                   stratbnd;             /*+ Strategy for band graph       +*/
-  Strat *                   stratorg;             /*+ Strategy for original graph   +*/
+  Gnum distmax;    /*+ Maximum distance to separator +*/
+  Strat *stratbnd; /*+ Strategy for band graph       +*/
+  Strat *stratorg; /*+ Strategy for original graph   +*/
 } VgraphSeparateBdParam;
 
 /*+ Neighbor queue. +*/
 
 typedef struct VgraphSeparateBdQueue_ {
-  Gnum *                    head;                 /*+ Head of distance queue  +*/
-  Gnum *                    tail;                 /*+ Tail of distance queue  +*/
-  Gnum *                    qtab;                 /*+ Array of queue elements +*/
+  Gnum *head; /*+ Head of distance queue  +*/
+  Gnum *tail; /*+ Tail of distance queue  +*/
+  Gnum *qtab; /*+ Array of queue elements +*/
 } VgraphSeparateBdQueue;
 
 /*
 **  The function prototypes.
 */
 
-int                         vgraphSeparateBd    (Vgraph * restrict const, const VgraphSeparateBdParam * restrict const);
+int vgraphSeparateBd(Vgraph *restrict const,
+                     const VgraphSeparateBdParam *restrict const);
 
 /*
 **  The macro definitions.
 */
 
-#define vgraphSeparateBdQueueFlush(queue)    ((queue)->head = (queue)->tail = (queue)->qtab)
-#define vgraphSeparateBdQueueEmpty(queue)    ((queue)->head <= (queue)->tail)
-#define vgraphSeparateBdQueuePut(queue,vnum) (* ((queue)->head ++) = (vnum))
-#define vgraphSeparateBdQueueGet(queue)      (* ((queue)->tail ++))
+#define vgraphSeparateBdQueueFlush(queue)                                      \
+  ((queue)->head = (queue)->tail = (queue)->qtab)
+#define vgraphSeparateBdQueueEmpty(queue) ((queue)->head <= (queue)->tail)
+#define vgraphSeparateBdQueuePut(queue, vnum) (*((queue)->head++) = (vnum))
+#define vgraphSeparateBdQueueGet(queue) (*((queue)->tail++))

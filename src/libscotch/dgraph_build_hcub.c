@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -75,140 +75,148 @@
 ** - !0  : on error.
 */
 
-int
-dgraphBuildHcub (
-Dgraph * restrict const     grafptr,              /* Graph               */
-const Gnum                  hcubdim,              /* Hypercube dimension */
-const Gnum                  baseval,              /* Base value          */
-const Gnum                  flagval)              /* Flags               */
+int dgraphBuildHcub(Dgraph *restrict const grafptr, /* Graph               */
+                    const Gnum hcubdim,             /* Hypercube dimension */
+                    const Gnum baseval,             /* Base value          */
+                    const Gnum flagval)             /* Flags               */
 {
-  Gnum                procngbnum;
-  Gnum                vertglbnbr;                 /* Total number of vertices        */
-  Gnum                vertglbnum;                 /* Global number of current vertex */
-  Gnum                vertlocnbr;                 /* Number of local vertices        */
-  Gnum                velolocnbr;                 /* Number of local vertex loads    */
-  Gnum                vertlocnnd;
-  Gnum                vertlocnum;
-  Gnum * restrict     vertloctax;
-  Gnum * restrict     veloloctax;
+  Gnum procngbnum;
+  Gnum vertglbnbr; /* Total number of vertices        */
+  Gnum vertglbnum; /* Global number of current vertex */
+  Gnum vertlocnbr; /* Number of local vertices        */
+  Gnum velolocnbr; /* Number of local vertex loads    */
+  Gnum vertlocnnd;
+  Gnum vertlocnum;
+  Gnum *restrict vertloctax;
+  Gnum *restrict veloloctax;
 #ifdef SCOTCH_DEBUG_DGRAPH3
-  Gnum * restrict     vlblloctax;
+  Gnum *restrict vlblloctax;
 #endif /* SCOTCH_DEBUG_DGRAPH3 */
-  Gnum                edgelocnbr;
-  Gnum * restrict     edgeloctax;
-  Gnum                edgelocnum;
-  Gnum                edlolocnbr;
-  Gnum * restrict     edloloctax;
-  int                 cheklocval;
-  Gnum                reduloctab[7];
-  Gnum                reduglbtab[7];
+  Gnum edgelocnbr;
+  Gnum *restrict edgeloctax;
+  Gnum edgelocnum;
+  Gnum edlolocnbr;
+  Gnum *restrict edloloctax;
+  int cheklocval;
+  Gnum reduloctab[7];
+  Gnum reduglbtab[7];
 
   vertglbnbr = 1 << hcubdim;
-  vertlocnbr = DATASIZE (vertglbnbr, grafptr->procglbnbr, grafptr->proclocnum);
+  vertlocnbr = DATASIZE(vertglbnbr, grafptr->procglbnbr, grafptr->proclocnum);
   velolocnbr = ((flagval & 1) != 0) ? vertlocnbr : 0;
-  edgelocnbr = vertlocnbr * hcubdim;              /* Set local number of arcs */
+  edgelocnbr = vertlocnbr * hcubdim; /* Set local number of arcs */
   edlolocnbr = ((flagval & 2) != 0) ? edgelocnbr : 0;
 
-  for (procngbnum = 0, vertglbnum = 0;            /* Compute index of first local vertex */
-       procngbnum < grafptr->proclocnum; procngbnum ++)
-    vertglbnum += DATASIZE (vertglbnbr, grafptr->procglbnbr, procngbnum);
+  for (procngbnum = 0, vertglbnum = 0; /* Compute index of first local vertex */
+       procngbnum < grafptr->proclocnum; procngbnum++)
+    vertglbnum += DATASIZE(vertglbnbr, grafptr->procglbnbr, procngbnum);
 
   cheklocval = 0;
-  vertloctax =
-  edgeloctax = NULL;
-  if (memAllocGroup ((void **) (void *)
-                     &vertloctax, (size_t) ((vertlocnbr + 1) * sizeof (Gnum)), /* Compact vertex array */
+  vertloctax = edgeloctax = NULL;
+  if (memAllocGroup(
+          (void **)(void *)&vertloctax,
+          (size_t)((vertlocnbr + 1) * sizeof(Gnum)), /* Compact vertex array */
 #ifdef SCOTCH_DEBUG_DGRAPH3
-                     &vlblloctax, (size_t) (vertlocnbr       * sizeof (Gnum)),
+          &vlblloctax, (size_t)(vertlocnbr * sizeof(Gnum)),
 #endif /* SCOTCH_DEBUG_DGRAPH3 */
-                     &veloloctax, (size_t) (velolocnbr       * sizeof (Gnum)), NULL) == NULL) {
-    errorPrint ("dgraphBuildHcub: out of memory (1)");
+          &veloloctax, (size_t)(velolocnbr * sizeof(Gnum)), NULL) == NULL) {
+    errorPrint("dgraphBuildHcub: out of memory (1)");
+    cheklocval = 1;
+  } else if (memAllocGroup((void **)(void *)&edgeloctax,
+                           (size_t)(edgelocnbr * sizeof(Gnum)), &edloloctax,
+                           (size_t)(edlolocnbr * sizeof(Gnum)), NULL) == NULL) {
+    errorPrint("dgraphBuildHcub: out of memory (2)");
     cheklocval = 1;
   }
-  else if (memAllocGroup ((void **) (void *)
-                          &edgeloctax, (size_t) (edgelocnbr * sizeof (Gnum)),
-                          &edloloctax, (size_t) (edlolocnbr * sizeof (Gnum)), NULL) == NULL) {
-    errorPrint ("dgraphBuildHcub: out of memory (2)");
-    cheklocval = 1;
-  }
-  reduloctab[0] =   hcubdim;
-  reduloctab[1] = - hcubdim;
-  reduloctab[2] =   baseval;
-  reduloctab[3] = - baseval;
-  reduloctab[4] =   flagval;
-  reduloctab[5] = - flagval;
-  reduloctab[6] =   cheklocval;
+  reduloctab[0] = hcubdim;
+  reduloctab[1] = -hcubdim;
+  reduloctab[2] = baseval;
+  reduloctab[3] = -baseval;
+  reduloctab[4] = flagval;
+  reduloctab[5] = -flagval;
+  reduloctab[6] = cheklocval;
 
-  if (MPI_Allreduce (reduloctab, reduglbtab, 7, GNUM_MPI, MPI_MAX, grafptr->proccomm) != MPI_SUCCESS) {
-    errorPrint ("dgraphBuildHcub: communication error");
-    return     (1);
+  if (MPI_Allreduce(reduloctab, reduglbtab, 7, GNUM_MPI, MPI_MAX,
+                    grafptr->proccomm) != MPI_SUCCESS) {
+    errorPrint("dgraphBuildHcub: communication error");
+    return (1);
   }
   if (reduglbtab[6] != 0) {
     if (vertloctax != NULL) {
       if (edgeloctax != NULL)
-        memFree (edgeloctax);
-      memFree (vertloctax);
+        memFree(edgeloctax);
+      memFree(vertloctax);
     }
     return (1);
   }
-  if ((reduglbtab[1] != - reduglbtab[0]) ||
-      (reduglbtab[3] != - reduglbtab[2]) ||
-      (reduglbtab[5] != - reduglbtab[4])) {
-    errorPrint ("dgraphBuildHcub: inconsistent parameters");
-    return     (1);
+  if ((reduglbtab[1] != -reduglbtab[0]) || (reduglbtab[3] != -reduglbtab[2]) ||
+      (reduglbtab[5] != -reduglbtab[4])) {
+    errorPrint("dgraphBuildHcub: inconsistent parameters");
+    return (1);
   }
   vertloctax -= baseval;
-  veloloctax  = ((flagval & 1) != 0) ? (veloloctax - baseval) : NULL;
+  veloloctax = ((flagval & 1) != 0) ? (veloloctax - baseval) : NULL;
   edgeloctax -= baseval;
-  edloloctax  = ((flagval & 2) != 0) ? (edloloctax - baseval) : NULL;
+  edloloctax = ((flagval & 2) != 0) ? (edloloctax - baseval) : NULL;
 #ifdef SCOTCH_DEBUG_DGRAPH3
   vlblloctax -= baseval;
 #endif /* SCOTCH_DEBUG_DGRAPH3 */
 
-  for (vertlocnum = baseval, vertlocnnd = vertlocnbr + baseval, edgelocnum = baseval;
-       vertlocnum < vertlocnnd; vertlocnum ++, vertglbnum ++) {
-    Gnum                vertngbbit;               /* Bit that differs between neighbors */
+  for (vertlocnum = baseval, vertlocnnd = vertlocnbr + baseval,
+      edgelocnum = baseval;
+       vertlocnum < vertlocnnd; vertlocnum++, vertglbnum++) {
+    Gnum vertngbbit; /* Bit that differs between neighbors */
 
     if (veloloctax != NULL)
-      veloloctax[vertlocnum] = 1 + (vertglbnum & 3);  /* Pseudo random weight (1 to 5) */
+      veloloctax[vertlocnum] =
+          1 + (vertglbnum & 3); /* Pseudo random weight (1 to 5) */
 #ifdef SCOTCH_DEBUG_DGRAPH3
-    vlblloctax[vertlocnum] = ((vertglbnum * COARHASHPRIME) % vertglbnbr) + baseval; /* Hash vertices to spread labels */
-#endif /* SCOTCH_DEBUG_DGRAPH3 */
+    vlblloctax[vertlocnum] = ((vertglbnum * COARHASHPRIME) % vertglbnbr) +
+                             baseval; /* Hash vertices to spread labels */
+#endif                                /* SCOTCH_DEBUG_DGRAPH3 */
     vertloctax[vertlocnum] = edgelocnum;
 
-    for (vertngbbit = 1; vertngbbit < vertglbnbr; vertngbbit <<= 1, edgelocnum ++) {
+    for (vertngbbit = 1; vertngbbit < vertglbnbr;
+         vertngbbit <<= 1, edgelocnum++) {
 #ifdef SCOTCH_DEBUG_DGRAPH3
-      edgeloctax[edgelocnum] = (((vertglbnum ^ vertngbbit) * COARHASHPRIME) % vertglbnbr) + baseval;
-#else /* SCOTCH_DEBUG_DGRAPH3 */
+      edgeloctax[edgelocnum] =
+          (((vertglbnum ^ vertngbbit) * COARHASHPRIME) % vertglbnbr) + baseval;
+#else  /* SCOTCH_DEBUG_DGRAPH3 */
       edgeloctax[edgelocnum] = (vertglbnum ^ vertngbbit) + baseval;
 #endif /* SCOTCH_DEBUG_DGRAPH3 */
       if (edloloctax != NULL)
-        edloloctax[edgelocnum] = ((vertglbnum + edgeloctax[edgelocnum]) % 16) + 1; /* Pseudo random weight (1 to 16) */
+        edloloctax[edgelocnum] = ((vertglbnum + edgeloctax[edgelocnum]) % 16) +
+                                 1; /* Pseudo random weight (1 to 16) */
     }
   }
-  vertloctax[vertlocnum] = edgelocnum;            /* Mark end of local vertex array */
+  vertloctax[vertlocnum] = edgelocnum; /* Mark end of local vertex array */
 
 #ifdef SCOTCH_DEBUG_DGRAPH2
   if (edgelocnum != edgelocnbr + baseval) {
-    errorPrint ("dgraphBuildHcub: internal error");
-    memFree    (vertloctax + baseval);           /* Free memory group leader */
-    return     (1);
+    errorPrint("dgraphBuildHcub: internal error");
+    memFree(vertloctax + baseval); /* Free memory group leader */
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_DGRAPH2 */
 
-  if (dgraphBuild2 (grafptr, baseval,             /* Build the distributed graph */
+  if (dgraphBuild2(grafptr, baseval, /* Build the distributed graph */
 #ifdef SCOTCH_DEBUG_DGRAPH3
-                    vertlocnbr, vertlocnbr, vertloctax, vertloctax + 1, NULL, vertlocnbr, NULL, vlblloctax,
-#else /* SCOTCH_DEBUG_DGRAPH3 */
-                    vertlocnbr, vertlocnbr, vertloctax, vertloctax + 1, NULL, vertlocnbr, NULL, NULL,
+                   vertlocnbr, vertlocnbr, vertloctax, vertloctax + 1, NULL,
+                   vertlocnbr, NULL, vlblloctax,
+#else  /* SCOTCH_DEBUG_DGRAPH3 */
+                   vertlocnbr, vertlocnbr, vertloctax, vertloctax + 1, NULL,
+                   vertlocnbr, NULL, NULL,
 #endif /* SCOTCH_DEBUG_DGRAPH3 */
-                    edgelocnbr, edgelocnbr, edgeloctax, NULL, edloloctax, hcubdim) != 0) {
-    memFree (edgeloctax + baseval);           /* Free memory group leaders */
-    memFree (vertloctax + baseval);
-    return  (1);
+                   edgelocnbr, edgelocnbr, edgeloctax, NULL, edloloctax,
+                   hcubdim) != 0) {
+    memFree(edgeloctax + baseval); /* Free memory group leaders */
+    memFree(vertloctax + baseval);
+    return (1);
   }
 
-  grafptr->flagval |= DGRAPHFREETABS | DGRAPHVERTGROUP | DGRAPHEDGEGROUP; /* Arrays created by the routine itself */
+  grafptr->flagval |=
+      DGRAPHFREETABS | DGRAPHVERTGROUP |
+      DGRAPHEDGEGROUP; /* Arrays created by the routine itself */
 
   return (0);
 }

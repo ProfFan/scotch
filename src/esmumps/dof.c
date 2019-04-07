@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -78,13 +78,10 @@
 *** - 0  : in all cases.
 +*/
 
-int
-dofInit (
-Dof * const                 deofptr)
-{
+int dofInit(Dof *const deofptr) {
   deofptr->baseval = 0;
   deofptr->nodenbr = 0;
-  deofptr->noddval = 1;                           /* Set constant, non zero, number of DOFs */
+  deofptr->noddval = 1; /* Set constant, non zero, number of DOFs */
   deofptr->noddtab = NULL;
 
   return (0);
@@ -96,15 +93,12 @@ Dof * const                 deofptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-dofExit (
-Dof * const                 deofptr)
-{
+void dofExit(Dof *const deofptr) {
   if (deofptr->noddtab != NULL)
-    memFree (deofptr->noddtab);
+    memFree(deofptr->noddtab);
 
 #ifdef DOF_DEBUG
-  dofInit (deofptr);
+  dofInit(deofptr);
 #endif /* DOF_DEBUG */
 }
 
@@ -114,17 +108,12 @@ Dof * const                 deofptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-dofConstant (
-Dof * const                 deofptr,
-const INT                   baseval,
-const INT                   nodenbr,
-const INT                   noddval)
-{
+void dofConstant(Dof *const deofptr, const INT baseval, const INT nodenbr,
+                 const INT noddval) {
   deofptr->baseval = baseval;
   deofptr->nodenbr = nodenbr;
-  if (deofptr->noddtab != NULL) {                 /* If DOF array already allocated */
-    memFree (deofptr->noddtab);                   /* It is no longer of use         */
+  if (deofptr->noddtab != NULL) { /* If DOF array already allocated */
+    memFree(deofptr->noddtab);    /* It is no longer of use         */
     deofptr->noddtab = NULL;
   }
   deofptr->noddval = noddval;
@@ -137,50 +126,49 @@ const INT                   noddval)
 *** - !0  : on error.
 +*/
 
-int
-dofGraph (
-Dof * const                 deofptr,              /*+ DOF index array to build [based]            +*/
-const Graph * const         grafptr,              /*+ Matrix adjacency structure [based]          +*/
-const INT                   deofval,              /*+ DOFs per node if no graph vertex load array +*/
-const INT * const           peritab)              /*+ Inverse vertex->node permutation array      +*/
+int dofGraph(
+    Dof *const deofptr, /*+ DOF index array to build [based]            +*/
+    const Graph *const grafptr, /*+ Matrix adjacency structure [based] +*/
+    const INT deofval, /*+ DOFs per node if no graph vertex load array +*/
+    const INT *const peritab) /*+ Inverse vertex->node permutation array +*/
 {
-  INT                 baseval;
-  INT                 vertnbr;
-  INT *               velotab;
-  INT                 edgenbr;
+  INT baseval;
+  INT vertnbr;
+  INT *velotab;
+  INT edgenbr;
 
-  SCOTCH_graphData (grafptr, &baseval, &vertnbr, NULL, NULL, &velotab, NULL, &edgenbr, NULL, NULL);
+  SCOTCH_graphData(grafptr, &baseval, &vertnbr, NULL, NULL, &velotab, NULL,
+                   &edgenbr, NULL, NULL);
 
   deofptr->baseval = baseval;
   deofptr->nodenbr = vertnbr;
-  if (velotab == NULL) {                          /* If no vertex weight (i.e. DOF) array */
-    deofptr->noddtab = NULL;                      /* No DOF array                         */
-    deofptr->noddval = deofval;                   /* Get node DOF value                   */
-  }
-  else {                                          /* Vertex load array present */
+  if (velotab == NULL) {        /* If no vertex weight (i.e. DOF) array */
+    deofptr->noddtab = NULL;    /* No DOF array                         */
+    deofptr->noddval = deofval; /* Get node DOF value                   */
+  } else {                      /* Vertex load array present */
 #ifdef DOF_CONSTANT
-    deofptr->noddtab = NULL;                      /* No DOF array */
+    deofptr->noddtab = NULL; /* No DOF array */
     deofptr->noddval = deofval;
-#else /* DOF_CONSTANT */
-    const INT * restrict  velotax;                /* Based access to grafptr->velotab  */
-    INT                   nodenum;                /* Number of current node            */
-    INT *                 noddtnd;                /* Pointer to end of DOF index array */
-    INT *                 noddptr;                /* Pointer to current DOF index      */
-    const INT *           periptr;
+#else  /* DOF_CONSTANT */
+    const INT *restrict velotax; /* Based access to grafptr->velotab  */
+    INT nodenum;                 /* Number of current node            */
+    INT *noddtnd;                /* Pointer to end of DOF index array */
+    INT *noddptr;                /* Pointer to current DOF index      */
+    const INT *periptr;
 
-    deofptr->noddval = 0;                         /* DOF values are not constant */
-    if ((deofptr->noddtab = (INT *) memAlloc ((vertnbr + 1) * sizeof (INT))) == NULL) {
-      errorPrint ("dofGraph: out of memory");
-      return     (1);
+    deofptr->noddval = 0; /* DOF values are not constant */
+    if ((deofptr->noddtab = (INT *)memAlloc((vertnbr + 1) * sizeof(INT))) ==
+        NULL) {
+      errorPrint("dofGraph: out of memory");
+      return (1);
     }
     for (noddptr = deofptr->noddtab, noddtnd = noddptr + vertnbr,
-         periptr = peritab, nodenum = baseval,
-         velotax = velotab - baseval;
-         noddptr < noddtnd; noddptr ++, periptr ++) {
-      *noddptr = nodenum;                         /* Set index to DOF array        */
-      nodenum += velotax[*periptr];               /* Add number of DOFs for vertex */
+        periptr = peritab, nodenum = baseval, velotax = velotab - baseval;
+         noddptr < noddtnd; noddptr++, periptr++) {
+      *noddptr = nodenum;           /* Set index to DOF array        */
+      nodenum += velotax[*periptr]; /* Add number of DOFs for vertex */
     }
-    *noddptr = nodenum;                           /* Set end of DOF array */
+    *noddptr = nodenum; /* Set end of DOF array */
 #endif /* DOF_CONSTANT */
   }
 

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -79,11 +79,8 @@
 ** - 0  : in all cases.
 */
 
-int
-listInit (
-VertList *          listptr)
-{
-  listptr->vnumnbr = 0;                           /* Initialize list fields */
+int listInit(VertList *listptr) {
+  listptr->vnumnbr = 0; /* Initialize list fields */
   listptr->vnumtab = NULL;
 
   return (0);
@@ -94,16 +91,13 @@ VertList *          listptr)
 ** - VOID  : in all cases.
 */
 
-void
-listExit (
-VertList *          listptr)
-{
+void listExit(VertList *listptr) {
   if (listptr->vnumtab != NULL)
-    memFree (listptr->vnumtab);                   /* Free vertex list array */
+    memFree(listptr->vnumtab); /* Free vertex list array */
 
 #ifdef SCOTCH_DEBUG_GRAPH2
-  memSet (listptr, 0, sizeof (VertList));         /* Purge list fields */
-#endif /* SCOTCH_DEBUG_GRAPH2 */
+  memSet(listptr, 0, sizeof(VertList)); /* Purge list fields */
+#endif                                  /* SCOTCH_DEBUG_GRAPH2 */
 }
 
 /* This routine allocates a vertex
@@ -113,19 +107,15 @@ VertList *          listptr)
 ** - !0  : on error.
 */
 
-int
-listAlloc (
-VertList *          listptr,
-Gnum                vnumnbr)
-{
-  if (vnumnbr == listptr->vnumnbr)                /* If array is already dimensioned */
-    return (0);                                   /* Keep it as it is                */
+int listAlloc(VertList *listptr, Gnum vnumnbr) {
+  if (vnumnbr == listptr->vnumnbr) /* If array is already dimensioned */
+    return (0);                    /* Keep it as it is                */
 
-  listFree (listptr);                             /* Free vertex array       */
-  if (vnumnbr > 0) {                              /* Reallocate vertex space */
-    if ((listptr->vnumtab = (Gnum *) memAlloc (vnumnbr * sizeof (Gnum))) == NULL) {
-      errorPrint ("listAlloc: out of memory");
-      return     (1);
+  listFree(listptr); /* Free vertex array       */
+  if (vnumnbr > 0) { /* Reallocate vertex space */
+    if ((listptr->vnumtab = (Gnum *)memAlloc(vnumnbr * sizeof(Gnum))) == NULL) {
+      errorPrint("listAlloc: out of memory");
+      return (1);
     }
     listptr->vnumnbr = vnumnbr;
   }
@@ -139,14 +129,11 @@ Gnum                vnumnbr)
 ** - 0  : in all cases.
 */
 
-int
-listFree (
-VertList *          listptr)
-{
-  if (listptr->vnumtab != NULL)                   /* Free vertex list array */
-    memFree (listptr->vnumtab);
+int listFree(VertList *listptr) {
+  if (listptr->vnumtab != NULL) /* Free vertex list array */
+    memFree(listptr->vnumtab);
 
-  listptr->vnumnbr = 0;                           /* Reset list values */
+  listptr->vnumnbr = 0; /* Reset list values */
   listptr->vnumtab = NULL;
 
   return (0);
@@ -161,36 +148,34 @@ VertList *          listptr)
 ** - !0  : on error.
 */
 
-int
-listLoad (
-VertList *          listptr,
-FILE *              stream)
-{
-  Gnum                vnumnbr;
-  Gnum                vnumnum;
+int listLoad(VertList *listptr, FILE *stream) {
+  Gnum vnumnbr;
+  Gnum vnumnum;
 
-  if (intLoad (stream, &vnumnbr) != 1) {          /* Read number of vertices */
-    errorPrint ("listLoad: bad input (1)");
-    return     (1);
+  if (intLoad(stream, &vnumnbr) != 1) { /* Read number of vertices */
+    errorPrint("listLoad: bad input (1)");
+    return (1);
   }
 
-  if (listAlloc (listptr, vnumnbr) != 0) {        /* Allocate vertex space */
-    errorPrint ("listLoad: out of memory");
-    return     (1);
+  if (listAlloc(listptr, vnumnbr) != 0) { /* Allocate vertex space */
+    errorPrint("listLoad: out of memory");
+    return (1);
   }
 
-  for (vnumnum = 0; vnumnum < vnumnbr; vnumnum ++) { /* Read vertex list contents */
-    if (intLoad (stream, &listptr->vnumtab[vnumnum]) != 1) {
-      errorPrint ("listLoad: bad input (2)");
-      return     (1);
+  for (vnumnum = 0; vnumnum < vnumnbr;
+       vnumnum++) { /* Read vertex list contents */
+    if (intLoad(stream, &listptr->vnumtab[vnumnum]) != 1) {
+      errorPrint("listLoad: bad input (2)");
+      return (1);
     }
   }
 
-  listSort (listptr);                             /* Sort vertex list by ascending order */
-  for (vnumnum = 1; vnumnum < vnumnbr; vnumnum ++) { /* Search list for duplicates       */
+  listSort(listptr); /* Sort vertex list by ascending order */
+  for (vnumnum = 1; vnumnum < vnumnbr;
+       vnumnum++) { /* Search list for duplicates       */
     if (listptr->vnumtab[vnumnum] == listptr->vnumtab[vnumnum - 1]) {
-      errorPrint ("listLoad: duplicate vertex numbers");
-      return     (1);
+      errorPrint("listLoad: duplicate vertex numbers");
+      return (1);
     }
   }
 
@@ -203,11 +188,8 @@ FILE *              stream)
 ** - VOID  : in all cases.
 */
 
-void
-listSort (
-VertList *          listptr)
-{
-  intSort1asc1 (listptr->vnumtab, listptr->vnumnbr);
+void listSort(VertList *listptr) {
+  intSort1asc1(listptr->vnumtab, listptr->vnumnbr);
 }
 
 /* This routine saves a vertex number list
@@ -217,24 +199,19 @@ VertList *          listptr)
 ** - !0  : on error.
 */
 
-int
-listSave (
-VertList *          listptr,
-FILE *              stream)
-{
-  Gnum                vnumnum;
-  int                 o;
+int listSave(VertList *listptr, FILE *stream) {
+  Gnum vnumnum;
+  int o;
 
-  o = (intSave (stream, listptr->vnumnbr) == 0);  /* Write number of vertices */
-  for (vnumnum = 0; (o == 0) && (vnumnum < listptr->vnumnbr); vnumnum ++) {
-    o = (fprintf (stream, "%c" GNUMSTRING,
-                  ((vnumnum % 8) == 0) ? '\n' : '\t',
-                  (Gnum) listptr->vnumtab[vnumnum]) == EOF);
+  o = (intSave(stream, listptr->vnumnbr) == 0); /* Write number of vertices */
+  for (vnumnum = 0; (o == 0) && (vnumnum < listptr->vnumnbr); vnumnum++) {
+    o = (fprintf(stream, "%c" GNUMSTRING, ((vnumnum % 8) == 0) ? '\n' : '\t',
+                 (Gnum)listptr->vnumtab[vnumnum]) == EOF);
   }
-  o |= (fprintf (stream, "\n") == EOF);
+  o |= (fprintf(stream, "\n") == EOF);
 
   if (o != 0)
-    errorPrint ("listSave: bad output");
+    errorPrint("listSave: bad output");
 
   return (o);
 }
@@ -246,18 +223,16 @@ FILE *              stream)
 ** - !0  : on error.
 */
 
-int
-listCopy (
-VertList *          dstlistptr,                   /* Destination list */
-VertList *          srclistptr)                   /* Source list      */
+int listCopy(VertList *dstlistptr, /* Destination list */
+             VertList *srclistptr) /* Source list      */
 {
-  if (listAlloc (dstlistptr, dstlistptr->vnumnbr) != 0) { /* Allocate vertex space */
-    errorPrint ("listCopy: out of memory");
-    return     (1);
+  if (listAlloc(dstlistptr, dstlistptr->vnumnbr) !=
+      0) { /* Allocate vertex space */
+    errorPrint("listCopy: out of memory");
+    return (1);
   }
-  memCpy (dstlistptr->vnumtab,                    /* Copy list data */
-          srclistptr->vnumtab,
-          srclistptr->vnumnbr * sizeof (Gnum));
+  memCpy(dstlistptr->vnumtab, /* Copy list data */
+         srclistptr->vnumtab, srclistptr->vnumnbr * sizeof(Gnum));
 
   return (0);
 }

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -57,19 +57,21 @@
 
 /*+ Prime number for hashing vertex numbers. +*/
 
-#define KGRAPHMAPFMHASHPRIME        17            /*+ Prime number for hashing +*/
+#define KGRAPHMAPFMHASHPRIME 17 /*+ Prime number for hashing +*/
 
 /*+ Ratio of unused slots before compacting extended edge array. +*/
 
-#define KGRAPHMAPFMEDXXCOMP         5             /*+ Compact if edxunbr > (edxxnbr / KGRAPHMAPFMEDXXCOMP) */ 
+#define KGRAPHMAPFMEDXXCOMP                                                    \
+  5 /*+ Compact if edxunbr > (edxxnbr / KGRAPHMAPFMEDXXCOMP) */
 
 /*+ Save type identifier +*/
 
-#define KGRAPHMAPPFMSAVEVEXX        0
-#define KGRAPHMAPPFMSAVEEDXX        1
-#define KGRAPHMAPPFMSAVELINK        2             /* Bit value for KGRAPHMAPPFMSAVELINKADD and KGRAPHMAPPFMSAVELINKDEL */
-#define KGRAPHMAPPFMSAVELINKDEL     2
-#define KGRAPHMAPPFMSAVELINKADD     3
+#define KGRAPHMAPPFMSAVEVEXX 0
+#define KGRAPHMAPPFMSAVEEDXX 1
+#define KGRAPHMAPPFMSAVELINK                                                   \
+  2 /* Bit value for KGRAPHMAPPFMSAVELINKADD and KGRAPHMAPPFMSAVELINKDEL */
+#define KGRAPHMAPPFMSAVELINKDEL 2
+#define KGRAPHMAPPFMSAVELINKADD 3
 
 /*
 **  The type and structure definitions.
@@ -78,9 +80,9 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct KgraphMapFmParam_ {
-  INT                       movenbr;              /*+ Maximum number of uneffective moves that can be done +*/
-  INT                       passnbr;              /*+ Number of passes to be performed (-1 : infinite)     +*/
-  double                    deltval;              /*+ Maximum weight imbalance ratio                       +*/
+  INT movenbr;    /*+ Maximum number of uneffective moves that can be done +*/
+  INT passnbr;    /*+ Number of passes to be performed (-1 : infinite)     +*/
+  double deltval; /*+ Maximum weight imbalance ratio                       +*/
 } KgraphMapFmParam;
 
 /*+ The extended edge structure. In fact, this
@@ -92,7 +94,7 @@ typedef struct KgraphMapFmParam_ {
 
 #ifdef SCOTCH_TABLE_GAIN
 
-typedef GainTabl * KgraphMapFmTabl;
+typedef GainTabl *KgraphMapFmTabl;
 typedef GainLink KgraphMapFmLink;
 
 #else /* SCOTCH_TABLE_GAIN */
@@ -103,60 +105,61 @@ typedef FiboNode KgraphMapFmLink;
 #endif /* SCOTCH_TABLE_GAIN */
 
 typedef struct KgraphMapFmEdge_ {
-  KgraphMapFmLink           gainlink;             /*+ Gain link; TRICK: FIRST                 +*/
-  Gnum                      commgain;             /*+ Communication gain                      +*/
-  Gnum                      cmiggain;             /*+ Migration communication gain            +*/
-  Gnum                      cmigmask;             /*+ Migration communication mask            +*/
-  Gnum                      edlosum;              /*+ Sum of edge loads linking to the domain +*/
-  Gnum                      edgenbr;              /*+ Number of edges linking to the domain   +*/
-  Anum                      domnnum;              /*+ Destination domain index                +*/
-  Anum                      distval;              /*+ Distance between the two domains        +*/
-  Gnum                      vexxidx;              /*+ Index of owner vertex in vertex array   +*/
-  Gnum                      edxxidx;              /*+ Index of next edge in edge array        +*/
-  Gnum                      mswpnum;              /*+ Number of move sweep when data recorded +*/
+  KgraphMapFmLink gainlink; /*+ Gain link; TRICK: FIRST                 +*/
+  Gnum commgain;            /*+ Communication gain                      +*/
+  Gnum cmiggain;            /*+ Migration communication gain            +*/
+  Gnum cmigmask;            /*+ Migration communication mask            +*/
+  Gnum edlosum;             /*+ Sum of edge loads linking to the domain +*/
+  Gnum edgenbr;             /*+ Number of edges linking to the domain   +*/
+  Anum domnnum;             /*+ Destination domain index                +*/
+  Anum distval;             /*+ Distance between the two domains        +*/
+  Gnum vexxidx;             /*+ Index of owner vertex in vertex array   +*/
+  Gnum edxxidx;             /*+ Index of next edge in edge array        +*/
+  Gnum mswpnum;             /*+ Number of move sweep when data recorded +*/
 } KgraphMapFmEdge;
 
 /*+ The hash vertex structure. +*/
 
 typedef struct KgraphMapFmVertex_ {
-  struct KgraphMapFmVertex_ * lockptr;            /*+ Pointer to next vertex in lock list or NULL; FIRST +*/
-  Gnum                        vertnum;            /*+ Number of vertex                                   +*/
-  Gnum                        cmigload;           /*+ Migration communication load                       +*/
-  Gnum                        edlosum;            /*+ Sum of edge loads linking to self domain           +*/
-  Gnum                        edgenbr;            /*+ Number of edges linking to self domain             +*/
-  Anum                        domnnum;            /*+ Domain number                                      +*/
-  ArchDom *                   domoptr;            /*+ Domain in old mapping (for repartitioning)         +*/
-  Gnum                        veloval;            /*+ Vertex load; negative when locked                  +*/
-  Gnum                        edxxidx;            /*+ Index of first element in edge array               +*/
-  Gnum                        mswpnum;            /*+ Number of move sweep when data recorded            +*/
+  struct KgraphMapFmVertex_
+      *lockptr;     /*+ Pointer to next vertex in lock list or NULL; FIRST +*/
+  Gnum vertnum;     /*+ Number of vertex                                   +*/
+  Gnum cmigload;    /*+ Migration communication load                       +*/
+  Gnum edlosum;     /*+ Sum of edge loads linking to self domain           +*/
+  Gnum edgenbr;     /*+ Number of edges linking to self domain             +*/
+  Anum domnnum;     /*+ Domain number                                      +*/
+  ArchDom *domoptr; /*+ Domain in old mapping (for repartitioning)         +*/
+  Gnum veloval;     /*+ Vertex load; negative when locked                  +*/
+  Gnum edxxidx;     /*+ Index of first element in edge array               +*/
+  Gnum mswpnum;     /*+ Number of move sweep when data recorded            +*/
 } KgraphMapFmVertex;
 
 /*+ The move recording structures. +*/
 
 typedef struct KgraphMapFmSave_ {
-  Gnum                      type;
+  Gnum type;
   union {
     struct {
-      Gnum                  vexxidx;              /*+ Index of vertex slot in hash table (vexxhab) +*/
-      Gnum                  veloval;              /*+ Vertex load                                  +*/
-      Anum                  domnnum;              /*+ Original vertex domain                       +*/
-      Gnum                  commload;             /*+ Communication load for current domain        +*/
-      Gnum                  cmigload;             /*+ Migration communication load                 +*/
-      Gnum                  edlosum;              /*+ Sum of edge loads linking to self domain     +*/
-      Gnum                  edgenbr;              /*+ Number of edges linking to self domain       +*/
+      Gnum vexxidx;  /*+ Index of vertex slot in hash table (vexxhab) +*/
+      Gnum veloval;  /*+ Vertex load                                  +*/
+      Anum domnnum;  /*+ Original vertex domain                       +*/
+      Gnum commload; /*+ Communication load for current domain        +*/
+      Gnum cmigload; /*+ Migration communication load                 +*/
+      Gnum edlosum;  /*+ Sum of edge loads linking to self domain     +*/
+      Gnum edgenbr;  /*+ Number of edges linking to self domain       +*/
     } vexxdat;
     struct {
-      Gnum                  edxxidx;              /*+ Index of edge in edge array                  +*/
-      Anum                  domnnum;              /*+ Destination domain index                     +*/
-      Anum                  distval;              /*+ Distance between the two domains             +*/
-      Gnum                  commgain;             /*+ Communication gain                           +*/
-      Gnum                  cmiggain;             /*+ Migration communication gain                 +*/
-      Gnum                  edlosum;              /*+ Sum of edge loads linking to the domain      +*/
-      Gnum                  edgenbr;              /*+ Number of edges linking to the domain        +*/
+      Gnum edxxidx;  /*+ Index of edge in edge array                  +*/
+      Anum domnnum;  /*+ Destination domain index                     +*/
+      Anum distval;  /*+ Distance between the two domains             +*/
+      Gnum commgain; /*+ Communication gain                           +*/
+      Gnum cmiggain; /*+ Migration communication gain                 +*/
+      Gnum edlosum;  /*+ Sum of edge loads linking to the domain      +*/
+      Gnum edgenbr;  /*+ Number of edges linking to the domain        +*/
     } edxxdat;
     struct {
-      Gnum                  edxxidx;              /*+ Index of extended vertex or edge             +*/
-      Gnum                  vexxidx;              /*+ Index of vertex slot in hash table (vexxhab) +*/
+      Gnum edxxidx; /*+ Index of extended vertex or edge             +*/
+      Gnum vexxidx; /*+ Index of vertex slot in hash table (vexxhab) +*/
     } linkdat;
   } u;
 } KgraphMapFmSave;
@@ -165,7 +168,7 @@ typedef struct KgraphMapFmSave_ {
 **  The function prototypes.
 */
 
-int                         kgraphMapFm         (Kgraph * restrict const, const KgraphMapFmParam * const);
+int kgraphMapFm(Kgraph *restrict const, const KgraphMapFmParam *const);
 
 /*
 **  The macro definitions.
@@ -175,32 +178,38 @@ int                         kgraphMapFm         (Kgraph * restrict const, const 
 
 /*+ Gain table subbits. +*/
 
-#define KGRAPHMAPFMSUBBITS       4
+#define KGRAPHMAPFMSUBBITS 4
 
 /*+ Service routines. +*/
 
-#define kgraphMapFmTablInit(t)      (((*(t)) = gainTablInit (GAINMAX, KGRAPHMAPFMSUBBITS)) == NULL)
-#define kgraphMapFmTablFree(t)      gainTablFree (*(t))
-#define kgraphMapFmTablExit(t)      do {                     \
-                                      if (*(t) != NULL)      \
-                                        gainTablExit (*(t)); \
-                                    } while (0)
-#define kgraphMapFmTablAdd(t,e)     gainTablAdd ((*(t)), &(e)->gainlink, ((e)->commgain + (((e)->cmiggain) & ((e)->cmigmask))) * (e)->distval)
-#define kgraphMapFmTablDel(t,e)     gainTablDel ((*(t)), &(e)->gainlink)
+#define kgraphMapFmTablInit(t)                                                 \
+  (((*(t)) = gainTablInit(GAINMAX, KGRAPHMAPFMSUBBITS)) == NULL)
+#define kgraphMapFmTablFree(t) gainTablFree(*(t))
+#define kgraphMapFmTablExit(t)                                                 \
+  do {                                                                         \
+    if (*(t) != NULL)                                                          \
+      gainTablExit(*(t));                                                      \
+  } while (0)
+#define kgraphMapFmTablAdd(t, e)                                               \
+  gainTablAdd((*(t)), &(e)->gainlink,                                          \
+              ((e)->commgain + (((e)->cmiggain) & ((e)->cmigmask))) *          \
+                  (e)->distval)
+#define kgraphMapFmTablDel(t, e) gainTablDel((*(t)), &(e)->gainlink)
 #else /* SCOTCH_TABLE_GAIN */
 
 /*+ Service routines. +*/
 
-#define kgraphMapFmTablInit(t)      (fiboHeapInit ((t), kgraphMapFmCmpFunc))
-#define kgraphMapFmTablFree(t)      fiboHeapFree (t)
-#define kgraphMapFmTablExit(t)      fiboHeapExit (t)
-#define kgraphMapFmTablAdd(t,e)     fiboHeapAdd ((t), &(e)->gainlink)
-#define kgraphMapFmTablDel(t,e)     fiboHeapDel ((t), &(e)->gainlink)
+#define kgraphMapFmTablInit(t) (fiboHeapInit((t), kgraphMapFmCmpFunc))
+#define kgraphMapFmTablFree(t) fiboHeapFree(t)
+#define kgraphMapFmTablExit(t) fiboHeapExit(t)
+#define kgraphMapFmTablAdd(t, e) fiboHeapAdd((t), &(e)->gainlink)
+#define kgraphMapFmTablDel(t, e) fiboHeapDel((t), &(e)->gainlink)
 
 #endif /* SCOTCH_TABLE_GAIN */
 
-#define kgraphMapFmLock(l,v)        do {                                        \
-                                      (v)->lockptr = (KgraphMapFmVertex *) (l); \
-                                      (l) = (v);                                \
-                                    } while (0)
-#define kgraphMapFmLockNext(v)      ((KgraphMapFmVertex *) (v)->lockptr)
+#define kgraphMapFmLock(l, v)                                                  \
+  do {                                                                         \
+    (v)->lockptr = (KgraphMapFmVertex *)(l);                                   \
+    (l) = (v);                                                                 \
+  } while (0)
+#define kgraphMapFmLockNext(v) ((KgraphMapFmVertex *)(v)->lockptr)

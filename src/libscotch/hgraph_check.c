@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -71,55 +71,56 @@
 ** - !0  : on error.
 */
 
-int
-hgraphCheck (
-const Hgraph * restrict const grafptr)
-{
-  Gnum                vertnum;                    /* Number of current vertex */
-  Gnum                edgenum;                    /* Number of current edge   */
-  Gnum                enlosum;
+int hgraphCheck(const Hgraph *restrict const grafptr) {
+  Gnum vertnum; /* Number of current vertex */
+  Gnum edgenum; /* Number of current edge   */
+  Gnum enlosum;
 
-  if (graphCheck (&grafptr->s) != 0) {
-    errorPrint ("hgraphCheck: invalid graph structure in halo graph");
-    return     (1);
+  if (graphCheck(&grafptr->s) != 0) {
+    errorPrint("hgraphCheck: invalid graph structure in halo graph");
+    return (1);
   }
 
-  if ((grafptr->vnohnbr < 0)                                        ||
-      (grafptr->vnohnbr > grafptr->s.vertnbr)                       ||
+  if ((grafptr->vnohnbr < 0) || (grafptr->vnohnbr > grafptr->s.vertnbr) ||
       (grafptr->vnohnnd != (grafptr->vnohnbr + grafptr->s.baseval)) ||
-      (grafptr->vnlosum > grafptr->s.velosum)                       ||
-      (grafptr->enohnbr > grafptr->s.edgenbr)                       ||
+      (grafptr->vnlosum > grafptr->s.velosum) ||
+      (grafptr->enohnbr > grafptr->s.edgenbr) ||
       (grafptr->enlosum < grafptr->enohnbr)) {
-    errorPrint ("hgraphCheck: invalid halo graph parameters");
-    return     (1);
+    errorPrint("hgraphCheck: invalid halo graph parameters");
+    return (1);
   }
 
   enlosum = (grafptr->s.edlotax == NULL) ? grafptr->enohnbr : 0;
-  for (vertnum = grafptr->s.baseval; vertnum < grafptr->vnohnnd; vertnum ++) { /* For all non-halo vertices */
+  for (vertnum = grafptr->s.baseval; vertnum < grafptr->vnohnnd;
+       vertnum++) { /* For all non-halo vertices */
     if ((grafptr->vnhdtax[vertnum] < grafptr->s.verttax[vertnum]) ||
         (grafptr->vnhdtax[vertnum] > grafptr->s.vendtax[vertnum])) {
-      errorPrint ("hgraphCheck: invalid non-halo end vertex array");
-      return     (1);
+      errorPrint("hgraphCheck: invalid non-halo end vertex array");
+      return (1);
     }
 
     if (grafptr->s.edlotax != NULL) {
-      Gnum                edgenum;
+      Gnum edgenum;
 
-      for (edgenum = grafptr->s.verttax[vertnum]; edgenum < grafptr->vnhdtax[vertnum]; edgenum ++)
+      for (edgenum = grafptr->s.verttax[vertnum];
+           edgenum < grafptr->vnhdtax[vertnum]; edgenum++)
         enlosum += grafptr->s.edlotax[edgenum];
     }
   }
 
   if (grafptr->enlosum != enlosum) {
-    errorPrint ("hgraphCheck: invalid non-halo edge load sum");
-    return     (1);
+    errorPrint("hgraphCheck: invalid non-halo edge load sum");
+    return (1);
   }
 
-  for ( ; vertnum < grafptr->s.vertnnd; vertnum ++) { /* For all halo vertices */
-    for (edgenum = grafptr->s.verttax[vertnum]; edgenum < grafptr->s.vendtax[vertnum]; edgenum ++) {
-      if (grafptr->s.edgetax[edgenum] >= grafptr->vnohnnd) { /* If two halo vertices connected together */
-        errorPrint ("hgraphCheck: halo vertices should not be connected together");
-        return     (1);
+  for (; vertnum < grafptr->s.vertnnd; vertnum++) { /* For all halo vertices */
+    for (edgenum = grafptr->s.verttax[vertnum];
+         edgenum < grafptr->s.vendtax[vertnum]; edgenum++) {
+      if (grafptr->s.edgetax[edgenum] >=
+          grafptr->vnohnnd) { /* If two halo vertices connected together */
+        errorPrint(
+            "hgraphCheck: halo vertices should not be connected together");
+        return (1);
       }
     }
   }

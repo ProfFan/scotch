@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -76,35 +76,32 @@
 ** - !0  : on error.
 */
 
-int
-kdgraphInit (
-Kdgraph * restrict const         actgrafptr,      /* Active graph */
-const Dgraph * restrict const    srcgrafptr,      /* Source graph */
-Dmapping * restrict const        dmapptr)         /* Mapping      */
+int kdgraphInit(Kdgraph *restrict const actgrafptr,      /* Active graph */
+                const Dgraph *restrict const srcgrafptr, /* Source graph */
+                Dmapping *restrict const dmapptr)        /* Mapping      */
 {
-  actgrafptr->s            = *srcgrafptr;         /* Clone source graph */
-  actgrafptr->s.flagval   &= ~DGRAPHFREEALL;
-  actgrafptr->s.vlblloctax = NULL;                /* Do not propagate vertex labels within computations (e.g. dgraphInduce) */
-  actgrafptr->levlnum      = 0;
-  actgrafptr->m.mappptr    = dmapptr;
-  archDomFrst (&dmapptr->archdat, &actgrafptr->m.domnorg);
+  actgrafptr->s = *srcgrafptr; /* Clone source graph */
+  actgrafptr->s.flagval &= ~DGRAPHFREEALL;
+  actgrafptr->s.vlblloctax = NULL; /* Do not propagate vertex labels within
+                                      computations (e.g. dgraphInduce) */
+  actgrafptr->levlnum = 0;
+  actgrafptr->m.mappptr = dmapptr;
+  archDomFrst(&dmapptr->archdat, &actgrafptr->m.domnorg);
 
   return (0);
 }
 
 /* This routine frees the contents
-** of the given active graph 
+** of the given active graph
 ** It returns:
 ** - VOID  : in all cases.
 */
 
-void
-kdgraphExit (
-Kdgraph  * restrict const    actgrafptr)          /* Active graph */
+void kdgraphExit(Kdgraph *restrict const actgrafptr) /* Active graph */
 {
-  dgraphExit (&actgrafptr->s);
+  dgraphExit(&actgrafptr->s);
 
 #ifdef SCOTCH_DEBUG_KDGRAPH1
-  memSet (actgrafptr, 0, sizeof (Kdgraph));
+  memSet(actgrafptr, 0, sizeof(Kdgraph));
 #endif /* SCOTCH_DEBUG_KDGRAPH1 */
 }

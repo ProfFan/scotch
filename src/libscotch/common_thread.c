@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -73,17 +73,13 @@
 
 #ifdef COMMON_PTHREAD_BARRIER
 
-int
-threadBarrierInit (
-ThreadBarrier *             barrptr,
-void *                      attrptr,              /* Not used */
-int                         thrdnbr)
-{
+int threadBarrierInit(ThreadBarrier *barrptr, void *attrptr, /* Not used */
+                      int thrdnbr) {
   barrptr->thrdnbr = thrdnbr;
   barrptr->thrdcur = 0;
   barrptr->instnum = 0;
-  pthread_mutex_init (&barrptr->mutedat, NULL);
-  pthread_cond_init  (&barrptr->conddat, NULL);
+  pthread_mutex_init(&barrptr->mutedat, NULL);
+  pthread_cond_init(&barrptr->conddat, NULL);
 
   return (0);
 }
@@ -92,12 +88,9 @@ int                         thrdnbr)
 **
 */
 
-int
-threadBarrierDestroy (
-ThreadBarrier *             barrptr)
-{
-  pthread_cond_destroy  (&barrptr->conddat);
-  pthread_mutex_destroy (&barrptr->mutedat);
+int threadBarrierDestroy(ThreadBarrier *barrptr) {
+  pthread_cond_destroy(&barrptr->conddat);
+  pthread_mutex_destroy(&barrptr->mutedat);
 
   return (0);
 }
@@ -106,35 +99,31 @@ ThreadBarrier *             barrptr)
 **
 */
 
-int
-threadBarrierWait (
-ThreadBarrier *             barrptr)
-{
-  int                 instnum;
-  int                 thrdcur;
-  int                 o;
+int threadBarrierWait(ThreadBarrier *barrptr) {
+  int instnum;
+  int thrdcur;
+  int o;
 
-  pthread_mutex_lock (&barrptr->mutedat);
+  pthread_mutex_lock(&barrptr->mutedat);
 
   thrdcur = barrptr->thrdcur + 1;
   instnum = barrptr->instnum;
 
-  o = 0;                                          /* Assume thread will not be the last one */
+  o = 0; /* Assume thread will not be the last one */
 
   if (thrdcur == barrptr->thrdnbr) {
     barrptr->thrdcur = 0;
     barrptr->instnum = instnum + 1;
-    pthread_cond_broadcast (&barrptr->conddat);
-    o = PTHREAD_BARRIER_SERIAL_THREAD;            /* Last thread returns special value */
-  }
-  else {
+    pthread_cond_broadcast(&barrptr->conddat);
+    o = PTHREAD_BARRIER_SERIAL_THREAD; /* Last thread returns special value */
+  } else {
     barrptr->thrdcur = thrdcur;
     do
-      pthread_cond_wait (&barrptr->conddat, &barrptr->mutedat);
+      pthread_cond_wait(&barrptr->conddat, &barrptr->mutedat);
     while (barrptr->instnum == instnum);
   }
 
-  pthread_mutex_unlock (&barrptr->mutedat);
+  pthread_mutex_unlock(&barrptr->mutedat);
 
   return (o);
 }
@@ -153,40 +142,40 @@ ThreadBarrier *             barrptr)
 ** - void  : in all cases.
 */
 
-void
-threadReduce (
-void * const                dataptr,              /* Per-thread data block        */
-void * const                contptr,              /* Pointer to thread contents   */
-ThreadReduceFunc const      redfptr,              /* Pointer to reduction routine */
-int                         rootnum)              /* Root of reduction            */
+void threadReduce(
+    void *const dataptr,            /* Per-thread data block        */
+    void *const contptr,            /* Pointer to thread contents   */
+    ThreadReduceFunc const redfptr, /* Pointer to reduction routine */
+    int rootnum)                    /* Root of reduction            */
 {
-  ThreadHeader * restrict const       thrdptr = (ThreadHeader *) dataptr;
-  ThreadGroupHeader * restrict const  grouptr = thrdptr->grouptr;
-  const size_t                        datasiz = grouptr->datasiz;
-  const int                           thrdnbr = grouptr->thrdnbr;
-  const int                           thrdnum = thrdptr->thrdnum;
-  int                                 thrdnsk;    /* Rank of thread in skewed reduction tree */
-  int                                 thrdmsk;
+  ThreadHeader *restrict const thrdptr = (ThreadHeader *)dataptr;
+  ThreadGroupHeader *restrict const grouptr = thrdptr->grouptr;
+  const size_t datasiz = grouptr->datasiz;
+  const int thrdnbr = grouptr->thrdnbr;
+  const int thrdnum = thrdptr->thrdnum;
+  int thrdnsk; /* Rank of thread in skewed reduction tree */
+  int thrdmsk;
 
   thrdnsk = (thrdnum + thrdnbr - rootnum) % thrdnbr;
   for (thrdmsk = 1; thrdmsk < thrdnbr; thrdmsk <<= 1) {
-    int                 thrdesk;                  /* Skewed rank of end thread */
+    int thrdesk; /* Skewed rank of end thread */
 
-    threadBarrierWait (&grouptr->barrdat);
+    threadBarrierWait(&grouptr->barrdat);
 
-    thrdesk = thrdnsk ^ thrdmsk;                  /* Get skewed rank of end thread */
+    thrdesk = thrdnsk ^ thrdmsk; /* Get skewed rank of end thread */
 
-    if (thrdesk < thrdnbr) {                      /* If end thread exists            */
-      if (thrdesk > thrdnsk) {                    /* If we are on the receiving side */
-        int                 thrdend;
-        int                 thrddlt;
+    if (thrdesk < thrdnbr) {   /* If end thread exists            */
+      if (thrdesk > thrdnsk) { /* If we are on the receiving side */
+        int thrdend;
+        int thrddlt;
 
         thrdend = (thrdesk + rootnum) % thrdnbr;
         thrddlt = thrdend - thrdnum;
-        redfptr (dataptr, contptr, (void *) ((byte *) contptr + thrddlt * datasiz)); /* Call reduction routine */
-      }
-      else                                        /* We are on the sending side       */
-        thrdnsk += thrdnbr;                       /* Make sure we will no longer work */
+        redfptr(dataptr, contptr,
+                (void *)((byte *)contptr +
+                         thrddlt * datasiz)); /* Call reduction routine */
+      } else                /* We are on the sending side       */
+        thrdnsk += thrdnbr; /* Make sure we will no longer work */
     }
   }
 }
@@ -201,31 +190,36 @@ int                         rootnum)              /* Root of reduction          
 ** - void  : in all cases.
 */
 
-void
-threadScan (
-void * const                dataptr,              /* Per-thread data block      */
-void * const                contptr,              /* Pointer to thread contents */
-ThreadScanFunc const        scafptr)              /* Scan function              */
+void threadScan(void *const dataptr,          /* Per-thread data block      */
+                void *const contptr,          /* Pointer to thread contents */
+                ThreadScanFunc const scafptr) /* Scan function              */
 {
-  ThreadHeader * restrict const       thrdptr = (ThreadHeader *) dataptr;
-  ThreadGroupHeader * restrict const  grouptr = thrdptr->grouptr;
-  const size_t                        datasiz = grouptr->datasiz;
-  const int                           thrdnbr = grouptr->thrdnbr;
-  const int                           thrdnum = thrdptr->thrdnum;
-  int                                 thrdmsk;
-  int                                 i;
+  ThreadHeader *restrict const thrdptr = (ThreadHeader *)dataptr;
+  ThreadGroupHeader *restrict const grouptr = thrdptr->grouptr;
+  const size_t datasiz = grouptr->datasiz;
+  const int thrdnbr = grouptr->thrdnbr;
+  const int thrdnum = thrdptr->thrdnum;
+  int thrdmsk;
+  int i;
 
-  for (thrdmsk = 1, i = 0; thrdmsk < thrdnbr; thrdmsk <<= 1, i ^= 1) ; /* Determine number of steps to go         */
-  if (i != 0)                                     /* If number of steps is odd                                    */
-    scafptr (dataptr, contptr, NULL, 0);          /* Pre-copy to swap area so that it will end at the right place */
+  for (thrdmsk = 1, i = 0; thrdmsk < thrdnbr; thrdmsk <<= 1, i ^= 1)
+    ;         /* Determine number of steps to go         */
+  if (i != 0) /* If number of steps is odd                                    */
+    scafptr(
+        dataptr, contptr, NULL,
+        0); /* Pre-copy to swap area so that it will end at the right place */
 
   for (thrdmsk = 1; thrdmsk < thrdnbr; thrdmsk <<= 1, i ^= 1) {
-    int                 thrdend;
+    int thrdend;
 
-    threadBarrierWait (&grouptr->barrdat);        /* Barrier on all threads, even those which do not participate */
+    threadBarrierWait(&grouptr->barrdat); /* Barrier on all threads, even those
+                                             which do not participate */
 
-    thrdend = thrdnum - thrdmsk;                  /* Get rank of end thread */
-    scafptr (dataptr, contptr, (thrdend >= 0) ? (void *) ((byte *) contptr - thrdmsk * datasiz) : NULL, i); /* If end thread exists, perform scan, else just copy */
+    thrdend = thrdnum - thrdmsk; /* Get rank of end thread */
+    scafptr(dataptr, contptr,
+            (thrdend >= 0) ? (void *)((byte *)contptr - thrdmsk * datasiz)
+                           : NULL,
+            i); /* If end thread exists, perform scan, else just copy */
   }
 }
 
@@ -237,66 +231,69 @@ ThreadScanFunc const        scafptr)              /* Scan function              
 ** only set affinity for themselves.
 */
 
-static
-void *
-threadLaunch2 (
-void *                      dataptr)              /* Per-thread data block */
+static void *threadLaunch2(void *dataptr) /* Per-thread data block */
 {
-  ThreadHeader * restrict const       thrdptr = (ThreadHeader *) dataptr;
-  ThreadGroupHeader * restrict const  grouptr = thrdptr->grouptr;
-  const size_t                        datasiz = grouptr->datasiz;
-  const int                           thrdnbr = grouptr->thrdnbr;
-  const int                           thrdnum = thrdptr->thrdnum;
-  int                                 thrdmsk;
-  int                                 o;
+  ThreadHeader *restrict const thrdptr = (ThreadHeader *)dataptr;
+  ThreadGroupHeader *restrict const grouptr = thrdptr->grouptr;
+  const size_t datasiz = grouptr->datasiz;
+  const int thrdnbr = grouptr->thrdnbr;
+  const int thrdnum = thrdptr->thrdnum;
+  int thrdmsk;
+  int o;
 #ifdef COMMON_PTHREAD_AFFINITY_LINUX
-  cpu_set_t                           cpuset;
+  cpu_set_t cpuset;
 #endif /* COMMON_PTHREAD_AFFINITY_LINUX */
 
 #ifdef COMMON_PTHREAD_AFFINITY_LINUX
-  CPU_ZERO (&cpuset);
-  CPU_SET  (thrdnum, &cpuset);                    /* Thread sets its own affinity */
-  pthread_setaffinity_np (thrdptr->thidval, sizeof (cpu_set_t), &cpuset);
+  CPU_ZERO(&cpuset);
+  CPU_SET(thrdnum, &cpuset); /* Thread sets its own affinity */
+  pthread_setaffinity_np(thrdptr->thidval, sizeof(cpu_set_t), &cpuset);
 #endif /* COMMON_PTHREAD_AFFINITY_LINUX */
 
-  o = grouptr->stafptr (dataptr);                 /* Call start routine */
+  o = grouptr->stafptr(dataptr); /* Call start routine */
 
   for (thrdmsk = 1; thrdmsk < thrdnbr; thrdmsk <<= 1) {
-    volatile ThreadHeader * restrict  thrdtmp;    /* Pointer to thread header of other thread */
-    int                               thrdend;
+    volatile ThreadHeader *restrict
+        thrdtmp; /* Pointer to thread header of other thread */
+    int thrdend;
 
-    thrdend = thrdnum ^ thrdmsk;                  /* Get rank of end thread       */
-    if (thrdend >= thrdnbr)                       /* If end thread does not exist */
+    thrdend = thrdnum ^ thrdmsk; /* Get rank of end thread       */
+    if (thrdend >= thrdnbr)      /* If end thread does not exist */
       continue;
 
-    thrdtmp = (ThreadHeader *) ((byte *) dataptr + grouptr->datasiz * (thrdend - thrdnum));
-    while (thrdtmp->thrdnum == -1) ;              /* Spin-lock until end thread created */
+    thrdtmp = (ThreadHeader *)((byte *)dataptr +
+                               grouptr->datasiz * (thrdend - thrdnum));
+    while (thrdtmp->thrdnum == -1)
+      ; /* Spin-lock until end thread created */
 
-    if (thrdnum > thrdend) {                      /* If we are on the sending side        */
-      if (thrdtmp->thrdnum < 0) {                 /* If end thread could not be created   */
-        pthread_detach (thrdptr->thidval);        /* Detach since nobody will join for us */
-        o = 1;                                    /* Set (useless) error return value     */
+    if (thrdnum > thrdend) {      /* If we are on the sending side        */
+      if (thrdtmp->thrdnum < 0) { /* If end thread could not be created   */
+        pthread_detach(
+            thrdptr->thidval); /* Detach since nobody will join for us */
+        o = 1;                 /* Set (useless) error return value     */
       }
 
-      pthread_exit ((void *) (intptr_t) o);       /* Exit anyway */
-    }
-    else {
-      if (thrdtmp->thrdnum < 0)                   /* If end thread could not be created */
-        o = 1;                                    /* Set error return value             */
+      pthread_exit((void *)(intptr_t)o); /* Exit anyway */
+    } else {
+      if (thrdtmp->thrdnum < 0) /* If end thread could not be created */
+        o = 1;                  /* Set error return value             */
       else {
-        void *              o2;
+        void *o2;
 
-        pthread_join (thrdtmp->thidval, &o2);     /* Get return value from end thread */
-        o |= (int) (intptr_t) o2;                 /* Amalgamate return status         */
+        pthread_join(thrdtmp->thidval,
+                     &o2);      /* Get return value from end thread */
+        o |= (int)(intptr_t)o2; /* Amalgamate return status         */
 
-        if ((grouptr->joifptr != NULL) &&         /* If we have something to do      */
-            (o == 0))                             /* And if no error in both threads */
-          o |= grouptr->joifptr (dataptr, (void *) ((byte *) dataptr + thrdmsk * datasiz)); /* Call join routine */
+        if ((grouptr->joifptr != NULL) && /* If we have something to do      */
+            (o == 0))                     /* And if no error in both threads */
+          o |= grouptr->joifptr(
+              dataptr, (void *)((byte *)dataptr +
+                                thrdmsk * datasiz)); /* Call join routine */
       }
     }
   }
 
-  return ((void *) (intptr_t) o);                 /* Thread of rank 0 returns global status */
+  return ((void *)(intptr_t)o); /* Thread of rank 0 returns global status */
 }
 
 /* This routine launches the given
@@ -309,21 +306,20 @@ void *                      dataptr)              /* Per-thread data block */
 ** - !0  : on error.
 */
 
-int
-threadLaunch (
-void * const                gdatptr,              /* Pointer to thread group data block           */
-void * const                tdattab,              /* Array of thread data                         */
-const size_t                datasiz,              /* Size of individual data array cell           */
-ThreadLaunchStartFunc       stafptr,              /* Pointer to start routine                     */
-ThreadLaunchJoinFunc        joifptr,              /* Pointer to join routine                      */
-const int                   thrdnbr,              /* Number of threads to run (including current) */
-const int                   flagval)              /* Flag for thread operation data structures    */
+int threadLaunch(
+    void *const gdatptr,  /* Pointer to thread group data block           */
+    void *const tdattab,  /* Array of thread data                         */
+    const size_t datasiz, /* Size of individual data array cell           */
+    ThreadLaunchStartFunc stafptr, /* Pointer to start routine */
+    ThreadLaunchJoinFunc joifptr,  /* Pointer to join routine  */
+    const int thrdnbr, /* Number of threads to run (including current) */
+    const int flagval) /* Flag for thread operation data structures    */
 {
-  ThreadGroupHeader * const grouptr = (ThreadGroupHeader *) gdatptr;
-  ThreadHeader *            thrdptr;
-  int                       thrdnum;
-  byte *                    dataptr;
-  void *                    o;
+  ThreadGroupHeader *const grouptr = (ThreadGroupHeader *)gdatptr;
+  ThreadHeader *thrdptr;
+  int thrdnum;
+  byte *dataptr;
+  void *o;
 
   grouptr->flagval = flagval;
   grouptr->datasiz = datasiz;
@@ -332,47 +328,51 @@ const int                   flagval)              /* Flag for thread operation d
   grouptr->joifptr = joifptr;
 
   if ((flagval & THREADHASBARRIER) != 0) {
-    if (threadBarrierInit (&grouptr->barrdat, NULL, thrdnbr) != 0) {
-      errorPrint ("threadLaunch: cannot initialize barrier (1)");
-      return     (1);
+    if (threadBarrierInit(&grouptr->barrdat, NULL, thrdnbr) != 0) {
+      errorPrint("threadLaunch: cannot initialize barrier (1)");
+      return (1);
     }
   }
 
-  for (thrdnum = 0, dataptr = (byte *) tdattab;   /* Prepare threads for launching */
-       thrdnum < thrdnbr; thrdnum ++, dataptr += datasiz) {
-    ThreadHeader *      thrdptr;
+  for (thrdnum = 0,
+      dataptr = (byte *)tdattab; /* Prepare threads for launching */
+       thrdnum < thrdnbr; thrdnum++, dataptr += datasiz) {
+    ThreadHeader *thrdptr;
 
-    thrdptr = (ThreadHeader *) dataptr;
-    thrdptr->thrdnum = -1;                        /* Set threads as not yet launched */
+    thrdptr = (ThreadHeader *)dataptr;
+    thrdptr->thrdnum = -1; /* Set threads as not yet launched */
   }
 
-  __sync_synchronize ();                          /* Full memory barrier */
+  __sync_synchronize(); /* Full memory barrier */
 
-  for (thrdnum = 1, dataptr = (byte *) tdattab + datasiz; /* Launch threads from 1 to (thrdnbr - 1) */
-       thrdnum < thrdnbr; thrdnum ++, dataptr += datasiz) {
-    ThreadHeader *      thrdptr;
+  for (thrdnum = 1,
+      dataptr = (byte *)tdattab +
+                datasiz; /* Launch threads from 1 to (thrdnbr - 1) */
+       thrdnum < thrdnbr; thrdnum++, dataptr += datasiz) {
+    ThreadHeader *thrdptr;
 
-    thrdptr = (ThreadHeader *) dataptr;
+    thrdptr = (ThreadHeader *)dataptr;
     thrdptr->grouptr = gdatptr;
     thrdptr->thrdnum = thrdnum;
 
-    if (pthread_create (&thrdptr->thidval, NULL, threadLaunch2, (void *) dataptr) != 0) {
-      errorPrint ("threadLaunch: cannot launch thread (%d)", thrdnum);
-      return     (1);
+    if (pthread_create(&thrdptr->thidval, NULL, threadLaunch2,
+                       (void *)dataptr) != 0) {
+      errorPrint("threadLaunch: cannot launch thread (%d)", thrdnum);
+      return (1);
     }
   }
 
-  thrdptr = (ThreadHeader *) tdattab;             /* Run thread 0 */
+  thrdptr = (ThreadHeader *)tdattab; /* Run thread 0 */
   thrdptr->grouptr = gdatptr;
-  thrdptr->thidval = pthread_self ();
+  thrdptr->thidval = pthread_self();
   thrdptr->thrdnum = 0;
 
-  o = threadLaunch2 (tdattab);
+  o = threadLaunch2(tdattab);
 
-  if ((flagval & THREADHASBARRIER) != 0)          /* Free allocated resources */
-    threadBarrierDestroy (&grouptr->barrdat);
+  if ((flagval & THREADHASBARRIER) != 0) /* Free allocated resources */
+    threadBarrierDestroy(&grouptr->barrdat);
 
-  return ((int) (intptr_t) o);
+  return ((int)(intptr_t)o);
 }
 
 #else /* COMMON_PTHREAD */
@@ -383,37 +383,33 @@ const int                   flagval)              /* Flag for thread operation d
 /*                                */
 /**********************************/
 
-void
-threadReduce (
-void * const                dataptr,              /* Per-thread data block        */
-void * const                contptr,              /* Pointer to thread contents   */
-ThreadReduceFunc const      redfptr,              /* Pointer to reduction routine */
-int                         rootnum)              /* Root of reduction            */
+void threadReduce(
+    void *const dataptr,            /* Per-thread data block        */
+    void *const contptr,            /* Pointer to thread contents   */
+    ThreadReduceFunc const redfptr, /* Pointer to reduction routine */
+    int rootnum)                    /* Root of reduction            */
 {
-  errorPrint ("threadReduce: Not compiled with COMMON_PTHREAD");
+  errorPrint("threadReduce: Not compiled with COMMON_PTHREAD");
 }
 
-void
-threadScan (
-void * const                dataptr,              /* Per-thread data block      */
-void * const                contptr,              /* Pointer to thread contents */
-ThreadScanFunc const        scafptr)              /* Scan function              */
+void threadScan(void *const dataptr,          /* Per-thread data block      */
+                void *const contptr,          /* Pointer to thread contents */
+                ThreadScanFunc const scafptr) /* Scan function              */
 {
-  errorPrint ("threadScan: Not compiled with COMMON_PTHREAD");
+  errorPrint("threadScan: Not compiled with COMMON_PTHREAD");
 }
 
-int
-threadLaunch (
-void * const                gdatptr,              /* Pointer to thread group data block           */
-void * const                tdattab,              /* Array of thread data                         */
-const size_t                datasiz,              /* Size of individual data array cell           */
-ThreadLaunchStartFunc       stafptr,              /* Pointer to start routine                     */
-ThreadLaunchJoinFunc        joifptr,              /* Pointer to join routine                      */
-const int                   thrdnbr,              /* Number of threads to run (including current) */
-const int                   flagval)              /* Flag for thread operation data structures    */
+int threadLaunch(
+    void *const gdatptr,  /* Pointer to thread group data block           */
+    void *const tdattab,  /* Array of thread data                         */
+    const size_t datasiz, /* Size of individual data array cell           */
+    ThreadLaunchStartFunc stafptr, /* Pointer to start routine */
+    ThreadLaunchJoinFunc joifptr,  /* Pointer to join routine  */
+    const int thrdnbr, /* Number of threads to run (including current) */
+    const int flagval) /* Flag for thread operation data structures    */
 {
-  errorPrint ("threadLaunch: Not compiled with COMMON_PTHREAD");
-  return     (1);
+  errorPrint("threadLaunch: Not compiled with COMMON_PTHREAD");
+  return (1);
 }
 
 #endif /* COMMON_PTHREAD */

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -48,16 +48,18 @@
 */
 
 #include <stdio.h>
-#if (((defined __STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || (defined HAVE_STDINT_H))
+#if (((defined __STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) ||          \
+     (defined HAVE_STDINT_H))
 #include <stdint.h>
-#endif /* (((defined __STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || (defined HAVE_STDINT_H)) */
+#endif /* (((defined __STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) ||    \
+          (defined HAVE_STDINT_H)) */
 #include <stdlib.h>
 #include <string.h>
 
 #include "scotch.h"
 
-void                        _SCOTCHintRandInit  (void);
-SCOTCH_Num                  _SCOTCHintRandVal   (SCOTCH_Num);
+void _SCOTCHintRandInit(void);
+SCOTCH_Num _SCOTCHintRandVal(SCOTCH_Num);
 
 /*********************/
 /*                   */
@@ -65,49 +67,45 @@ SCOTCH_Num                  _SCOTCHintRandVal   (SCOTCH_Num);
 /*                   */
 /*********************/
 
-int
-main (
-int                 argc,
-char *              argv[])
-{
-  FILE *              fileptr;
-  SCOTCH_Graph        grafdat;
-  SCOTCH_Num          diamval;
+int main(int argc, char *argv[]) {
+  FILE *fileptr;
+  SCOTCH_Graph grafdat;
+  SCOTCH_Num diamval;
 
-  SCOTCH_errorProg (argv[0]);
+  SCOTCH_errorProg(argv[0]);
 
   if (argc != 2) {
-    SCOTCH_errorPrint ("usage: %s graph_file", argv[0]);
-    exit (EXIT_FAILURE);
+    SCOTCH_errorPrint("usage: %s graph_file", argv[0]);
+    exit(EXIT_FAILURE);
   }
 
-  if (SCOTCH_graphInit (&grafdat) != 0) {         /* Initialize source graph */
-    SCOTCH_errorPrint ("main: cannot initialize graph");
-    exit (EXIT_FAILURE);
+  if (SCOTCH_graphInit(&grafdat) != 0) { /* Initialize source graph */
+    SCOTCH_errorPrint("main: cannot initialize graph");
+    exit(EXIT_FAILURE);
   }
 
-  if ((fileptr = fopen (argv[1], "r")) == NULL) {
-    SCOTCH_errorPrint ("main: cannot open file");
-    exit (EXIT_FAILURE);
+  if ((fileptr = fopen(argv[1], "r")) == NULL) {
+    SCOTCH_errorPrint("main: cannot open file");
+    exit(EXIT_FAILURE);
   }
 
-  if (SCOTCH_graphLoad (&grafdat, fileptr, -1, 0) != 0) { /* Read source graph */
-    SCOTCH_errorPrint ("main: cannot load graph");
-    exit (EXIT_FAILURE);
+  if (SCOTCH_graphLoad(&grafdat, fileptr, -1, 0) != 0) { /* Read source graph */
+    SCOTCH_errorPrint("main: cannot load graph");
+    exit(EXIT_FAILURE);
   }
 
-  fclose (fileptr);
+  fclose(fileptr);
 
-  _SCOTCHintRandInit ();
+  _SCOTCHintRandInit();
 
-  if ((diamval = SCOTCH_graphDiamPV (&grafdat)) < 0) {
-    SCOTCH_errorPrint ("main: cannot compute graph pseudo-diameter");
-    exit (EXIT_FAILURE);
+  if ((diamval = SCOTCH_graphDiamPV(&grafdat)) < 0) {
+    SCOTCH_errorPrint("main: cannot compute graph pseudo-diameter");
+    exit(EXIT_FAILURE);
   }
 
-  printf ("Graph pseudo-diameter: %ld\n", (long) diamval);
+  printf("Graph pseudo-diameter: %ld\n", (long)diamval);
 
-  SCOTCH_graphExit (&grafdat);
+  SCOTCH_graphExit(&grafdat);
 
-  exit (EXIT_SUCCESS);
+  exit(EXIT_SUCCESS);
 }

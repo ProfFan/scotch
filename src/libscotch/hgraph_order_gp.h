@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -59,35 +59,37 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct HgraphOrderGpParam_ {
-  INT                       passnbr;              /*+ Number of passes to do +*/
+  INT passnbr; /*+ Number of passes to do +*/
 } HgraphOrderGpParam;
 
 /*+ Complementary vertex structure. +*/
 
 typedef struct HgraphOrgerGpVertex_ {
-  Gnum                      passnum;              /*+ Number of pass when vertex selected   +*/
-  Gnum                      vertdist;             /*+ Current distance from diameter vertex +*/
+  Gnum passnum;  /*+ Number of pass when vertex selected   +*/
+  Gnum vertdist; /*+ Current distance from diameter vertex +*/
 } HgraphOrderGpVertex;
 
 /*+ Neighbor queue. +*/
 
 typedef struct HgraphOrgerGpQueue_ {
-  Gnum *                    head;                 /*+ Head of distance queue  +*/
-  Gnum *                    tail;                 /*+ Tail of distance queue  +*/
-  Gnum *                    qtab;                 /*+ Array of queue elements +*/
+  Gnum *head; /*+ Head of distance queue  +*/
+  Gnum *tail; /*+ Tail of distance queue  +*/
+  Gnum *qtab; /*+ Array of queue elements +*/
 } HgraphOrgerGpQueue;
 
 /*
 **  The function prototypes.
 */
 
-int                         hgraphOrderGp       (const Hgraph * const, Order * const, const Gnum, OrderCblk * const, const HgraphOrderGpParam * restrict const);
+int hgraphOrderGp(const Hgraph *const, Order *const, const Gnum,
+                  OrderCblk *const, const HgraphOrderGpParam *restrict const);
 
 /*
 **  The macro definitions.
 */
 
-#define hgraphOrderGpQueueFlush(queue)    ((queue)->head = (queue)->tail = (queue)->qtab)
-#define hgraphOrderGpQueueEmpty(queue)    ((queue)->head <= (queue)->tail)
-#define hgraphOrderGpQueuePut(queue,vnum) (* ((queue)->head ++) = (vnum))
-#define hgraphOrderGpQueueGet(queue)      (* ((queue)->tail ++))
+#define hgraphOrderGpQueueFlush(queue)                                         \
+  ((queue)->head = (queue)->tail = (queue)->qtab)
+#define hgraphOrderGpQueueEmpty(queue) ((queue)->head <= (queue)->tail)
+#define hgraphOrderGpQueuePut(queue, vnum) (*((queue)->head++) = (vnum))
+#define hgraphOrderGpQueueGet(queue) (*((queue)->tail++))

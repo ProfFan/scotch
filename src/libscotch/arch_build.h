@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -60,23 +60,23 @@
 /*+ Job to process. +*/
 
 typedef struct ArchDecoBuildJob_ {
-  struct ArchDecoBuildJob_ *  joblink;            /*+ Link to job pool                        +*/
-  ArchDomNum                  domnum;             /*+ Mapping domain to which vertices belong +*/
-  Graph                       grafdat;            /*+ Job graph data                          +*/
+  struct ArchDecoBuildJob_ *joblink; /*+ Link to job pool +*/
+  ArchDomNum domnum; /*+ Mapping domain to which vertices belong +*/
+  Graph grafdat;     /*+ Job graph data                          +*/
 } ArchDecoBuildJob;
 
 /*+ Vertex distance information. +*/
 
 typedef struct ArchDecoBuildDistElem_ {
-  int                       queued;               /*+ Flag set if vertex queued  +*/
-  Anum                      distval;              /*+ Distance to initial vertex +*/
+  int queued;   /*+ Flag set if vertex queued  +*/
+  Anum distval; /*+ Distance to initial vertex +*/
 } ArchDecoBuildDistElem;
 
 /*+ Queue element. +*/
 
 typedef struct ArchDecoBuildQueuElem_ {
-  Gnum                      vertnum;              /*+ Vertex number in source graph +*/
-  Anum                      distval;              /*+ Distance reached              +*/
+  Gnum vertnum; /*+ Vertex number in source graph +*/
+  Anum distval; /*+ Distance reached              +*/
 } ArchDecoBuildQueuElem;
 
 /*
@@ -84,7 +84,8 @@ typedef struct ArchDecoBuildQueuElem_ {
 */
 
 #ifdef ARCH_BUILD
-static void                 archDecoBuildJobExit (ArchDecoBuildJob *);
+static void archDecoBuildJobExit(ArchDecoBuildJob *);
 #endif /* ARCH_BUILD */
 
-int                         archDecoArchBuild   (Arch * const, const Graph * const, const VertList * const, const Strat * const);
+int archDecoArchBuild(Arch *const, const Graph *const, const VertList *const,
+                      const Strat *const);

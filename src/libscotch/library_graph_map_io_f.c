@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -61,33 +61,31 @@
 /*                                    */
 /**************************************/
 
-SCOTCH_FORTRAN (                      \
-GRAPHTABLOAD, graphtabload, (         \
-const SCOTCH_Graph * const  grafptr,  \
-SCOTCH_Num * const          parttab,  \
-const int * const           fileptr,  \
-int * const                 revaptr), \
-(grafptr, parttab, fileptr, revaptr))
-{
-  FILE *              stream;                     /* Stream to build from handle */
-  int                 filenum;                    /* Duplicated handle           */
-  int                 o;
+SCOTCH_FORTRAN(GRAPHTABLOAD, graphtabload,
+               (const SCOTCH_Graph *const grafptr, SCOTCH_Num *const parttab,
+                const int *const fileptr, int *const revaptr),
+               (grafptr, parttab, fileptr, revaptr)) {
+  FILE *stream; /* Stream to build from handle */
+  int filenum;  /* Duplicated handle           */
+  int o;
 
-  if ((filenum = dup (*fileptr)) < 0) {           /* If cannot duplicate file descriptor */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHTABLOAD)) ": cannot duplicate handle");
-    *revaptr = 1;                                 /* Indicate error */
+  if ((filenum = dup(*fileptr)) < 0) { /* If cannot duplicate file descriptor */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHTABLOAD)) ": cannot duplicate handle");
+    *revaptr = 1; /* Indicate error */
     return;
   }
-  if ((stream = fdopen (filenum, "r")) == NULL) { /* Build stream from handle */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHTABLOAD)) ": cannot open input stream");
-    close      (filenum);
+  if ((stream = fdopen(filenum, "r")) == NULL) { /* Build stream from handle */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHTABLOAD)) ": cannot open input stream");
+    close(filenum);
     *revaptr = 1;
     return;
   }
 
-  o = SCOTCH_graphTabLoad (grafptr, parttab, stream);
+  o = SCOTCH_graphTabLoad(grafptr, parttab, stream);
 
-  fclose (stream);                                /* This closes file descriptor too */
+  fclose(stream); /* This closes file descriptor too */
 
   *revaptr = o;
 }
@@ -96,33 +94,32 @@ int * const                 revaptr), \
 **
 */
 
-SCOTCH_FORTRAN (                      \
-GRAPHMAPLOAD, graphmapload, (         \
-const SCOTCH_Graph * const  grafptr,  \
-SCOTCH_Mapping * const      mappptr,  \
-const int * const           fileptr,  \
-int * const                 revaptr), \
-(grafptr, mappptr, fileptr, revaptr))
-{
-  FILE *              stream;                     /* Stream to build from handle */
-  int                 filenum;                    /* Duplicated handle           */
-  int                 o;
+SCOTCH_FORTRAN(GRAPHMAPLOAD, graphmapload,
+               (const SCOTCH_Graph *const grafptr,
+                SCOTCH_Mapping *const mappptr, const int *const fileptr,
+                int *const revaptr),
+               (grafptr, mappptr, fileptr, revaptr)) {
+  FILE *stream; /* Stream to build from handle */
+  int filenum;  /* Duplicated handle           */
+  int o;
 
-  if ((filenum = dup (*fileptr)) < 0) {           /* If cannot duplicate file descriptor */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHMAPLOAD)) ": cannot duplicate handle");
-    *revaptr = 1;                                 /* Indicate error */
+  if ((filenum = dup(*fileptr)) < 0) { /* If cannot duplicate file descriptor */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHMAPLOAD)) ": cannot duplicate handle");
+    *revaptr = 1; /* Indicate error */
     return;
   }
-  if ((stream = fdopen (filenum, "r")) == NULL) { /* Build stream from handle */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHMAPLOAD)) ": cannot open input stream");
-    close      (filenum);
+  if ((stream = fdopen(filenum, "r")) == NULL) { /* Build stream from handle */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHMAPLOAD)) ": cannot open input stream");
+    close(filenum);
     *revaptr = 1;
     return;
   }
 
-  o = SCOTCH_graphMapLoad (grafptr, mappptr, stream);
+  o = SCOTCH_graphMapLoad(grafptr, mappptr, stream);
 
-  fclose (stream);                                /* This closes file descriptor too */
+  fclose(stream); /* This closes file descriptor too */
 
   *revaptr = o;
 }
@@ -131,34 +128,33 @@ int * const                 revaptr), \
 **
 */
 
-SCOTCH_FORTRAN (                      \
-GRAPHMAPSAVE, graphmapsave, (         \
-const SCOTCH_Graph * const  grafptr,  \
-SCOTCH_Mapping * const      mappptr,  \
-const int * const           fileptr,  \
-int * const                 revaptr), \
-(grafptr, mappptr, fileptr, revaptr))
-{
-  FILE *              stream;                     /* Stream to build from handle */
-  int                 filenum;                    /* Duplicated handle           */
-  int                 o;
+SCOTCH_FORTRAN(GRAPHMAPSAVE, graphmapsave,
+               (const SCOTCH_Graph *const grafptr,
+                SCOTCH_Mapping *const mappptr, const int *const fileptr,
+                int *const revaptr),
+               (grafptr, mappptr, fileptr, revaptr)) {
+  FILE *stream; /* Stream to build from handle */
+  int filenum;  /* Duplicated handle           */
+  int o;
 
-  if ((filenum = dup (*fileptr)) < 0) {           /* If cannot duplicate file descriptor */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHMAPSAVE)) ": cannot duplicate handle");
+  if ((filenum = dup(*fileptr)) < 0) { /* If cannot duplicate file descriptor */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHMAPSAVE)) ": cannot duplicate handle");
 
-    *revaptr = 1;                                 /* Indicate error */
+    *revaptr = 1; /* Indicate error */
     return;
   }
-  if ((stream = fdopen (filenum, "w")) == NULL) { /* Build stream from handle */
-    errorPrint (STRINGIFY (SCOTCH_NAME_PUBLICFU (GRAPHMAPSAVE)) ": cannot open output stream");
-    close      (filenum);
+  if ((stream = fdopen(filenum, "w")) == NULL) { /* Build stream from handle */
+    errorPrint(STRINGIFY(
+        SCOTCH_NAME_PUBLICFU(GRAPHMAPSAVE)) ": cannot open output stream");
+    close(filenum);
     *revaptr = 1;
     return;
   }
 
-  o = SCOTCH_graphMapSave (grafptr, mappptr, stream);
+  o = SCOTCH_graphMapSave(grafptr, mappptr, stream);
 
-  fclose (stream);                                /* This closes filenum too */
+  fclose(stream); /* This closes filenum too */
 
   *revaptr = o;
 }

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -82,128 +82,156 @@
 ** - !0  : on error.
 */
 
-int
-vdgraphGatherAll (
-const Vdgraph * restrict const dgrfptr,           /* Distributed graph */
-Vgraph * restrict              cgrfptr)           /* Centralized graph */
+int vdgraphGatherAll(
+    const Vdgraph *restrict const dgrfptr, /* Distributed graph */
+    Vgraph *restrict cgrfptr)              /* Centralized graph */
 {
-  int * restrict     froncnttab;                  /* Count array for gather operations        */
-  int * restrict     frondsptab;                  /* Displacement array for gather operations */
-  int                fronlocnbr;                  /* Also int to enforce MPI standard         */
+  int *restrict froncnttab; /* Count array for gather operations        */
+  int *restrict frondsptab; /* Displacement array for gather operations */
+  int fronlocnbr;           /* Also int to enforce MPI standard         */
 #ifdef SCOTCH_DEBUG_VDGRAPH1
-  int                cheklocval;
-  int                chekglbval;
+  int cheklocval;
+  int chekglbval;
 #endif /* SCOTCH_DEBUG_VDGRAPH1 */
-  int                procnum;
+  int procnum;
 
 #ifdef SCOTCH_DEBUG_VDGRAPH1
   cheklocval = 0;
-  if (cgrfptr == NULL)                            /* Centralized graphs should be provided by all */
+  if (cgrfptr == NULL) /* Centralized graphs should be provided by all */
     cheklocval = 1;
-  if (MPI_Allreduce (&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (1)");
-    return     (1);
+  if (MPI_Allreduce(&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX,
+                    dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (1)");
+    return (1);
   }
   if (chekglbval != 0) {
-    errorPrint ("vdgraphGatherAll: centralized graphs should be provided on every process");
-    return     (1);
+    errorPrint("vdgraphGatherAll: centralized graphs should be provided on "
+               "every process");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VDGRAPH1 */
 
-  if (dgraphGatherAll (&dgrfptr->s, &cgrfptr->s) != 0) {
-    errorPrint ("vdgraphGatherAll: cannot build centralized graph");
-    return     (1);
+  if (dgraphGatherAll(&dgrfptr->s, &cgrfptr->s) != 0) {
+    errorPrint("vdgraphGatherAll: cannot build centralized graph");
+    return (1);
   }
 
-  cgrfptr->parttax = NULL;                        /* In case of error */
+  cgrfptr->parttax = NULL; /* In case of error */
   cgrfptr->frontab = NULL;
-  if (((cgrfptr->parttax = (GraphPart *) memAlloc (cgrfptr->s.vertnbr * sizeof (GraphPart))) == NULL) ||
+  if (((cgrfptr->parttax = (GraphPart *)memAlloc(cgrfptr->s.vertnbr *
+                                                 sizeof(GraphPart))) == NULL) ||
       ((cgrfptr->parttax -= cgrfptr->s.baseval,
-        cgrfptr->frontab = (Gnum *) memAlloc (cgrfptr->s.vertnbr * sizeof (Gnum))) == NULL)) {
-    errorPrint ("vdgraphGatherAll: out of memory (1)");
+        cgrfptr->frontab =
+            (Gnum *)memAlloc(cgrfptr->s.vertnbr * sizeof(Gnum))) == NULL)) {
+    errorPrint("vdgraphGatherAll: out of memory (1)");
 #ifndef SCOTCH_DEBUG_VDGRAPH1
-    vgraphExit (cgrfptr);
-    return     (1);
+    vgraphExit(cgrfptr);
+    return (1);
   }
-#else /* SCOTCH_DEBUG_VDGRAPH1 */
+#else  /* SCOTCH_DEBUG_VDGRAPH1 */
     cheklocval = 1;
   }
-  if (MPI_Allreduce (&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (2)");
-    return     (1);
+  if (MPI_Allreduce(&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX,
+                    dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (2)");
+    return (1);
   }
   if (chekglbval != 0) {
-    vgraphExit (cgrfptr);
-    return     (1);
+    vgraphExit(cgrfptr);
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VDGRAPH1 */
 
-  cgrfptr->levlnum = dgrfptr->levlnum;            /* Set level of separation graph as level of halo graph */
+  cgrfptr->levlnum =
+      dgrfptr
+          ->levlnum; /* Set level of separation graph as level of halo graph */
 
-  if (dgrfptr->partgsttax == NULL) {              /* If distributed graph does not have a part array yet */
-    vgraphZero (cgrfptr);
-    return     (0);
+  if (dgrfptr->partgsttax ==
+      NULL) { /* If distributed graph does not have a part array yet */
+    vgraphZero(cgrfptr);
+    return (0);
   }
 
-  if (memAllocGroup ((void **) (void *)           /* Allocate tempory arrays to gather separator vertices */
-                     &froncnttab, (size_t) (dgrfptr->s.procglbnbr * sizeof (int)),
-                     &frondsptab, (size_t) (dgrfptr->s.procglbnbr * sizeof (int)), NULL) == NULL) {
-    errorPrint ("vdgraphGatherAll: out of memory (2)");
+  if (memAllocGroup((void **)(void *)/* Allocate tempory arrays to gather
+                                        separator vertices */
+                    &froncnttab,
+                    (size_t)(dgrfptr->s.procglbnbr * sizeof(int)), &frondsptab,
+                    (size_t)(dgrfptr->s.procglbnbr * sizeof(int)),
+                    NULL) == NULL) {
+    errorPrint("vdgraphGatherAll: out of memory (2)");
 #ifndef SCOTCH_DEBUG_VDGRAPH1
-    vgraphExit (cgrfptr);
-    return     (1);
+    vgraphExit(cgrfptr);
+    return (1);
   }
-#else /* SCOTCH_DEBUG_VDGRAPH1 */
+#else  /* SCOTCH_DEBUG_VDGRAPH1 */
     cheklocval = 1;
   }
-  if (MPI_Allreduce (&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (3)");
-    return     (1);
+  if (MPI_Allreduce(&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX,
+                    dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (3)");
+    return (1);
   }
   if (chekglbval != 0) {
     if (froncnttab != NULL)
-      memFree (froncnttab);
-    vgraphExit (cgrfptr);
-    return     (1);
+      memFree(froncnttab);
+    vgraphExit(cgrfptr);
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VDGRAPH1 */
 
-  if (commAllgatherv (dgrfptr->partgsttax + dgrfptr->s.baseval, dgrfptr->s.vertlocnbr, GRAPHPART_MPI, /* Get parttax of distributed graph */
-                      cgrfptr->parttax, dgrfptr->s.proccnttab, dgrfptr->s.procdsptab, GRAPHPART_MPI, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (4)");
-    return     (1);
+  if (commAllgatherv(
+          dgrfptr->partgsttax + dgrfptr->s.baseval, dgrfptr->s.vertlocnbr,
+          GRAPHPART_MPI, /* Get parttax of distributed graph */
+          cgrfptr->parttax, dgrfptr->s.proccnttab, dgrfptr->s.procdsptab,
+          GRAPHPART_MPI, dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (4)");
+    return (1);
   }
 
-  fronlocnbr = (int) dgrfptr->complocsize[2];
-  if (MPI_Allgather (&fronlocnbr, 1, MPI_INT,     /* Compute how separator vertices are distributed */
-                     froncnttab, 1, MPI_INT, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (5)");
-    return     (1);
+  fronlocnbr = (int)dgrfptr->complocsize[2];
+  if (MPI_Allgather(
+          &fronlocnbr, 1,
+          MPI_INT, /* Compute how separator vertices are distributed */
+          froncnttab, 1, MPI_INT, dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (5)");
+    return (1);
   }
-  frondsptab[0] = 0;                              /* Offset 0 for first process                                                    */
-  for (procnum = 1; procnum < dgrfptr->s.procglbnbr; procnum ++) /* Adjust index sub-arrays for all processes except the first one */
+  frondsptab[0] = 0; /* Offset 0 for first process */
+  for (procnum = 1; procnum < dgrfptr->s.procglbnbr;
+       procnum++) /* Adjust index sub-arrays for all processes except the first
+                     one */
     frondsptab[procnum] = frondsptab[procnum - 1] + froncnttab[procnum - 1];
 
-  if (MPI_Allgatherv (dgrfptr->fronloctab, fronlocnbr, GNUM_MPI, /* Gather separator vertices */
-                      cgrfptr->frontab, froncnttab, frondsptab, GNUM_MPI, dgrfptr->s.proccomm) != MPI_SUCCESS) {
-    errorPrint ("vdgraphGatherAll: communication error (6)");
-    return     (1);
+  if (MPI_Allgatherv(dgrfptr->fronloctab, fronlocnbr,
+                     GNUM_MPI, /* Gather separator vertices */
+                     cgrfptr->frontab, froncnttab, frondsptab, GNUM_MPI,
+                     dgrfptr->s.proccomm) != MPI_SUCCESS) {
+    errorPrint("vdgraphGatherAll: communication error (6)");
+    return (1);
   }
 
-  for (procnum = 1; procnum < dgrfptr->s.procglbnbr; procnum ++) { /* Adjust index sub-arrays for all processes except the first one */
-    Gnum               vertnum;
-    Gnum               vertnnd;
+  for (procnum = 1; procnum < dgrfptr->s.procglbnbr;
+       procnum++) { /* Adjust index sub-arrays for all processes except the
+                       first one */
+    Gnum vertnum;
+    Gnum vertnnd;
 
-    for (vertnum = (Gnum) frondsptab[procnum], vertnnd = vertnum + (Gnum) froncnttab[procnum];
-         vertnum < vertnnd; vertnum ++)
-      cgrfptr->frontab[vertnum] += (Gnum) dgrfptr->s.procdsptab[procnum] - dgrfptr->s.baseval;
+    for (vertnum = (Gnum)frondsptab[procnum],
+        vertnnd = vertnum + (Gnum)froncnttab[procnum];
+         vertnum < vertnnd; vertnum++)
+      cgrfptr->frontab[vertnum] +=
+          (Gnum)dgrfptr->s.procdsptab[procnum] - dgrfptr->s.baseval;
   }
 
-  memFree (froncnttab);                           /* Free group leader */
+  memFree(froncnttab); /* Free group leader */
 
-  for (procnum = 0; procnum < dgrfptr->s.proclocnum; procnum ++) /* Desynchronize random generators across processes */
-    intRandVal (2);
-  intPerm (cgrfptr->frontab, dgrfptr->compglbsize[2]); /* Compute permutation of frontier array to have different solutions on every process */
+  for (procnum = 0; procnum < dgrfptr->s.proclocnum;
+       procnum++) /* Desynchronize random generators across processes */
+    intRandVal(2);
+  intPerm(
+      cgrfptr->frontab,
+      dgrfptr->compglbsize[2]); /* Compute permutation of frontier array to have
+                                   different solutions on every process */
 
   cgrfptr->compload[0] = dgrfptr->compglbload[0]; /* Update other fields */
   cgrfptr->compload[1] = dgrfptr->compglbload[1];
@@ -211,13 +239,13 @@ Vgraph * restrict              cgrfptr)           /* Centralized graph */
   cgrfptr->comploaddlt = dgrfptr->compglbloaddlt;
   cgrfptr->compsize[0] = dgrfptr->compglbsize[0];
   cgrfptr->compsize[1] = dgrfptr->compglbsize[1];
-  cgrfptr->fronnbr     = dgrfptr->compglbsize[2];
+  cgrfptr->fronnbr = dgrfptr->compglbsize[2];
 
 #ifdef SCOTCH_DEBUG_VDGRAPH2
-  if (vgraphCheck (cgrfptr) != 0) {
-    errorPrint ("vdgraphGatherAll: internal error");
-    vgraphExit (cgrfptr);
-    return     (1);
+  if (vgraphCheck(cgrfptr) != 0) {
+    errorPrint("vdgraphGatherAll: internal error");
+    vgraphExit(cgrfptr);
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_VDGRAPH2 */
 

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -83,12 +83,9 @@
 ** - 0  : in all cases.
 */
 
-int
-graphInit (
-Graph * const               grafptr)
-{
-  memSet (grafptr, 0, sizeof (Graph));            /* Initialize graph fields     */
-  grafptr->flagval = GRAPHFREETABS;               /* By default, free all arrays */
+int graphInit(Graph *const grafptr) {
+  memSet(grafptr, 0, sizeof(Graph)); /* Initialize graph fields     */
+  grafptr->flagval = GRAPHFREETABS;  /* By default, free all arrays */
 
   return (0);
 }
@@ -98,15 +95,12 @@ Graph * const               grafptr)
 ** - VOID  : in all cases.
 */
 
-void
-graphExit (
-Graph * const               grafptr)
-{
-  graphFree (grafptr);                            /* Free graph data */
+void graphExit(Graph *const grafptr) {
+  graphFree(grafptr); /* Free graph data */
 
 #ifdef SCOTCH_DEBUG_GRAPH2
-  memSet (grafptr, ~0, sizeof (Graph));           /* Purge graph fields */
-#endif /* SCOTCH_DEBUG_GRAPH2 */
+  memSet(grafptr, ~0, sizeof(Graph)); /* Purge graph fields */
+#endif                                /* SCOTCH_DEBUG_GRAPH2 */
 }
 
 /* This routine frees the graph data.
@@ -114,41 +108,47 @@ Graph * const               grafptr)
 ** - VOID  : in all cases.
 */
 
-void
-graphFree (
-Graph * const               grafptr)
-{
-  if (((grafptr->flagval & GRAPHFREEEDGE) != 0) && /* If edgetab must be freed */
-      (grafptr->edgetax != NULL))                 /* And if it exists          */
-    memFree (grafptr->edgetax + grafptr->baseval); /* Free it                  */
+void graphFree(Graph *const grafptr) {
+  if (((grafptr->flagval & GRAPHFREEEDGE) !=
+       0) &&                      /* If edgetab must be freed */
+      (grafptr->edgetax != NULL)) /* And if it exists          */
+    memFree(grafptr->edgetax + grafptr->baseval); /* Free it                  */
 
-  if ((grafptr->flagval & GRAPHFREEVERT) != 0) {  /* If verttab/vendtab must be freed                            */
-    if ((grafptr->vendtax != NULL) &&             /* If vendtax is distinct from verttab                         */
-        (grafptr->vendtax != grafptr->verttax + 1) && /* (if vertex arrays grouped, vendtab not distinct anyway) */
+  if ((grafptr->flagval & GRAPHFREEVERT) !=
+      0) { /* If verttab/vendtab must be freed                            */
+    if ((grafptr->vendtax !=
+         NULL) && /* If vendtax is distinct from verttab */
+        (grafptr->vendtax !=
+         grafptr->verttax +
+             1) && /* (if vertex arrays grouped, vendtab not distinct anyway) */
         ((grafptr->flagval & GRAPHVERTGROUP) == 0))
-      memFree (grafptr->vendtax + grafptr->baseval); /* Then free vendtax                                 */
-    if (grafptr->verttax != NULL)                 /* Free verttab anyway, as it is the array group leader */
-      memFree (grafptr->verttax + grafptr->baseval);
+      memFree(grafptr->vendtax + grafptr->baseval); /* Then free vendtax */
+    if (grafptr->verttax !=
+        NULL) /* Free verttab anyway, as it is the array group leader */
+      memFree(grafptr->verttax + grafptr->baseval);
   }
-  if ((grafptr->flagval & GRAPHFREEVNUM) != 0) {  /* If vnumtab must be freed         */
-    if ((grafptr->vnumtax != NULL) &&             /* And is not in vertex array group */
+  if ((grafptr->flagval & GRAPHFREEVNUM) !=
+      0) {                            /* If vnumtab must be freed         */
+    if ((grafptr->vnumtax != NULL) && /* And is not in vertex array group */
         ((grafptr->flagval & GRAPHVERTGROUP) == 0))
-      memFree (grafptr->vnumtax + grafptr->baseval);
+      memFree(grafptr->vnumtax + grafptr->baseval);
   }
-  if ((grafptr->flagval & GRAPHFREEOTHR) != 0) {  /* If other arrays must be freed */
-    if ((grafptr->velotax != NULL) &&             /* Free graph tables             */
+  if ((grafptr->flagval & GRAPHFREEOTHR) !=
+      0) {                            /* If other arrays must be freed */
+    if ((grafptr->velotax != NULL) && /* Free graph tables             */
         ((grafptr->flagval & GRAPHVERTGROUP) == 0))
-      memFree (grafptr->velotax + grafptr->baseval);
+      memFree(grafptr->velotax + grafptr->baseval);
     if ((grafptr->vlbltax != NULL) &&
         ((grafptr->flagval & GRAPHVERTGROUP) == 0))
-      memFree (grafptr->vlbltax + grafptr->baseval);
+      memFree(grafptr->vlbltax + grafptr->baseval);
     if ((grafptr->edlotax != NULL) &&
         ((grafptr->flagval & GRAPHEDGEGROUP) == 0))
-      memFree (grafptr->edlotax + grafptr->baseval);
+      memFree(grafptr->edlotax + grafptr->baseval);
   }
 
 #ifdef SCOTCH_DEBUG_GRAPH2
-  memSet (grafptr, ~0, sizeof (Graph));           /* Purge graph fields */
-#endif /* SCOTCH_DEBUG_GRAPH2 */
-  grafptr->flagval = GRAPHNONE;                   /* Allow to double-call graphFree or call graphExit */
+  memSet(grafptr, ~0, sizeof(Graph)); /* Purge graph fields */
+#endif                                /* SCOTCH_DEBUG_GRAPH2 */
+  grafptr->flagval =
+      GRAPHNONE; /* Allow to double-call graphFree or call graphExit */
 }

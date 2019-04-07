@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2011,2014,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2011,2014,2015,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -77,18 +78,18 @@
 /*+ The complete graph definitions. +*/
 
 typedef struct ArchCmplt_ {
-  Anum                      termnbr;              /*+ Number of vertices +*/
+  Anum termnbr; /*+ Number of vertices +*/
 } ArchCmplt;
 
 typedef struct ArchCmpltDom_ {
-  Anum                      termmin;              /*+ Minimum vertex number +*/
-  Anum                      termnbr;              /*+ Number of vertices    +*/
+  Anum termmin; /*+ Minimum vertex number +*/
+  Anum termnbr; /*+ Number of vertices    +*/
 } ArchCmpltDom;
 
 typedef struct ArchCmpltMatch_ {
-  ArchCoarsenMulti *        multtab;              /*+ Multinode array for all coarsenings +*/
-  Anum                      vertnbr;              /*+ Number of vertices in fine graph    +*/
-  Anum                      passnum;              /*+ Pass number                         +*/
+  ArchCoarsenMulti *multtab; /*+ Multinode array for all coarsenings +*/
+  Anum vertnbr;              /*+ Number of vertices in fine graph    +*/
+  Anum passnum;              /*+ Pass number                         +*/
 } ArchCmpltMatch;
 
 #endif /* ARCH_CMPLT_H_STRUCT */
@@ -101,26 +102,34 @@ typedef struct ArchCmpltMatch_ {
 #ifndef ARCH_CMPLT_H_PROTO
 #define ARCH_CMPLT_H_PROTO
 
-int                         archCmpltArchLoad   (ArchCmplt * restrict const, FILE * restrict const);
-int                         archCmpltArchSave   (const ArchCmplt * const, FILE * restrict const);
-#define archCmpltArchFree           NULL
+int archCmpltArchLoad(ArchCmplt *restrict const, FILE *restrict const);
+int archCmpltArchSave(const ArchCmplt *const, FILE *restrict const);
+#define archCmpltArchFree NULL
 
-int                         archCmpltMatchInit  (ArchCmpltMatch * restrict const, const ArchCmplt * restrict const);
-void                        archCmpltMatchExit  (ArchCmpltMatch * restrict const);
-Anum                        archCmpltMatchMate  (ArchCmpltMatch * restrict const, ArchCoarsenMulti ** restrict const);
+int archCmpltMatchInit(ArchCmpltMatch *restrict const,
+                       const ArchCmplt *restrict const);
+void archCmpltMatchExit(ArchCmpltMatch *restrict const);
+Anum archCmpltMatchMate(ArchCmpltMatch *restrict const,
+                        ArchCoarsenMulti **restrict const);
 
-ArchDomNum                  archCmpltDomNum     (const ArchCmplt * const, const ArchCmpltDom * const);
-int                         archCmpltDomTerm    (const ArchCmplt * const, ArchCmpltDom * restrict const, const ArchDomNum);
-Anum                        archCmpltDomSize    (const ArchCmplt * const, const ArchCmpltDom * const);
-#define archCmpltDomWght            archCmpltDomSize
-Anum                        archCmpltDomDist    (const ArchCmplt * const, const ArchCmpltDom * const, const ArchCmpltDom * const);
-int                         archCmpltDomFrst    (const ArchCmplt * const, ArchCmpltDom * const);
-int                         archCmpltDomLoad    (const ArchCmplt * const, ArchCmpltDom * const, FILE * const);
-int                         archCmpltDomSave    (const ArchCmplt * const, const ArchCmpltDom * const, FILE * const);
-int                         archCmpltDomBipart  (const ArchCmplt * const, const ArchCmpltDom * const, ArchCmpltDom * restrict const, ArchCmpltDom * restrict const);
-int                         archCmpltDomIncl    (const ArchCmplt * const, const ArchCmpltDom * const, const ArchCmpltDom * const);
+ArchDomNum archCmpltDomNum(const ArchCmplt *const, const ArchCmpltDom *const);
+int archCmpltDomTerm(const ArchCmplt *const, ArchCmpltDom *restrict const,
+                     const ArchDomNum);
+Anum archCmpltDomSize(const ArchCmplt *const, const ArchCmpltDom *const);
+#define archCmpltDomWght archCmpltDomSize
+Anum archCmpltDomDist(const ArchCmplt *const, const ArchCmpltDom *const,
+                      const ArchCmpltDom *const);
+int archCmpltDomFrst(const ArchCmplt *const, ArchCmpltDom *const);
+int archCmpltDomLoad(const ArchCmplt *const, ArchCmpltDom *const, FILE *const);
+int archCmpltDomSave(const ArchCmplt *const, const ArchCmpltDom *const,
+                     FILE *const);
+int archCmpltDomBipart(const ArchCmplt *const, const ArchCmpltDom *const,
+                       ArchCmpltDom *restrict const,
+                       ArchCmpltDom *restrict const);
+int archCmpltDomIncl(const ArchCmplt *const, const ArchCmpltDom *const,
+                     const ArchCmpltDom *const);
 #ifdef SCOTCH_PTSCOTCH
-int                         archCmpltDomMpiType (const ArchCmplt * const, MPI_Datatype * const);
+int archCmpltDomMpiType(const ArchCmplt *const, MPI_Datatype *const);
 #endif /* SCOTCH_PTSCOTCH */
 
 #endif /* ARCH_CMPLT_H_PROTO */

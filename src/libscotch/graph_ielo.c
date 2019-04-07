@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -71,31 +71,32 @@
 ** - -1    : on error.
 */
 
-Gnum
-graphIelo (
-const Graph * const         grafptr,
-Gnum * const                edlotax,              /* Pointer to edge load array [norestrict]                 */
-Gnum * const                ielotax)              /* Pointer to inverse edge load array to fill [norestrict] */
+Gnum graphIelo(
+    const Graph *const grafptr,
+    Gnum *const edlotax, /* Pointer to edge load array [norestrict] */
+    Gnum *const
+        ielotax) /* Pointer to inverse edge load array to fill [norestrict] */
 {
-  Gnum                vertnum;
-  Gnum                edlomin;
-  Gnum                edlomax;
-  Gnum                edlosum;
-  float               prodval;
+  Gnum vertnum;
+  Gnum edlomin;
+  Gnum edlomax;
+  Gnum edlosum;
+  float prodval;
 
-  const Gnum                  vertnnd = grafptr->vertnnd;
-  const Gnum * restrict const verttax = grafptr->verttax;
-  const Gnum * restrict const vendtax = grafptr->vendtax;
+  const Gnum vertnnd = grafptr->vertnnd;
+  const Gnum *restrict const verttax = grafptr->verttax;
+  const Gnum *restrict const vendtax = grafptr->vendtax;
 
   edlomin = GNUMMAX;
   edlomax = 0;
-  for (vertnum = grafptr->baseval; vertnum < vertnnd; vertnum ++) { /* Handle non-compact graphs as well as compact graphs */
-    Gnum                  edgenum;
-    Gnum                  edgennd;
+  for (vertnum = grafptr->baseval; vertnum < vertnnd;
+       vertnum++) { /* Handle non-compact graphs as well as compact graphs */
+    Gnum edgenum;
+    Gnum edgennd;
 
     for (edgenum = verttax[vertnum], edgennd = vendtax[vertnum];
-         edgenum < edgennd; edgenum ++) {
-      Gnum                edloval;
+         edgenum < edgennd; edgenum++) {
+      Gnum edloval;
 
       edloval = edlotax[edgenum];
       if (edloval < edlomin)
@@ -105,34 +106,34 @@ Gnum * const                ielotax)              /* Pointer to inverse edge loa
     }
   }
 
-  if (edlomin < 1)                                /* Zero-weight edges cannot be inverted */
+  if (edlomin < 1) /* Zero-weight edges cannot be inverted */
     edlomin = 1;
-  prodval = (float) edlomin * (float) edlomax;
+  prodval = (float)edlomin * (float)edlomax;
 
   edlosum = 0;
-  for (vertnum = grafptr->baseval; vertnum < vertnnd; vertnum ++) {
-    Gnum                  edgenum;
-    Gnum                  edgennd;
+  for (vertnum = grafptr->baseval; vertnum < vertnnd; vertnum++) {
+    Gnum edgenum;
+    Gnum edgennd;
 
     for (edgenum = verttax[vertnum], edgennd = vendtax[vertnum];
-         edgenum < edgennd; edgenum ++) {
-      Gnum                edloval;
+         edgenum < edgennd; edgenum++) {
+      Gnum edloval;
 
       edloval = edlotax[edgenum];
-      if (edloval <= edlomin)                     /* "<=" for zero-weight edges */
+      if (edloval <= edlomin) /* "<=" for zero-weight edges */
         edloval = edlomax;
       else if (edloval == edlomax)
         edloval = edlomin;
       else
-        edloval = (Gnum) (prodval / (float) edloval + 0.49F);
+        edloval = (Gnum)(prodval / (float)edloval + 0.49F);
 #ifdef SCOTCH_DEBUG_ARCH2
       if ((edloval < edlomin) || (edloval > edlomax)) {
-        errorPrint ("graphIelo: internal error");
+        errorPrint("graphIelo: internal error");
         return (-1);
       }
-#endif /* SCOTCH_DEBUG_ARCH2 */
-      edlosum +=                                  /* Accumulate edge load sum          */
-      ielotax[edgenum] = edloval;                 /* Write inversed cost in work array */
+#endif                                /* SCOTCH_DEBUG_ARCH2 */
+      edlosum +=                      /* Accumulate edge load sum          */
+          ielotax[edgenum] = edloval; /* Write inversed cost in work array */
     }
   }
 

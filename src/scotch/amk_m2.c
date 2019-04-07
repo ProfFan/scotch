@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -89,21 +90,21 @@
 **  The static definitions.
 */
 
-static int                  C_paraNum = 0;        /* Number of parameters       */
-static int                  C_fileNum = 0;        /* Number of file in arg list */
-static File                 C_fileTab[C_FILENBR] = { /* File array              */
-                              { FILEMODEW } };
+static int C_paraNum = 0;           /* Number of parameters       */
+static int C_fileNum = 0;           /* Number of file in arg list */
+static File C_fileTab[C_FILENBR] = {/* File array              */
+                                    {FILEMODEW}};
 
-static const char *         C_usageList[] = {
-  "amk_m2 <dimX> [<dimY> [<output target file>]] <options>",
-  "  -h          : Display this help",
-  "  -m<method>  : Decomposition method",
-  "                  n  : Nested dissection (cut biggest dimension)",
-  "                  o  : One-way dissection (y, then x)",
-  "  -V          : Print program version and copyright",
-  "",
-  "Default option set is : '-Mn'",
-  NULL };
+static const char *C_usageList[] = {
+    "amk_m2 <dimX> [<dimY> [<output target file>]] <options>",
+    "  -h          : Display this help",
+    "  -m<method>  : Decomposition method",
+    "                  n  : Nested dissection (cut biggest dimension)",
+    "                  o  : One-way dissection (y, then x)",
+    "  -V          : Print program version and copyright",
+    "",
+    "Default option set is : '-Mn'",
+    NULL};
 
 /*************************************************/
 /*                                               */
@@ -112,124 +113,126 @@ static const char *         C_usageList[] = {
 /*                                               */
 /*************************************************/
 
-int
-main (
-int                         argc,
-char *                      argv[])
-{
-  ArchMesh2        arch;                          /* Mesh dimensions            */
-  ArchMesh2Dom     dom;                           /* Initial domain             */
-  C_MethType       methtype;                      /* Bipartitioning method      */
-  unsigned int     termnbr;                       /* Number of terminal domains */
-  unsigned int     termnum;
-  unsigned int     termmax;                       /* Maximum terminal number    */
-  unsigned int *   termtab;                       /* Terminal numbers table     */
-  unsigned int     x0, y0, x1, y1;
-  int              i;
+int main(int argc, char *argv[]) {
+  ArchMesh2 arch;       /* Mesh dimensions            */
+  ArchMesh2Dom dom;     /* Initial domain             */
+  C_MethType methtype;  /* Bipartitioning method      */
+  unsigned int termnbr; /* Number of terminal domains */
+  unsigned int termnum;
+  unsigned int termmax;  /* Maximum terminal number    */
+  unsigned int *termtab; /* Terminal numbers table     */
+  unsigned int x0, y0, x1, y1;
+  int i;
 
-  errorProg ("amk_m2");
+  errorProg("amk_m2");
 
-  if ((argc >= 2) && (argv[1][0] == '?')) {       /* If need for help */
-    usagePrint (stdout, C_usageList);
-    return     (0);
+  if ((argc >= 2) && (argv[1][0] == '?')) { /* If need for help */
+    usagePrint(stdout, C_usageList);
+    return (0);
   }
 
-  methtype  = C_METHNESTED;
-  arch.c[0] =                                     /* Preset mesh dimensions */
-  arch.c[1] = 1;
+  methtype = C_METHNESTED;
+  arch.c[0] = /* Preset mesh dimensions */
+      arch.c[1] = 1;
 
-  fileBlockInit (C_fileTab, C_FILENBR);           /* Set default stream pointers */
+  fileBlockInit(C_fileTab, C_FILENBR); /* Set default stream pointers */
 
-  for (i = 1; i < argc; i ++) {                   /* Loop for all option codes                        */
-    if ((argv[i][0] != '-') || (argv[i][1] == '\0') || (argv[i][1] == '.')) { /* If found a file name */
-      if (C_paraNum < 2) {                        /* If number of parameters not reached              */
-        if ((arch.c[C_paraNum ++] = atoi (argv[i])) < 1) { /* Get the dimension                       */
-          errorPrint ("main: invalid dimension '%s'", argv[i]);
-          return     (1);
+  for (i = 1; i < argc; i++) { /* Loop for all option codes */
+    if ((argv[i][0] != '-') || (argv[i][1] == '\0') ||
+        (argv[i][1] == '.')) { /* If found a file name */
+      if (C_paraNum < 2) {     /* If number of parameters not reached     */
+        if ((arch.c[C_paraNum++] = atoi(argv[i])) <
+            1) { /* Get the dimension                       */
+          errorPrint("main: invalid dimension '%s'", argv[i]);
+          return (1);
         }
-        continue;                                 /* Process the other parameters */
+        continue; /* Process the other parameters */
       }
-      if (C_fileNum < C_FILEARGNBR)               /* A file name has been given */
-        fileBlockName (C_fileTab, C_fileNum ++) = argv[i];
+      if (C_fileNum < C_FILEARGNBR) /* A file name has been given */
+        fileBlockName(C_fileTab, C_fileNum++) = argv[i];
       else {
-        errorPrint ("main: too many file names given");
-        return     (1);
+        errorPrint("main: too many file names given");
+        return (1);
       }
-    }
-    else {                                        /* If found an option name */
+    } else { /* If found an option name */
       switch (argv[i][1]) {
-        case 'M' :                                /* Use a built-in method */
-        case 'm' :
-          switch (argv[i][2]) {
-            case 'N' :                            /* Nested dissection */
-            case 'n' :
-              methtype = C_METHNESTED;
-              break;
-            case 'O' :                            /* One-way dissection */
-            case 'o' :
-              methtype = C_METHONEWAY;
-              break;
-            default :
-              errorPrint ("main: unprocessed option '%s'", argv[i]);
-              return     (1);
-          }
+      case 'M': /* Use a built-in method */
+      case 'm':
+        switch (argv[i][2]) {
+        case 'N': /* Nested dissection */
+        case 'n':
+          methtype = C_METHNESTED;
           break;
-        case 'H' :                               /* Give the usage message */
-        case 'h' :
-          usagePrint (stdout, C_usageList);
-          return     (0);
-        case 'V' :
-          fprintf (stderr, "amk_m2, version " SCOTCH_VERSION_STRING "\n");
-          fprintf (stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS, France\n");
-          fprintf (stderr, "This software is libre/free software under CeCILL-C -- see the user's manual for more information\n");
-          return  (0);
-        default :
-          errorPrint ("main: unprocessed option '%s'", argv[i]);
-          return     (1);
+        case 'O': /* One-way dissection */
+        case 'o':
+          methtype = C_METHONEWAY;
+          break;
+        default:
+          errorPrint("main: unprocessed option '%s'", argv[i]);
+          return (1);
+        }
+        break;
+      case 'H': /* Give the usage message */
+      case 'h':
+        usagePrint(stdout, C_usageList);
+        return (0);
+      case 'V':
+        fprintf(stderr, "amk_m2, version " SCOTCH_VERSION_STRING "\n");
+        fprintf(stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, "
+                        "Universite de Bordeaux, INRIA & CNRS, France\n");
+        fprintf(stderr, "This software is libre/free software under CeCILL-C "
+                        "-- see the user's manual for more information\n");
+        return (0);
+      default:
+        errorPrint("main: unprocessed option '%s'", argv[i]);
+        return (1);
       }
     }
   }
 
-  fileBlockOpen (C_fileTab, C_FILENBR);           /* Open all files */
+  fileBlockOpen(C_fileTab, C_FILENBR); /* Open all files */
 
-  dom.c[0][0] = 0;                                /* Set the initial domain */
+  dom.c[0][0] = 0; /* Set the initial domain */
   dom.c[0][1] = arch.c[0] - 1;
   dom.c[1][0] = 0;
   dom.c[1][1] = arch.c[1] - 1;
 
-  termnbr = arch.c[0] * arch.c[1];                /* Compute number of terminals                                    */
-  termmax = 0;                                    /* Maximum terminal value not known yet                           */
-  if ((termtab = (unsigned int *) memAlloc (termnbr * sizeof (unsigned int))) == NULL) { /* Allocate terminal array */
-    errorPrint ("main: out of memory");
-    return     (1);
+  termnbr = arch.c[0] * arch.c[1]; /* Compute number of terminals */
+  termmax = 0;                     /* Maximum terminal value not known yet                     */
+  if ((termtab = (unsigned int *)memAlloc(termnbr * sizeof(unsigned int))) ==
+      NULL) { /* Allocate terminal array */
+    errorPrint("main: out of memory");
+    return (1);
   }
-  memset (termtab, -1, termnbr * sizeof (unsigned int)); /* Initilize mapping table */
+  memset(termtab, -1,
+         termnbr * sizeof(unsigned int)); /* Initilize mapping table */
 
-  C_termBipart (&arch, &dom, 1, termtab, &termmax, /* Compute terminal numbers */
-                (methtype == C_METHNESTED) ? archMesh2DomBipart : C_methBipartOne);
+  C_termBipart(&arch, &dom, 1, termtab, &termmax, /* Compute terminal numbers */
+               (methtype == C_METHNESTED) ? archMesh2DomBipart
+                                          : C_methBipartOne);
 
-  fprintf (C_filepntrarcout, "deco\n0\n%u\t%u\n", /* Print file header                */
-           termnbr,                               /* Print number of terminal domains */
-           termmax);                              /* Print biggest terminal value     */
-  for (termnum = 0; termnum < termnbr; termnum ++) /* For all terminals               */
-    fprintf (C_filepntrarcout, "%u\t1\t%u\n",     /* Print terminal data              */
-             termnum, termtab[termnum]);
+  fprintf(C_filepntrarcout, "deco\n0\n%u\t%u\n", /* Print file header */
+          termnbr,  /* Print number of terminal domains */
+          termmax); /* Print biggest terminal value     */
+  for (termnum = 0; termnum < termnbr; termnum++) /* For all terminals */
+    fprintf(C_filepntrarcout, "%u\t1\t%u\n",      /* Print terminal data      */
+            termnum, termtab[termnum]);
 
-  for (y0 = 0; y0 < arch.c[1]; y0 ++) {           /* For all vertices */
-    for (x0 = 0; x0 < arch.c[0]; x0 ++) {
-      for (y1 = 0; y1 <= y0; y1 ++) {             /* Compute distance to smaller vertices */
-        for (x1 = 0; (x1 < arch.c[0]) && ((y1 < y0) || (x1 < x0)); x1 ++)
-          fprintf (C_filepntrarcout,
-                   ((x1 == 0) && (y1 == 0)) ? "%u" : " %u",
-                   C_termDist (x0, y0, x1, y1));
+  for (y0 = 0; y0 < arch.c[1]; y0++) { /* For all vertices */
+    for (x0 = 0; x0 < arch.c[0]; x0++) {
+      for (y1 = 0; y1 <= y0; y1++) { /* Compute distance to smaller vertices */
+        for (x1 = 0; (x1 < arch.c[0]) && ((y1 < y0) || (x1 < x0)); x1++)
+          fprintf(C_filepntrarcout, ((x1 == 0) && (y1 == 0)) ? "%u" : " %u",
+                  C_termDist(x0, y0, x1, y1));
       }
-      fprintf (C_filepntrarcout, "\n");
+      fprintf(C_filepntrarcout, "\n");
     }
   }
 
-  fileBlockClose (C_fileTab, C_FILENBR);          /* Always close explicitely to end eventual (un)compression tasks */
+  fileBlockClose(C_fileTab, C_FILENBR); /* Always close explicitely to end
+                                           eventual (un)compression tasks */
 
-  memFree (termtab);                              /* Free terminal number array */
+  memFree(termtab); /* Free terminal number array */
 
   return (0);
 }
@@ -239,27 +242,22 @@ char *                      argv[])
 ** and puts them in table.
 */
 
-void
-C_termBipart (
-ArchMesh2 *                 archptr,
-ArchMesh2Dom *              domptr,
-unsigned int                num,
-unsigned int *              termtab,
-unsigned int *              termmax,
-int                     (*  methfunc) ())
-{
-  ArchMesh2Dom        dom0;
-  ArchMesh2Dom        dom1;
+void C_termBipart(ArchMesh2 *archptr, ArchMesh2Dom *domptr, unsigned int num,
+                  unsigned int *termtab, unsigned int *termmax,
+                  int (*methfunc)()) {
+  ArchMesh2Dom dom0;
+  ArchMesh2Dom dom1;
 
-  if (methfunc (archptr, domptr, &dom0, &dom1) == 0) { /* If we can bipartition                          */
-    C_termBipart (archptr, &dom0, num + num,     termtab, termmax, methfunc); /* Bipartition recursively */
-    C_termBipart (archptr, &dom1, num + num + 1, termtab, termmax, methfunc);
-  }
-  else {                                          /* If we have reached the end */
-    termtab[domptr->c[1][0] * archptr->c[0] +     /* Set the terminal number    */
+  if (methfunc(archptr, domptr, &dom0, &dom1) ==
+      0) { /* If we can bipartition                          */
+    C_termBipart(archptr, &dom0, num + num, termtab, termmax,
+                 methfunc); /* Bipartition recursively */
+    C_termBipart(archptr, &dom1, num + num + 1, termtab, termmax, methfunc);
+  } else {                                    /* If we have reached the end */
+    termtab[domptr->c[1][0] * archptr->c[0] + /* Set the terminal number    */
             domptr->c[0][0]] = num;
-    if (*termmax < num)                           /* If we have reached a new maximum */
-      *termmax = num;                             /* Record it                        */
+    if (*termmax < num) /* If we have reached a new maximum */
+      *termmax = num;   /* Record it                        */
   }
 }
 
@@ -271,27 +269,24 @@ int                     (*  methfunc) ())
 ** - 0  : else.
 */
 
-int
-C_methBipartOne (
-const ArchMesh2 * const       archptr,
-const ArchMesh2Dom * const    domptr,
-ArchMesh2Dom * restrict const dom0ptr,
-ArchMesh2Dom * restrict const dom1ptr)
-{
-  if ((domptr->c[0][0] == domptr->c[0][1]) &&     /* Return if cannot split more */
+int C_methBipartOne(const ArchMesh2 *const archptr,
+                    const ArchMesh2Dom *const domptr,
+                    ArchMesh2Dom *restrict const dom0ptr,
+                    ArchMesh2Dom *restrict const dom1ptr) {
+  if ((domptr->c[0][0] == domptr->c[0][1]) && /* Return if cannot split more */
       (domptr->c[1][0] == domptr->c[1][1]))
     return (0);
 
-  if (domptr->c[1][1] == domptr->c[1][0]) {       /* If the Y dimension cannot be cut */
-    dom0ptr->c[0][0] = domptr->c[0][0];           /* Cut in the X dimension           */
+  if (domptr->c[1][1] ==
+      domptr->c[1][0]) {                /* If the Y dimension cannot be cut */
+    dom0ptr->c[0][0] = domptr->c[0][0]; /* Cut in the X dimension           */
     dom0ptr->c[0][1] = (domptr->c[0][0] + domptr->c[0][1]) / 2;
     dom1ptr->c[0][0] = dom0ptr->c[0][1] + 1;
     dom1ptr->c[0][1] = domptr->c[0][1];
 
     dom0ptr->c[1][0] = dom1ptr->c[1][0] = domptr->c[1][0];
     dom0ptr->c[1][1] = dom1ptr->c[1][1] = domptr->c[1][1];
-  }
-  else {                                          /* If the Y dimension can be cut, cut it */
+  } else { /* If the Y dimension can be cut, cut it */
     dom0ptr->c[0][0] = dom1ptr->c[0][0] = domptr->c[0][0];
     dom0ptr->c[0][1] = dom1ptr->c[0][1] = domptr->c[0][1];
 

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -52,31 +52,33 @@
 ** - void  : in all cases.
 */
 
-static
-void
-DGRAPHHALOFILLNAME (
-const Dgraph * restrict const grafptr,
-const void * restrict const   attrgsttab,         /* Attribute array to diffuse           */
-const int                     attrglbsiz,         /* Type extent of attribute             */
-byte ** restrict const        attrdsptab)         /* Temporary address displacement array */
+static void DGRAPHHALOFILLNAME(
+    const Dgraph *restrict const grafptr,
+    const void *restrict const attrgsttab, /* Attribute array to diffuse */
+    const int attrglbsiz,             /* Type extent of attribute             */
+    byte **restrict const attrdsptab) /* Temporary address displacement array */
 {
-  byte * restrict       attrgstptr;
-  const int * restrict  procsidptr;
-  const int * restrict  procsidnnd;
+  byte *restrict attrgstptr;
+  const int *restrict procsidptr;
+  const int *restrict procsidnnd;
 
-  for (procsidptr = grafptr->procsidtab, procsidnnd = procsidptr + grafptr->procsidnbr, attrgstptr = (byte *) attrgsttab;
-       procsidptr < procsidnnd; procsidptr ++) {
-    int                 procsidval;
+  for (procsidptr = grafptr->procsidtab,
+      procsidnnd = procsidptr + grafptr->procsidnbr,
+      attrgstptr = (byte *)attrgsttab;
+       procsidptr < procsidnnd; procsidptr++) {
+    int procsidval;
 
     procsidval = *procsidptr;
     if (procsidval < 0)
-      attrgstptr -= ((Gnum) procsidval) * DGRAPHHALOFILLSIZE;
+      attrgstptr -= ((Gnum)procsidval) * DGRAPHHALOFILLSIZE;
     else {
-      byte *              attrdspptr;
+      byte *attrdspptr;
 
       attrdspptr = attrdsptab[procsidval];
-      attrdsptab[procsidval] = attrdspptr + DGRAPHHALOFILLSIZE; /* Skip to next position in send buffer */
-      DGRAPHHALOFILLCOPY (attrdspptr, attrgstptr, DGRAPHHALOFILLSIZE);
+      attrdsptab[procsidval] =
+          attrdspptr +
+          DGRAPHHALOFILLSIZE; /* Skip to next position in send buffer */
+      DGRAPHHALOFILLCOPY(attrdspptr, attrgstptr, DGRAPHHALOFILLSIZE);
     }
   }
 }

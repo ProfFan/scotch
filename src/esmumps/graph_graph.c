@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -76,28 +76,27 @@
 ** - !0  : on error.
 */
 
-int
-graphBuildGraph (
-Graph * const               grafptr,              /*+ Graph to build                             +*/
-const INT                   baseval,              /*+ Base value                                 +*/
-const INT                   vertnbr,              /*+ Number of vertices                         +*/
-const INT                   edgenbr,              /*+ Number of arcs                             +*/
-INT * restrict              verttab,              /*+ Vertex array                               +*/
-INT * restrict              velotab,              /*+ Array of vertex weights (DOFs) if not NULL +*/
-INT * restrict              edgetab)              /*+ Edge array                                 +*/
+int graphBuildGraph(
+    Graph *const grafptr,  /*+ Graph to build                             +*/
+    const INT baseval,     /*+ Base value                                 +*/
+    const INT vertnbr,     /*+ Number of vertices                         +*/
+    const INT edgenbr,     /*+ Number of arcs                             +*/
+    INT *restrict verttab, /*+ Vertex array                               +*/
+    INT *restrict velotab, /*+ Array of vertex weights (DOFs) if not NULL +*/
+    INT *restrict edgetab) /*+ Edge array                                 +*/
 {
-  if (sizeof (INT) != sizeof (SCOTCH_Num)) {      /* Check integer consistency */
-    errorPrint ("graphBuildGraph: inconsistent integer types");
-    return     (1);
+  if (sizeof(INT) != sizeof(SCOTCH_Num)) { /* Check integer consistency */
+    errorPrint("graphBuildGraph: inconsistent integer types");
+    return (1);
   }
 
-  SCOTCH_graphBuild (grafptr, baseval, vertnbr, verttab, NULL, velotab,
-                     NULL, edgenbr, edgetab, NULL);
+  SCOTCH_graphBuild(grafptr, baseval, vertnbr, verttab, NULL, velotab, NULL,
+                    edgenbr, edgetab, NULL);
 
 #ifdef GRAPH_DEBUG
-  if (graphCheck (grafptr) != 0) {                /* Check graph consistency */
-    errorPrint ("graphBuildGraph: inconsistent graph data");
-    return     (1);
+  if (graphCheck(grafptr) != 0) { /* Check graph consistency */
+    errorPrint("graphBuildGraph: inconsistent graph data");
+    return (1);
   }
 #endif /* GRAPH_DEBUG */
 
@@ -113,31 +112,30 @@ INT * restrict              edgetab)              /*+ Edge array                
 ** - !0  : on error.
 */
 
-int
-graphBuildGraph2 (
-Graph * const               grafptr,              /*+ Graph to build                             +*/
-const INT                   baseval,              /*+ Base value                                 +*/
-const INT                   vertnbr,              /*+ Number of vertices                         +*/
-const INT                   edgenbr,              /*+ Number of arcs                             +*/
-INT * restrict              verttab,              /*+ Vertex array                               +*/
-INT * restrict              vendtab,              /*+ Vertex end array                           +*/
-INT * restrict              velotab,              /*+ Array of vertex weights (DOFs) if not NULL +*/
-INT * restrict              vlbltab,              /*+ Array of vertex labels if not NULL         +*/
-INT * restrict              edgetab,              /*+ Edge array                                 +*/
-INT * restrict              edlotab)              /*+ Edge load array                            +*/
+int graphBuildGraph2(
+    Graph *const grafptr,  /*+ Graph to build                             +*/
+    const INT baseval,     /*+ Base value                                 +*/
+    const INT vertnbr,     /*+ Number of vertices                         +*/
+    const INT edgenbr,     /*+ Number of arcs                             +*/
+    INT *restrict verttab, /*+ Vertex array                               +*/
+    INT *restrict vendtab, /*+ Vertex end array                           +*/
+    INT *restrict velotab, /*+ Array of vertex weights (DOFs) if not NULL +*/
+    INT *restrict vlbltab, /*+ Array of vertex labels if not NULL         +*/
+    INT *restrict edgetab, /*+ Edge array                                 +*/
+    INT *restrict edlotab) /*+ Edge load array                            +*/
 {
-  if (sizeof (INT) != sizeof (SCOTCH_Num)) {      /* Check integer consistency */
-    errorPrint ("graphBuildGraph2: inconsistent integer types");
-    return     (1);
+  if (sizeof(INT) != sizeof(SCOTCH_Num)) { /* Check integer consistency */
+    errorPrint("graphBuildGraph2: inconsistent integer types");
+    return (1);
   }
 
-  SCOTCH_graphBuild (grafptr, baseval, vertnbr, verttab, vendtab, velotab,
-                     vlbltab, edgenbr, edgetab, edlotab);
+  SCOTCH_graphBuild(grafptr, baseval, vertnbr, verttab, vendtab, velotab,
+                    vlbltab, edgenbr, edgetab, edlotab);
 
 #ifdef GRAPH_DEBUG
-  if (graphCheck (grafptr) != 0) {                /* Check graph consistency */
-    errorPrint ("graphBuildGraph2: inconsistent graph data");
-    return     (1);
+  if (graphCheck(grafptr) != 0) { /* Check graph consistency */
+    errorPrint("graphBuildGraph2: inconsistent graph data");
+    return (1);
   }
 #endif /* GRAPH_DEBUG */
 

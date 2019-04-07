@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -83,15 +83,13 @@
 *** - !0  : on error.
 +*/
 
-int
-orderGraph (
-Order * restrict const      ordeptr,              /*+ Ordering to compute   +*/
-Graph * restrict const      grafptr)              /*+ Graph matrix to order +*/
+int orderGraph(Order *restrict const ordeptr, /*+ Ordering to compute   +*/
+               Graph *restrict const grafptr) /*+ Graph matrix to order +*/
 {
-  INT                 vertnbr;
+  INT vertnbr;
 
-  SCOTCH_graphSize (grafptr, &vertnbr, NULL);
-  return (orderGraphList (ordeptr, grafptr, vertnbr, NULL));
+  SCOTCH_graphSize(grafptr, &vertnbr, NULL);
+  return (orderGraphList(ordeptr, grafptr, vertnbr, NULL));
 }
 
 /*+ This routine orders the subgraph of
@@ -103,15 +101,23 @@ Graph * restrict const      grafptr)              /*+ Graph matrix to order +*/
 *** - !0  : on error.
 +*/
 
-int
-orderGraphList (
-Order * restrict const      ordeptr,              /*+ Ordering to compute        +*/
-Graph * restrict const      grafptr,              /*+ Graph matrix to order      +*/
-const INT                   listnbr,              /*+ Number of vertices in list +*/
-const INT * restrict const  listtab)              /*+ Vertex list array          +*/
+int orderGraphList(
+    Order *restrict const ordeptr,     /*+ Ordering to compute        +*/
+    Graph *restrict const grafptr,     /*+ Graph matrix to order      +*/
+    const INT listnbr,                 /*+ Number of vertices in list +*/
+    const INT *restrict const listtab) /*+ Vertex list array          +*/
 {
-  return (orderGraphListStrat (ordeptr, grafptr, listnbr, listtab,
-                               "c{rat=0.7,cpr=n{sep=/(vert>120)?m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}}|m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}};,ole=f{cmin=0,cmax=100000,frat=0.0},ose=g},unc=n{sep=/(vert>120)?m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}}|m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}};,ole=f{cmin=15,cmax=100000,frat=0.0},ose=g}}"));
+  return (orderGraphListStrat(
+      ordeptr, grafptr, listnbr, listtab,
+      "c{rat=0.7,cpr=n{sep=/"
+      "(vert>120)?m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{"
+      "bal=0.2},org=(|h{pass=10})f{bal=0.2}}}|m{type=h,rat=0.7,vert=100,low=h{"
+      "pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}};,"
+      "ole=f{cmin=0,cmax=100000,frat=0.0},ose=g},unc=n{sep=/"
+      "(vert>120)?m{type=h,rat=0.7,vert=100,low=h{pass=10},asc=b{width=3,bnd=f{"
+      "bal=0.2},org=(|h{pass=10})f{bal=0.2}}}|m{type=h,rat=0.7,vert=100,low=h{"
+      "pass=10},asc=b{width=3,bnd=f{bal=0.2},org=(|h{pass=10})f{bal=0.2}}};,"
+      "ole=f{cmin=15,cmax=100000,frat=0.0},ose=g}}"));
 }
 
 /*+ This routine orders the given
@@ -122,16 +128,15 @@ const INT * restrict const  listtab)              /*+ Vertex list array         
 *** - !0  : on error.
 +*/
 
-int
-orderGraphStrat (
-Order * restrict const      ordeptr,              /*+ Ordering to compute   +*/
-Graph * restrict const      grafptr,              /*+ Graph matrix to order +*/
-const char * restrict const stratptr)             /*+ Ordering strategy     +*/
+int orderGraphStrat(
+    Order *restrict const ordeptr,       /*+ Ordering to compute   +*/
+    Graph *restrict const grafptr,       /*+ Graph matrix to order +*/
+    const char *restrict const stratptr) /*+ Ordering strategy     +*/
 {
-  INT                 vertnbr;
+  INT vertnbr;
 
-  SCOTCH_graphSize (grafptr, &vertnbr, NULL);
-  return (orderGraphListStrat (ordeptr, grafptr, vertnbr, NULL, stratptr));
+  SCOTCH_graphSize(grafptr, &vertnbr, NULL);
+  return (orderGraphListStrat(ordeptr, grafptr, vertnbr, NULL, stratptr));
 }
 
 /*+ This routine orders the subgraph of
@@ -143,61 +148,64 @@ const char * restrict const stratptr)             /*+ Ordering strategy     +*/
 *** - !0  : on error.
 +*/
 
-int
-orderGraphListStrat (
-Order * restrict const      ordeptr,              /*+ Ordering to compute        +*/
-Graph * restrict const      grafptr,              /*+ Graph matrix to order      +*/
-const INT                   listnbr,              /*+ Number of vertices in list +*/
-const INT * restrict const  listtab,              /*+ Vertex list array          +*/
-const char * restrict const stratptr)             /*+ Ordering strategy          +*/
+int orderGraphListStrat(
+    Order *restrict const ordeptr,       /*+ Ordering to compute        +*/
+    Graph *restrict const grafptr,       /*+ Graph matrix to order      +*/
+    const INT listnbr,                   /*+ Number of vertices in list +*/
+    const INT *restrict const listtab,   /*+ Vertex list array          +*/
+    const char *restrict const stratptr) /*+ Ordering strategy          +*/
 {
-  SCOTCH_Strat        scotstrat;                  /* Scotch ordering strategy */
-  INT                 baseval;
-  INT                 vertnbr;
-  INT                 edgenbr;
-  int                 o;
+  SCOTCH_Strat scotstrat; /* Scotch ordering strategy */
+  INT baseval;
+  INT vertnbr;
+  INT edgenbr;
+  int o;
 
-  if (sizeof (INT) != sizeof (SCOTCH_Num)) {      /* Check integer consistency */
-    errorPrint ("orderGraphListStrat: inconsistent integer types");
-    return     (1);
+  if (sizeof(INT) != sizeof(SCOTCH_Num)) { /* Check integer consistency */
+    errorPrint("orderGraphListStrat: inconsistent integer types");
+    return (1);
   }
 
-  SCOTCH_graphData (grafptr, &baseval, &vertnbr, NULL, NULL, NULL, NULL, &edgenbr, NULL, NULL);
+  SCOTCH_graphData(grafptr, &baseval, &vertnbr, NULL, NULL, NULL, NULL,
+                   &edgenbr, NULL, NULL);
 
-  if (((ordeptr->permtab = (INT *) memAlloc ( vertnbr      * sizeof (INT))) == NULL) ||
-      ((ordeptr->peritab = (INT *) memAlloc ( vertnbr      * sizeof (INT))) == NULL) ||
-      ((ordeptr->rangtab = (INT *) memAlloc ((vertnbr + 1) * sizeof (INT))) == NULL)) {
-    errorPrint ("orderGraphListStrat: out of memory");
-    orderExit  (ordeptr);
-    orderInit  (ordeptr);
-    return     (1);
+  if (((ordeptr->permtab = (INT *)memAlloc(vertnbr * sizeof(INT))) == NULL) ||
+      ((ordeptr->peritab = (INT *)memAlloc(vertnbr * sizeof(INT))) == NULL) ||
+      ((ordeptr->rangtab = (INT *)memAlloc((vertnbr + 1) * sizeof(INT))) ==
+       NULL)) {
+    errorPrint("orderGraphListStrat: out of memory");
+    orderExit(ordeptr);
+    orderInit(ordeptr);
+    return (1);
   }
 
-  SCOTCH_stratInit (&scotstrat);                  /* Initialize default ordering strategy */
+  SCOTCH_stratInit(&scotstrat); /* Initialize default ordering strategy */
 
-  o = SCOTCH_stratGraphOrder (&scotstrat, stratptr);
+  o = SCOTCH_stratGraphOrder(&scotstrat, stratptr);
   if (o == 0)
-    o = SCOTCH_graphOrderList (grafptr,           /* Compute graph ordering */
-                               (SCOTCH_Num) listnbr, (SCOTCH_Num *) listtab, &scotstrat,
-                               (SCOTCH_Num *) ordeptr->permtab,  (SCOTCH_Num *) ordeptr->peritab,
-                               (SCOTCH_Num *) &ordeptr->cblknbr, (SCOTCH_Num *) ordeptr->rangtab, NULL);
+    o = SCOTCH_graphOrderList(
+        grafptr, /* Compute graph ordering */
+        (SCOTCH_Num)listnbr, (SCOTCH_Num *)listtab, &scotstrat,
+        (SCOTCH_Num *)ordeptr->permtab, (SCOTCH_Num *)ordeptr->peritab,
+        (SCOTCH_Num *)&ordeptr->cblknbr, (SCOTCH_Num *)ordeptr->rangtab, NULL);
 
-  SCOTCH_stratExit (&scotstrat);
+  SCOTCH_stratExit(&scotstrat);
 
-  if (o != 0) {                                   /* If something failed in Scotch */
-    orderExit (ordeptr);                          /* Free ordering arrays          */
-    orderInit (ordeptr);
-    return    (1);
+  if (o != 0) {         /* If something failed in Scotch */
+    orderExit(ordeptr); /* Free ordering arrays          */
+    orderInit(ordeptr);
+    return (1);
   }
 #ifdef ORDER_DEBUG
-  if ((ordeptr->rangtab[0]                != baseval)           ||
+  if ((ordeptr->rangtab[0] != baseval) ||
       (ordeptr->rangtab[ordeptr->cblknbr] != baseval + vertnbr) ||
-      (orderCheck (ordeptr) != 0)) {
-    errorPrint ("orderGraphListStrat: invalid ordering");
+      (orderCheck(ordeptr) != 0)) {
+    errorPrint("orderGraphListStrat: invalid ordering");
   }
 #endif /* ORDER_DEBUG */
 
-  ordeptr->rangtab = (INT *) memRealloc (ordeptr->rangtab, (ordeptr->cblknbr + 1) * sizeof (INT));
+  ordeptr->rangtab =
+      (INT *)memRealloc(ordeptr->rangtab, (ordeptr->cblknbr + 1) * sizeof(INT));
 
   return (0);
 }

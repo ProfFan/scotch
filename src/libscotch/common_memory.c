@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010,2012,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010,2012,2015,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -62,7 +63,9 @@
 #endif /* COMMON_NOMODULE */
 #include "common.h"
 
-#define COMMON_MEMORY_SZSP          (MAX ((sizeof (size_t)), (sizeof (double)))) /* Space for size, properly aligned */
+#define COMMON_MEMORY_SZSP                                                     \
+  (MAX((sizeof(size_t)),                                                       \
+       (sizeof(double)))) /* Space for size, properly aligned */
 
 #ifdef COMMON_MEMORY_CHECK
 
@@ -70,18 +73,21 @@
 #define COMMON_MEMORY_TRACE
 #endif /* COMMON_MEMORY_TRACE */
 
-#define MEMORY_CHECK_BLOCKS         10000
-#define MEMORY_CHECK_BORDER         16384         /* Huge sentinel block */
+#define MEMORY_CHECK_BLOCKS 10000
+#define MEMORY_CHECK_BORDER 16384 /* Huge sentinel block */
 
-#define COMMON_MEMORY_SKEW          MEMORY_CHECK_BORDER
-#define COMMON_MEMORY_OVHD          (MEMORY_CHECK_BORDER * 2)
+#define COMMON_MEMORY_SKEW MEMORY_CHECK_BORDER
+#define COMMON_MEMORY_OVHD (MEMORY_CHECK_BORDER * 2)
 
-static int                  memorycheckenabled = COMMON_MEMORY_CHECK; /* Set to 1 by default */
-static char                 memorycheckmagktab[16] = { 0123, 0156, 0371, 0012, 0345, 0272, 0301, 0234,
-                                                       0167, 0010, 0127, 0254, 0321, 0012, 0276, 0143 };
-static void *               memorycheckbloktab[MEMORY_CHECK_BLOCKS] = { NULL }; /* Pre-allocated static array, less easily wrecked by out-of-bound heap memory writes */
-static int                  memorycheckbloknbr = 0;
-static void *               memorycheckwtchval = NULL; /* Block address to watch */
+static int memorycheckenabled = COMMON_MEMORY_CHECK; /* Set to 1 by default */
+static char memorycheckmagktab[16] = {0123, 0156, 0371, 0012, 0345, 0272,
+                                      0301, 0234, 0167, 0010, 0127, 0254,
+                                      0321, 0012, 0276, 0143};
+static void *memorycheckbloktab[MEMORY_CHECK_BLOCKS] = {
+    NULL}; /* Pre-allocated static array, less easily wrecked by out-of-bound
+              heap memory writes */
+static int memorycheckbloknbr = 0;
+static void *memorycheckwtchval = NULL; /* Block address to watch */
 
 #endif /* COMMON_MEMORY_CHECK */
 
@@ -93,66 +99,55 @@ static void *               memorycheckwtchval = NULL; /* Block address to watch
 
 #ifdef COMMON_MEMORY_CHECK
 
-static
-void
-memCheckBlock (
-void *            blokptr)
-{
-  char *              zoneptr;
-  char *              zoneend;
-  int                 zoneidx;
-  size_t              bloksiz;
+static void memCheckBlock(void *blokptr) {
+  char *zoneptr;
+  char *zoneend;
+  int zoneidx;
+  size_t bloksiz;
 
-  bloksiz = *((size_t *) blokptr);
+  bloksiz = *((size_t *)blokptr);
 
-  for (zoneptr = (char *) blokptr + COMMON_MEMORY_SZSP, /* Check "before" sentinel */
-       zoneend = (char *) blokptr + MEMORY_CHECK_BORDER, zoneidx = 0;
-       zoneptr < zoneend; ) {
-    if (*zoneptr ++ != memorycheckmagktab[zoneidx ++ % 16]) {
-      errorPrintW ("memoryCheck: error before block at %p, real size %ld",
-                   (char *) blokptr + MEMORY_CHECK_BORDER,
-                   (long) bloksiz);
+  for (zoneptr =
+           (char *)blokptr + COMMON_MEMORY_SZSP, /* Check "before" sentinel */
+       zoneend = (char *)blokptr + MEMORY_CHECK_BORDER, zoneidx = 0;
+       zoneptr < zoneend;) {
+    if (*zoneptr++ != memorycheckmagktab[zoneidx++ % 16]) {
+      errorPrintW("memoryCheck: error before block at %p, real size %ld",
+                  (char *)blokptr + MEMORY_CHECK_BORDER, (long)bloksiz);
       break;
     }
   }
 
-  for (zoneptr = (char *) blokptr + MEMORY_CHECK_BORDER + bloksiz, /* Check "after" sentinel */
-       zoneend = (char *) zoneptr + MEMORY_CHECK_BORDER, zoneidx = 0;
-       zoneptr < zoneend; ) {
-    if (*zoneptr ++ != memorycheckmagktab[zoneidx ++ % 16]) {
-      errorPrintW ("memoryCheck: error after block at %p, real size %ld",
-                   (char *) blokptr + MEMORY_CHECK_BORDER,
-                   (long) bloksiz);
+  for (zoneptr = (char *)blokptr + MEMORY_CHECK_BORDER +
+                 bloksiz, /* Check "after" sentinel */
+       zoneend = (char *)zoneptr + MEMORY_CHECK_BORDER, zoneidx = 0;
+       zoneptr < zoneend;) {
+    if (*zoneptr++ != memorycheckmagktab[zoneidx++ % 16]) {
+      errorPrintW("memoryCheck: error after block at %p, real size %ld",
+                  (char *)blokptr + MEMORY_CHECK_BORDER, (long)bloksiz);
       break;
     }
   }
 }
 
-int
-memCheck ()
-{
-  int                 bloknum;
+int memCheck() {
+  int bloknum;
 
-  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum ++)
-    memCheckBlock (memorycheckbloktab[bloknum]);
+  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum++)
+    memCheckBlock(memorycheckbloktab[bloknum]);
 }
 
-int
-memCheckToggle ()
-{
+int memCheckToggle() {
   return (memorycheckenabled = (memorycheckenabled != 0) ? 0 : 1);
 }
 
-int
-memCheckExists (
-void *            blokptr)
-{
-  void *              bloktmp;
-  int                 bloknum;
+int memCheckExists(void *blokptr) {
+  void *bloktmp;
+  int bloknum;
 
-  bloktmp = (void *) ((char *) blokptr - MEMORY_CHECK_BORDER);
+  bloktmp = (void *)((char *)blokptr - MEMORY_CHECK_BORDER);
 
-  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum ++) {
+  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum++) {
     if (memorycheckbloktab[bloknum] == bloktmp)
       return (1);
   }
@@ -160,87 +155,77 @@ void *            blokptr)
   return (0);
 }
 
-size_t
-memCheckSize (
-void *            blokptr)
-{
-  void *              bloktmp;
-  int                 bloknum;
+size_t memCheckSize(void *blokptr) {
+  void *bloktmp;
+  int bloknum;
 
-  bloktmp = (void *) ((char *) blokptr - MEMORY_CHECK_BORDER);
+  bloktmp = (void *)((char *)blokptr - MEMORY_CHECK_BORDER);
 
-  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum ++) {
+  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum++) {
     if (memorycheckbloktab[bloknum] == bloktmp)
-      return (*((size_t *) bloktmp));
+      return (*((size_t *)bloktmp));
   }
 
   return (-1);
 }
 
-void
-memCheckWatch (
-void *            blokptr)
-{
-  memorycheckwtchval = blokptr;                   /* Record user location */
+void memCheckWatch(void *blokptr) {
+  memorycheckwtchval = blokptr; /* Record user location */
 }
 
-static
-void
-memCheckEnlist (
-void *            blokptr,
-size_t            bloksiz)
-{
-  char *              zoneptr;
-  char *              zoneend;
-  int                 zoneidx;
+static void memCheckEnlist(void *blokptr, size_t bloksiz) {
+  char *zoneptr;
+  char *zoneend;
+  int zoneidx;
 
   if (memorycheckbloknbr >= MEMORY_CHECK_BLOCKS) {
-    errorPrintW ("memoryEnlist: too many blocks");
+    errorPrintW("memoryEnlist: too many blocks");
     return;
   }
 
   if (memorycheckenabled != 0)
-    memCheck ();
+    memCheck();
 
-  memorycheckbloktab[memorycheckbloknbr ++] = blokptr; /* Insert block into checked block array */
+  memorycheckbloktab[memorycheckbloknbr++] =
+      blokptr; /* Insert block into checked block array */
 
-  for (zoneptr = (char *) blokptr + COMMON_MEMORY_SZSP, /* Set "before" sentinel */
-       zoneend = (char *) blokptr + MEMORY_CHECK_BORDER, zoneidx = 0;
-       zoneptr < zoneend; )
-    *zoneptr ++ = memorycheckmagktab[zoneidx ++ % 16];
+  for (zoneptr =
+           (char *)blokptr + COMMON_MEMORY_SZSP, /* Set "before" sentinel */
+       zoneend = (char *)blokptr + MEMORY_CHECK_BORDER, zoneidx = 0;
+       zoneptr < zoneend;)
+    *zoneptr++ = memorycheckmagktab[zoneidx++ % 16];
 
-  if (memorycheckwtchval == (void *) zoneend)     /* Test user location */
-    errorPrintW ("memoryEnlist: watched block address %p enlisted", zoneend);
+  if (memorycheckwtchval == (void *)zoneend) /* Test user location */
+    errorPrintW("memoryEnlist: watched block address %p enlisted", zoneend);
 
-  for (zoneptr = (char *) blokptr + MEMORY_CHECK_BORDER + bloksiz, /* Set "after" sentinel */
-       zoneend = (char *) zoneptr + MEMORY_CHECK_BORDER, zoneidx = 0;
-       zoneptr < zoneend; )
-    *zoneptr ++ = memorycheckmagktab[zoneidx ++ % 16];
+  for (zoneptr = (char *)blokptr + MEMORY_CHECK_BORDER +
+                 bloksiz, /* Set "after" sentinel */
+       zoneend = (char *)zoneptr + MEMORY_CHECK_BORDER, zoneidx = 0;
+       zoneptr < zoneend;)
+    *zoneptr++ = memorycheckmagktab[zoneidx++ % 16];
 }
 
-static
-void
-memCheckDelist (
-void *            blokptr)
-{
-  int                 bloknum;
+static void memCheckDelist(void *blokptr) {
+  int bloknum;
 
   if (memorycheckenabled != 0)
-    memCheck ();
+    memCheck();
 
-  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum ++) {
+  for (bloknum = 0; bloknum < memorycheckbloknbr; bloknum++) {
     if (memorycheckbloktab[bloknum] == blokptr)
       break;
   }
   if (bloknum == memorycheckbloknbr) {
-    errorPrintW ("memoryDelist: block not found");
+    errorPrintW("memoryDelist: block not found");
     return;
   }
 
-  if (memorycheckwtchval == (void *) ((char *) blokptr + MEMORY_CHECK_BORDER))
-    errorPrintW ("memoryDelist: watched block address %p unlisted", blokptr);
+  if (memorycheckwtchval == (void *)((char *)blokptr + MEMORY_CHECK_BORDER))
+    errorPrintW("memoryDelist: watched block address %p unlisted", blokptr);
 
-  memorycheckbloktab[bloknum] = memorycheckbloktab[-- memorycheckbloknbr]; /* Remove block from checked block array */
+  memorycheckbloktab[bloknum] =
+      memorycheckbloktab[--memorycheckbloknbr]; /* Remove block from checked
+                                                   block array */
 }
 
 #endif /* COMMON_MEMORY_CHECK */
@@ -259,17 +244,18 @@ void *            blokptr)
 #ifdef COMMON_MEMORY_TRACE
 
 #ifndef COMMON_MEMORY_SKEW
-#define COMMON_MEMORY_SKEW          COMMON_MEMORY_SZSP /* Increase block size just to store size */
-#define COMMON_MEMORY_OVHD          COMMON_MEMORY_SKEW
+#define COMMON_MEMORY_SKEW                                                     \
+  COMMON_MEMORY_SZSP /* Increase block size just to store size */
+#define COMMON_MEMORY_OVHD COMMON_MEMORY_SKEW
 #endif /* COMMON_MEMORY_SKEW */
 
-static intptr_t             memorysiz = 0;        /*+ Number of allocated bytes        +*/
-static intptr_t             memorymax = 0;        /*+ Maximum amount of allocated data +*/
+static intptr_t memorysiz = 0; /*+ Number of allocated bytes        +*/
+static intptr_t memorymax = 0; /*+ Maximum amount of allocated data +*/
 
 #ifdef COMMON_PTHREAD_MEMORY
-static int                  muteflag = 1;         /*+ Flag for mutex initialization +*/
-static pthread_mutex_t      mutelocdat;           /*+ Local mutex for updates       +*/
-#endif /* COMMON_PTHREAD_MEMORY */
+static int muteflag = 1;           /*+ Flag for mutex initialization +*/
+static pthread_mutex_t mutelocdat; /*+ Local mutex for updates       +*/
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
 /* This routine allocates and records
 ** a memory block.
@@ -278,38 +264,38 @@ static pthread_mutex_t      mutelocdat;           /*+ Local mutex for updates   
 ** - !NULL  : location of the allocated block.
 */
 
-void *
-memAllocRecord (
-size_t                      newsiz)
-{
-  byte *              newptr;
+void *memAllocRecord(size_t newsiz) {
+  byte *newptr;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  if (muteflag != 0) {                            /* Unsafe code with respect to race conditions but should work as first allocs are sequential; portable TSL needed */
+  if (muteflag !=
+      0) { /* Unsafe code with respect to race conditions but should work as
+              first allocs are sequential; portable TSL needed */
     muteflag = 0;
-    pthread_mutex_init (&mutelocdat, NULL);       /* Initialize local mutex */
+    pthread_mutex_init(&mutelocdat, NULL); /* Initialize local mutex */
   }
-  pthread_mutex_lock (&mutelocdat);               /* Lock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_lock(&mutelocdat); /* Lock local mutex */
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
-  if ((newptr = malloc (newsiz + COMMON_MEMORY_OVHD)) != NULL) { /* Non-zero size will guarantee non-NULL pointers */
-    memorysiz += (intptr_t) newsiz;
+  if ((newptr = malloc(newsiz + COMMON_MEMORY_OVHD)) !=
+      NULL) { /* Non-zero size will guarantee non-NULL pointers */
+    memorysiz += (intptr_t)newsiz;
     if (memorymax < memorysiz)
       memorymax = memorysiz;
 
 #ifdef COMMON_MEMORY_CHECK
-    memCheckEnlist (newptr, newsiz);
+    memCheckEnlist(newptr, newsiz);
 #endif /* COMMON_MEMORY_CHECK */
 
-    *((size_t *) newptr) = newsiz;                /* Record size for freeing                */
-    newptr += COMMON_MEMORY_SKEW;                 /* Skew pointer while enforcing alignment */
+    *((size_t *)newptr) = newsiz; /* Record size for freeing                */
+    newptr += COMMON_MEMORY_SKEW; /* Skew pointer while enforcing alignment */
   }
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_unlock (&mutelocdat);             /* Unlock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_unlock(&mutelocdat); /* Unlock local mutex */
+#endif                               /* COMMON_PTHREAD_MEMORY */
 
-  return ((void *) newptr);                       /* Return skewed pointer or NULL */
+  return ((void *)newptr); /* Return skewed pointer or NULL */
 }
 
 /* This routine reallocates and records
@@ -319,45 +305,42 @@ size_t                      newsiz)
 ** - !NULL  : location of the reallocated block.
 */
 
-void *
-memReallocRecord (
-void *                      oldptr,
-size_t                      newsiz)
-{
-  byte *              tmpptr;
-  byte *              newptr;
-  size_t              oldsiz;
+void *memReallocRecord(void *oldptr, size_t newsiz) {
+  byte *tmpptr;
+  byte *newptr;
+  size_t oldsiz;
 
-  tmpptr = ((byte *) oldptr) - COMMON_MEMORY_SKEW;
-  oldsiz = *((size_t *) tmpptr);
+  tmpptr = ((byte *)oldptr) - COMMON_MEMORY_SKEW;
+  oldsiz = *((size_t *)tmpptr);
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_lock (&mutelocdat);               /* Lock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_lock(&mutelocdat); /* Lock local mutex */
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
 #ifdef COMMON_MEMORY_CHECK
-    memCheckDelist (tmpptr);
+  memCheckDelist(tmpptr);
 #endif /* COMMON_MEMORY_CHECK */
 
-  if ((newptr = realloc (tmpptr, newsiz + COMMON_MEMORY_OVHD)) != NULL) {
-    memorysiz -= (intptr_t) oldsiz;               /* Subtract then add unsigned values to avoid handling signs */
-    memorysiz += (intptr_t) newsiz;
+  if ((newptr = realloc(tmpptr, newsiz + COMMON_MEMORY_OVHD)) != NULL) {
+    memorysiz -= (intptr_t)
+        oldsiz; /* Subtract then add unsigned values to avoid handling signs */
+    memorysiz += (intptr_t)newsiz;
     if (memorymax < memorysiz)
       memorymax = memorysiz;
 
 #ifdef COMMON_MEMORY_CHECK
-    memCheckEnlist (newptr, newsiz);
+    memCheckEnlist(newptr, newsiz);
 #endif /* COMMON_MEMORY_CHECK */
 
-    *((size_t *) newptr) = newsiz;                /* Record size for freeing                */
-    newptr += COMMON_MEMORY_SKEW;                 /* Skew pointer while enforcing alignment */
+    *((size_t *)newptr) = newsiz; /* Record size for freeing                */
+    newptr += COMMON_MEMORY_SKEW; /* Skew pointer while enforcing alignment */
   }
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_unlock (&mutelocdat);             /* Unlock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_unlock(&mutelocdat); /* Unlock local mutex */
+#endif                               /* COMMON_PTHREAD_MEMORY */
 
-  return ((void *) newptr);                       /* Return skewed pointer or NULL */
+  return ((void *)newptr); /* Return skewed pointer or NULL */
 }
 
 /* This routine frees a recorded
@@ -366,30 +349,27 @@ size_t                      newsiz)
 ** - void  : in all cases.
 */
 
-void
-memFreeRecord (
-void *                      oldptr)
-{
-  byte *              tmpptr;
-  size_t              oldsiz;
+void memFreeRecord(void *oldptr) {
+  byte *tmpptr;
+  size_t oldsiz;
 
-  tmpptr = ((byte *) oldptr) - COMMON_MEMORY_SKEW;
-  oldsiz = *((size_t *) tmpptr);
+  tmpptr = ((byte *)oldptr) - COMMON_MEMORY_SKEW;
+  oldsiz = *((size_t *)tmpptr);
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_lock (&mutelocdat);               /* Lock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_lock(&mutelocdat); /* Lock local mutex */
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
 #ifdef COMMON_MEMORY_CHECK
-    memCheckDelist (tmpptr);
+  memCheckDelist(tmpptr);
 #endif /* COMMON_MEMORY_CHECK */
 
-  free (tmpptr);
+  free(tmpptr);
   memorysiz -= oldsiz;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_unlock (&mutelocdat);             /* Unlock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_unlock(&mutelocdat); /* Unlock local mutex */
+#endif                               /* COMMON_PTHREAD_MEMORY */
 }
 
 /* This routine returns the memory
@@ -399,22 +379,20 @@ void *                      oldptr)
 ** - x  : current memory footprint.
 */
 
-IDX
-memCur ()
-{
-  intptr_t            memotmp;
+IDX memCur() {
+  intptr_t memotmp;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_lock (&mutelocdat);               /* Lock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_lock(&mutelocdat); /* Lock local mutex */
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
   memotmp = memorysiz;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_unlock (&mutelocdat);             /* Unlock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_unlock(&mutelocdat); /* Unlock local mutex */
+#endif                               /* COMMON_PTHREAD_MEMORY */
 
-  return ((IDX) memotmp);
+  return ((IDX)memotmp);
 }
 
 /* This routine returns the maximum memory
@@ -424,22 +402,20 @@ memCur ()
 ** - x  : current maximum memory footprint.
 */
 
-IDX
-memMax ()
-{
-  intptr_t            memotmp;
+IDX memMax() {
+  intptr_t memotmp;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_lock (&mutelocdat);               /* Lock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_lock(&mutelocdat); /* Lock local mutex */
+#endif                             /* COMMON_PTHREAD_MEMORY */
 
   memotmp = memorymax;
 
 #ifdef COMMON_PTHREAD_MEMORY
-  pthread_mutex_unlock (&mutelocdat);             /* Unlock local mutex */
-#endif /* COMMON_PTHREAD_MEMORY */
+  pthread_mutex_unlock(&mutelocdat); /* Unlock local mutex */
+#endif                               /* COMMON_PTHREAD_MEMORY */
 
-  return ((IDX) memotmp);
+  return ((IDX)memotmp);
 }
 
 #else /* COMMON_MEMORY_TRACE */
@@ -448,17 +424,9 @@ memMax ()
 ** COMMON_MEMORY_TRACE set.
 */
 
-IDX
-memCur ()
-{
-  return ((IDX) -1);
-}
+IDX memCur() { return ((IDX)-1); }
 
-IDX
-memMax ()
-{
-  return ((IDX) -1);
-}
+IDX memMax() { return ((IDX)-1); }
 
 #endif /* COMMON_MEMORY_TRACE */
 
@@ -473,43 +441,41 @@ memMax ()
 ** - NULL   : no array allocated.
 */
 
-void *
-memAllocGroup (
-void **                     memptr,               /*+ Pointer to first argument to allocate +*/
-...)
-{
-  va_list             memlist;                    /* Argument list of the call              */
-  byte **             memloc;                     /* Pointer to pointer of current argument */
-  size_t              memoff;                     /* Offset value of argument               */
-  byte *              blkptr;                     /* Pointer to memory chunk                */
+void *memAllocGroup(void **memptr, /*+ Pointer to first argument to allocate +*/
+                    ...) {
+  va_list memlist; /* Argument list of the call              */
+  byte **memloc;   /* Pointer to pointer of current argument */
+  size_t memoff;   /* Offset value of argument               */
+  byte *blkptr;    /* Pointer to memory chunk                */
 
   memoff = 0;
-  memloc = (byte **) memptr;                      /* Point to first memory argument */
-  va_start (memlist, memptr);                     /* Start argument parsing         */
-  while (memloc != NULL) {                        /* As long as not NULL pointer    */
-    memoff  = (memoff + (sizeof (double) - 1)) & (~ (sizeof (double) - 1));
-    memoff += va_arg (memlist, size_t);
-    memloc  = va_arg (memlist, byte **);
+  memloc = (byte **)memptr;  /* Point to first memory argument */
+  va_start(memlist, memptr); /* Start argument parsing         */
+  while (memloc != NULL) {   /* As long as not NULL pointer    */
+    memoff = (memoff + (sizeof(double) - 1)) & (~(sizeof(double) - 1));
+    memoff += va_arg(memlist, size_t);
+    memloc = va_arg(memlist, byte **);
   }
-  va_end (memlist);
+  va_end(memlist);
 
-  if ((blkptr = (byte *) memAlloc (memoff)) == NULL) { /* If cannot allocate   */
-    *memptr = NULL;                               /* Set first pointer to NULL */
+  if ((blkptr = (byte *)memAlloc(memoff)) == NULL) { /* If cannot allocate   */
+    *memptr = NULL; /* Set first pointer to NULL */
     return (NULL);
   }
 
   memoff = 0;
-  memloc = (byte **) memptr;                      /* Point to first memory argument */
-  va_start (memlist, memptr);                     /* Restart argument parsing       */
-  while (memloc != NULL) {                        /* As long as not NULL pointer    */
-    memoff  = (memoff + (sizeof (double) - 1)) & (~ (sizeof (double) - 1)); /* Pad  */
-    *memloc = blkptr + memoff;                    /* Set argument address           */
-    memoff += va_arg (memlist, size_t);           /* Accumulate padded sizes        */
-    memloc  = va_arg (memlist, void *);           /* Get next argument pointer      */
+  memloc = (byte **)memptr;  /* Point to first memory argument */
+  va_start(memlist, memptr); /* Restart argument parsing       */
+  while (memloc != NULL) {   /* As long as not NULL pointer    */
+    memoff =
+        (memoff + (sizeof(double) - 1)) & (~(sizeof(double) - 1)); /* Pad  */
+    *memloc = blkptr + memoff;         /* Set argument address           */
+    memoff += va_arg(memlist, size_t); /* Accumulate padded sizes        */
+    memloc = va_arg(memlist, void *);  /* Get next argument pointer      */
   }
-  va_end (memlist);
+  va_end(memlist);
 
-  return ((void *) blkptr);
+  return ((void *)blkptr);
 }
 
 /* This routine reallocates a set of arrays in
@@ -524,37 +490,39 @@ void **                     memptr,               /*+ Pointer to first argument 
 ** - NULL   : no array allocated.
 */
 
-void *
-memReallocGroup (
-void *                      oldptr,               /*+ Pointer to block to reallocate +*/
-...)
-{
-  va_list             memlist;                    /* Argument list of the call              */
-  byte **             memloc;                     /* Pointer to pointer of current argument */
-  size_t              memoff;                     /* Offset value of argument               */
-  byte *              blkptr;                     /* Pointer to memory chunk                */
+void *memReallocGroup(void *oldptr, /*+ Pointer to block to reallocate +*/
+                      ...) {
+  va_list memlist; /* Argument list of the call              */
+  byte **memloc;   /* Pointer to pointer of current argument */
+  size_t memoff;   /* Offset value of argument               */
+  byte *blkptr;    /* Pointer to memory chunk                */
 
   memoff = 0;
-  va_start (memlist, oldptr);                     /* Start argument parsing             */
-  while ((memloc = va_arg (memlist, byte **)) != NULL) { /* As long as not NULL pointer */
-    memoff  = (memoff + (sizeof (double) - 1)) & (~ (sizeof (double) - 1)); /* Pad      */
-    memoff += va_arg (memlist, size_t);           /* Accumulate padded sizes            */
+  va_start(memlist, oldptr); /* Start argument parsing             */
+  while ((memloc = va_arg(memlist, byte **)) !=
+         NULL) { /* As long as not NULL pointer */
+    memoff =
+        (memoff + (sizeof(double) - 1)) & (~(sizeof(double) - 1)); /* Pad */
+    memoff += va_arg(memlist, size_t); /* Accumulate padded sizes            */
   }
-  va_end (memlist);
+  va_end(memlist);
 
-  if ((blkptr = (byte *) memRealloc (oldptr, memoff)) == NULL) /* If cannot allocate block */
+  if ((blkptr = (byte *)memRealloc(oldptr, memoff)) ==
+      NULL) /* If cannot allocate block */
     return (NULL);
 
   memoff = 0;
-  va_start (memlist, oldptr);                     /* Restart argument parsing           */
-  while ((memloc = va_arg (memlist, byte **)) != NULL) { /* As long as not NULL pointer */
-    memoff  = (memoff + (sizeof (double) - 1)) & (~ (sizeof (double) - 1)); /* Pad      */
-    *memloc = blkptr + memoff;                    /* Set argument address               */
-    memoff += va_arg (memlist, size_t);           /* Accumulate padded sizes            */
+  va_start(memlist, oldptr); /* Restart argument parsing           */
+  while ((memloc = va_arg(memlist, byte **)) !=
+         NULL) { /* As long as not NULL pointer */
+    memoff =
+        (memoff + (sizeof(double) - 1)) & (~(sizeof(double) - 1)); /* Pad */
+    *memloc = blkptr + memoff;         /* Set argument address               */
+    memoff += va_arg(memlist, size_t); /* Accumulate padded sizes            */
   }
-  va_end (memlist);
+  va_end(memlist);
 
-  return ((void *) blkptr);
+  return ((void *)blkptr);
 }
 
 /* This routine computes the offsets of arrays
@@ -568,23 +536,21 @@ void *                      oldptr,               /*+ Pointer to block to reallo
 **            the memory area.
 */
 
-void *
-memOffset (
-void *                      memptr,               /*+ Pointer to base address of memory area +*/
-...)
-{
-  va_list             memlist;                    /* Argument list of the call              */
-  byte **             memloc;                     /* Pointer to pointer of current argument */
-  size_t              memoff;                     /* Offset value of argument               */
+void *memOffset(void *memptr, /*+ Pointer to base address of memory area +*/
+                ...) {
+  va_list memlist; /* Argument list of the call              */
+  byte **memloc;   /* Pointer to pointer of current argument */
+  size_t memoff;   /* Offset value of argument               */
 
   memoff = 0;
-  va_start (memlist, memptr);                     /* Start argument parsing             */
-  while ((memloc = va_arg (memlist, byte **)) != NULL) { /* As long as not NULL pointer */
-    memoff  = (memoff + (sizeof (double) - 1)) & (~ (sizeof (double) - 1));
-    *memloc = (byte *) memptr + memoff;           /* Set argument address    */
-    memoff += va_arg (memlist, size_t);           /* Accumulate padded sizes */
+  va_start(memlist, memptr); /* Start argument parsing             */
+  while ((memloc = va_arg(memlist, byte **)) !=
+         NULL) { /* As long as not NULL pointer */
+    memoff = (memoff + (sizeof(double) - 1)) & (~(sizeof(double) - 1));
+    *memloc = (byte *)memptr + memoff; /* Set argument address    */
+    memoff += va_arg(memlist, size_t); /* Accumulate padded sizes */
   }
-  va_end (memlist);
+  va_end(memlist);
 
-  return ((void *) ((byte *) memptr + memoff));
+  return ((void *)((byte *)memptr + memoff));
 }

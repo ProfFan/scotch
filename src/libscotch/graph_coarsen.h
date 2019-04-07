@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2011-2013,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2011-2013,2015,2018 IPB, Universite de Bordeaux, INRIA &
+*CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -70,18 +71,23 @@
 /*+ Graph option flags. Their values must be equal
     to those defined in library.h and library_f.h  +*/
 
-#define GRAPHCOARSENNONE            0x0000        /* No options set */
+#define GRAPHCOARSENNONE 0x0000 /* No options set */
 
-#define GRAPHCOARSENDSTMATE         0x0001        /* Matching/fine-to-coarse array destination provided */
-#define GRAPHCOARSENDSTMULT         0x0002        /* Multinode array destination provided               */
-#define GRAPHCOARSENHASMULT         0x0004        /* Multinode array provided                           */
-#define GRAPHCOARSENUSEMATE         0x0008        /* Matching array data provided                       */
+#define GRAPHCOARSENDSTMATE                                                    \
+  0x0001 /* Matching/fine-to-coarse array destination provided */
+#define GRAPHCOARSENDSTMULT                                                    \
+  0x0002 /* Multinode array destination provided               */
+#define GRAPHCOARSENHASMULT                                                    \
+  0x0004 /* Multinode array provided                           */
+#define GRAPHCOARSENUSEMATE                                                    \
+  0x0008 /* Matching array data provided                       */
 
-#define GRAPHCOARSENNOMERGE         0x4000        /* Do not merge isolated vertices                     */
+#define GRAPHCOARSENNOMERGE                                                    \
+  0x4000 /* Do not merge isolated vertices                     */
 
 /*+ Prime number for hashing vertex numbers. +*/
 
-#define GRAPHCOARSENHASHPRIME       1049          /*+ Prime number +*/
+#define GRAPHCOARSENHASHPRIME 1049 /*+ Prime number +*/
 
 /*
 **  The type and structure definitions.
@@ -90,9 +96,9 @@
 /*+ Here are the edge matching function types for coarsening. +*/
 
 typedef enum GraphCoarsenType_ {
-  GRAPHCOARHEM,                                   /*+ Heavy-edge matching       +*/
-  GRAPHCOARSCN,                                   /*+ Scanning (first) matching +*/
-  GRAPHCOARNBR                                    /*+ Number of matching types  +*/
+  GRAPHCOARHEM, /*+ Heavy-edge matching       +*/
+  GRAPHCOARSCN, /*+ Scanning (first) matching +*/
+  GRAPHCOARNBR  /*+ Number of matching types  +*/
 } GraphCoarsenType;
 
 /*+ The multinode table element, which contains
@@ -104,7 +110,7 @@ typedef enum GraphCoarsenType_ {
     of the fine graph.                               +*/
 
 typedef struct GraphCoarsenMulti_ {
-  Gnum                      vertnum[2];           /*+ Numbers of the collapsed vertices of a multinode +*/
+  Gnum vertnum[2]; /*+ Numbers of the collapsed vertices of a multinode +*/
 } GraphCoarsenMulti;
 
 /*+ A table made of such elements is used during
@@ -112,9 +118,9 @@ typedef struct GraphCoarsenMulti_ {
     graph, after the labeling of the vertices.    +*/
 
 typedef struct GraphCoarsenHash_ {
-  Gnum                      vertorgnum;           /*+ Origin vertex (i.e. pass) number +*/
-  Gnum                      vertendnum;           /*+ Other end vertex number          +*/
-  Gnum                      edgenum;              /*+ Number of corresponding edge     +*/
+  Gnum vertorgnum; /*+ Origin vertex (i.e. pass) number +*/
+  Gnum vertendnum; /*+ Other end vertex number          +*/
+  Gnum edgenum;    /*+ Number of corresponding edge     +*/
 } GraphCoarsenHash;
 
 /*+ The matching and coarsening routine
@@ -122,45 +128,48 @@ typedef struct GraphCoarsenHash_ {
     thread-independent data.             +*/
 
 typedef struct GraphCoarsenData_ {
-  ThreadGroupHeader         thrddat;              /*+ Thread handling data                            +*/
-  int                       flagval;              /*+ Flags for controlling matching and coarsening   +*/
-  const Graph *             finegrafptr;          /*+ Fine graph to perform matching on               +*/
-  const Anum *              fineparotax;          /*+ Old part array                                  +*/
-  const Anum *              finepfixtax;          /*+ Array of fixed vertices                         +*/
-  Gnum                      finevfixnbr;          /*+ Number of fine fixed vertices                   +*/
-  Gnum *                    finematetax;          /*+ Fine mate array / fine-to-coarse array          +*/
-  Graph *                   coargrafptr;          /*+ Coarse graph to build                           +*/
-  Gnum                      coarvertmax;          /*+ Maximum number of vertices to get               +*/
-  Gnum                      coarvertnbr;          /*+ Global number of coarse vertices after matching +*/
-  Gnum *                    coarvfixptr;          /*+ Pointer to number of coarse fixed vertices      +*/
-  GraphCoarsenMulti *       coarmulttab;          /*+ Multinode array                                 +*/
-  Gnum                      coarmultsiz;          /*+ Size of multinode array allocated in graph      +*/
-  Gnum                      coarhashmsk;          /*+ Hash table mask                                 +*/
+  ThreadGroupHeader thrddat; /*+ Thread handling data +*/
+  int flagval; /*+ Flags for controlling matching and coarsening   +*/
+  const Graph *finegrafptr; /*+ Fine graph to perform matching on +*/
+  const Anum *fineparotax;  /*+ Old part array  +*/
+  const Anum *finepfixtax;  /*+ Array of fixed vertices  +*/
+  Gnum finevfixnbr;   /*+ Number of fine fixed vertices                   +*/
+  Gnum *finematetax;  /*+ Fine mate array / fine-to-coarse array          +*/
+  Graph *coargrafptr; /*+ Coarse graph to build                           +*/
+  Gnum coarvertmax;   /*+ Maximum number of vertices to get               +*/
+  Gnum coarvertnbr;   /*+ Global number of coarse vertices after matching +*/
+  Gnum *coarvfixptr;  /*+ Pointer to number of coarse fixed vertices      +*/
+  GraphCoarsenMulti *coarmulttab; /*+ Multinode array +*/
+  Gnum coarmultsiz; /*+ Size of multinode array allocated in graph      +*/
+  Gnum coarhashmsk; /*+ Hash table mask                                 +*/
 #ifdef SCOTCH_PTHREAD
-  int * restrict            finelocktax;          /*+ Matching lock array (if any)                    +*/
-  Gnum * restrict           finequeutab;          /*+ Matching queue array (if any)                   +*/
-  void                   (* fendptr) (void *);    /*+ Pointer to final / sequential match routine     +*/
-  void                   (* fmidptr) (void *);    /*+ Pointer to intermediate match routine (if any)  +*/
-#endif /* SCOTCH_PTHREAD */
-  void                   (* fbegptr) (void *);    /*+ Pointer to beginning match routine (if any)     +*/
+  int *restrict finelocktax;  /*+ Matching lock array (if any)  +*/
+  Gnum *restrict finequeutab; /*+ Matching queue array (if any) +*/
+  void (*fendptr)(void *); /*+ Pointer to final / sequential match routine +*/
+  void (*fmidptr)(
+      void *); /*+ Pointer to intermediate match routine (if any)  +*/
+#endif         /* SCOTCH_PTHREAD */
+  void (*fbegptr)(void *); /*+ Pointer to beginning match routine (if any) +*/
 } GraphCoarsenData;
 
 /*+ The thread-specific data block. +*/
 
 typedef struct GraphCoarsenThread_ {
-  ThreadHeader              thrddat;              /*+ Thread management data                                    +*/
-  Gunum                     randval;              /*+ Per-thread unsigned random value                          +*/
-  GraphCoarsenHash *        coarhashtab;          /*+ End vertex hash table (may be local)                      +*/
-  Gnum                      coarvertnnd;          /*+ After-last coarse vertex number                           +*/
-  Gnum                      coarvertbas;          /*+ Minimum coarse vertex number; for prefix scan             +*/
-  Gnum                      coarvertnbr;          /*+ Number of coarse vertices to date; TRICK: scan dummy area +*/
-  Gnum                      coaredloadj;          /*+ (Local) coarse edge load sum adjust                       +*/
-  Gnum                      coardegrmax;          /*+ (Local) maximum degree                                    +*/
-  Gnum                      coaredgebas;          /*+ Minimum coarse edge number; for prefix scan               +*/
-  Gnum                      finevertbas;          /*+ Start of fine vertex range; TRICK: scan dummy area        +*/
-  Gnum                      finevertnnd;          /*+ End of fine vertex range                                  +*/
-  Gnum                      finequeubas;          /*+ Minimum perturbation or queue index for matching          +*/
-  Gnum                      finequeunnd;          /*+ After-last perturbation or queue index for matching       +*/
+  ThreadHeader thrddat;          /*+ Thread management data          +*/
+  Gunum randval;                 /*+ Per-thread unsigned random value                 +*/
+  GraphCoarsenHash *coarhashtab; /*+ End vertex hash table (may be local) +*/
+  Gnum coarvertnnd;              /*+ After-last coarse vertex number              +*/
+  Gnum coarvertbas; /*+ Minimum coarse vertex number; for prefix scan +*/
+  Gnum coarvertnbr; /*+ Number of coarse vertices to date; TRICK: scan dummy
+                       area +*/
+  Gnum coaredloadj; /*+ (Local) coarse edge load sum adjust +*/
+  Gnum coardegrmax; /*+ (Local) maximum degree +*/
+  Gnum coaredgebas; /*+ Minimum coarse edge number; for prefix scan +*/
+  Gnum finevertbas; /*+ Start of fine vertex range; TRICK: scan dummy area +*/
+  Gnum finevertnnd; /*+ End of fine vertex range +*/
+  Gnum finequeubas; /*+ Minimum perturbation or queue index for matching +*/
+  Gnum
+      finequeunnd; /*+ After-last perturbation or queue index for matching +*/
 } GraphCoarsenThread;
 
 /*
@@ -169,12 +178,22 @@ typedef struct GraphCoarsenThread_ {
 
 #ifdef GRAPH_COARSEN
 #ifdef GRAPHCOARSENTHREAD
-static void                 graphCoarsenEdgeCt  (GraphCoarsenThread *);
+static void graphCoarsenEdgeCt(GraphCoarsenThread *);
 #endif /* GRAPHCOARSENTHREAD */
-static void                 graphCoarsenEdgeLl  (GraphCoarsenThread *);
-static void                 graphCoarsenEdgeLu  (GraphCoarsenThread *);
+static void graphCoarsenEdgeLl(GraphCoarsenThread *);
+static void graphCoarsenEdgeLu(GraphCoarsenThread *);
 #endif /* GRAPH_COARSEN */
 
-int                         graphCoarsen        (const Graph * restrict const, Graph * restrict const, Gnum * restrict * restrict const, GraphCoarsenMulti * restrict * restrict const, const Gnum, const double, const Gnum, const Anum * restrict const, const Anum * restrict const, const Gnum, Gnum * restrict const);
-int                         graphCoarsenMatch   (const Graph * restrict const, Gnum * restrict * restrict const, Gnum * restrict const, const double, const Gnum, const Anum * restrict const, const Anum * restrict const, const Gnum, Gnum * restrict const);
-int                         graphCoarsenBuild   (const Graph * restrict const, Graph * restrict const, Gnum * restrict const, GraphCoarsenMulti * restrict * restrict const, const Gnum);
+int graphCoarsen(const Graph *restrict const, Graph *restrict const,
+                 Gnum *restrict *restrict const,
+                 GraphCoarsenMulti *restrict *restrict const, const Gnum,
+                 const double, const Gnum, const Anum *restrict const,
+                 const Anum *restrict const, const Gnum, Gnum *restrict const);
+int graphCoarsenMatch(const Graph *restrict const,
+                      Gnum *restrict *restrict const, Gnum *restrict const,
+                      const double, const Gnum, const Anum *restrict const,
+                      const Anum *restrict const, const Gnum,
+                      Gnum *restrict const);
+int graphCoarsenBuild(const Graph *restrict const, Graph *restrict const,
+                      Gnum *restrict const,
+                      GraphCoarsenMulti *restrict *restrict const, const Gnum);

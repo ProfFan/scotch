@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -81,49 +81,48 @@
 ** - !0  : on error.
 */
 
-int
-dgraphGather (
-const Dgraph * restrict const dgrfptr,            /* Distributed graph */
-Graph * restrict              cgrfptr)            /* Centralized graph */
+int dgraphGather(const Dgraph *restrict const dgrfptr, /* Distributed graph */
+                 Graph *restrict cgrfptr)              /* Centralized graph */
 {
-  Gnum                reduloctab[3];
-  Gnum                reduglbtab[3];
+  Gnum reduloctab[3];
+  Gnum reduglbtab[3];
 
-  if (dgrfptr->edloloctax == NULL)                /* Compute sum of edge loads */
+  if (dgrfptr->edloloctax == NULL) /* Compute sum of edge loads */
     reduloctab[2] = dgrfptr->edgelocnbr;
   else {
-    Gnum                vertlocnum;
-    Gnum                edlolocsum;
+    Gnum vertlocnum;
+    Gnum edlolocsum;
 
     for (vertlocnum = dgrfptr->baseval, edlolocsum = 0;
-         vertlocnum < dgrfptr->vertlocnnd; vertlocnum ++) {
-      Gnum                edgelocnum;
-      Gnum                edgelocnnd;
+         vertlocnum < dgrfptr->vertlocnnd; vertlocnum++) {
+      Gnum edgelocnum;
+      Gnum edgelocnnd;
 
       for (edgelocnum = dgrfptr->vertloctax[vertlocnum],
-           edgelocnnd = dgrfptr->vendloctax[vertlocnum];
-           edgelocnum < edgelocnnd; edgelocnum ++)
+          edgelocnnd = dgrfptr->vendloctax[vertlocnum];
+           edgelocnum < edgelocnnd; edgelocnum++)
         edlolocsum += dgrfptr->edloloctax[edgelocnum];
     }
     reduloctab[2] = edlolocsum;
   }
 
-  if (cgrfptr != NULL) {                          /* If centralized graph provided */
-    reduloctab[0] = 1;                            /* This process is the root      */
-    reduloctab[1] = (Gnum) dgrfptr->proclocnum;   /* Get its number                */
+  if (cgrfptr != NULL) { /* If centralized graph provided */
+    reduloctab[0] = 1;   /* This process is the root      */
+    reduloctab[1] = (Gnum)dgrfptr->proclocnum; /* Get its number */
+  } else {
+    reduloctab[0] = /* This process is not the root */
+        reduloctab[1] = 0;
   }
-  else {
-    reduloctab[0] =                               /* This process is not the root */
-    reduloctab[1] = 0;
-  }
-  if (MPI_Allreduce (reduloctab, reduglbtab, 3, GNUM_MPI, MPI_SUM, dgrfptr->proccomm) != MPI_SUCCESS) {
-    errorPrint ("dgraphGather: communication error");
-    return     (1);
+  if (MPI_Allreduce(reduloctab, reduglbtab, 3, GNUM_MPI, MPI_SUM,
+                    dgrfptr->proccomm) != MPI_SUCCESS) {
+    errorPrint("dgraphGather: communication error");
+    return (1);
   }
   if (reduglbtab[0] != 1) {
-    errorPrint ("dgraphGather: should have only one root");
-    return     (1);
+    errorPrint("dgraphGather: should have only one root");
+    return (1);
   }
 
-  return (dgraphGatherAll2 (dgrfptr, cgrfptr, reduglbtab[2], (int) reduglbtab[1]));
+  return (
+      dgraphGatherAll2(dgrfptr, cgrfptr, reduglbtab[2], (int)reduglbtab[1]));
 }

@@ -18,9 +18,9 @@
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* This is a minimal pthread implementation based on windows functions.
@@ -51,16 +51,16 @@ static inline int sem_init(sem_t *sem, int pshared, unsigned int value) {
 
 static inline int do_sem_wait(sem_t *sem, DWORD timeout) {
   switch (WaitForSingleObject(*sem, timeout)) {
-    default:
-    case WAIT_FAILED:
-      setSystemErrno();
-      return -1;
-    case WAIT_TIMEOUT:
-      errno = EAGAIN;
-      return -1;
-    case WAIT_ABANDONED:
-    case WAIT_OBJECT_0:
-      return 0;
+  default:
+  case WAIT_FAILED:
+    setSystemErrno();
+    return -1;
+  case WAIT_TIMEOUT:
+    errno = EAGAIN;
+    return -1;
+  case WAIT_ABANDONED:
+  case WAIT_OBJECT_0:
+    return 0;
   }
 }
 

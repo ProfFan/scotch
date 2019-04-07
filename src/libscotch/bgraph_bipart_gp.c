@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -83,174 +83,198 @@
 ** - 1 : on error.
 */
 
-int
-bgraphBipartGp (
-Bgraph * restrict const           grafptr,
-const BgraphBipartGpParam * const paraptr)        /*+ Method parameters +*/
+int bgraphBipartGp(
+    Bgraph *restrict const grafptr,
+    const BgraphBipartGpParam *const paraptr) /*+ Method parameters +*/
 {
-  BgraphBipartGpQueue             queudat;        /* Neighbor queue               */
-  BgraphBipartGpVertex * restrict vexxtax;        /* Complementary vertex array   */
-  Gnum                            compload0dlt;
-  Gnum                            compsize0;
-  Gnum                            commloadintn;
-  Gnum                            commloadextn;
-  Gnum                            rootnum;        /* Index of potential next root */
+  BgraphBipartGpQueue queudat;            /* Neighbor queue               */
+  BgraphBipartGpVertex *restrict vexxtax; /* Complementary vertex array   */
+  Gnum compload0dlt;
+  Gnum compsize0;
+  Gnum commloadintn;
+  Gnum commloadextn;
+  Gnum rootnum; /* Index of potential next root */
 
-  const Gnum * restrict const verttax = grafptr->s.verttax; /* Fast accesses */
-  const Gnum * restrict const vendtax = grafptr->s.vendtax;
-  const Gnum * restrict const velotax = grafptr->s.velotax;
-  const Gnum * restrict const edgetax = grafptr->s.edgetax;
-  const Gnum * restrict const edlotax = grafptr->s.edlotax;
-  const Gnum * restrict const veextax = grafptr->veextax;
+  const Gnum *restrict const verttax = grafptr->s.verttax; /* Fast accesses */
+  const Gnum *restrict const vendtax = grafptr->s.vendtax;
+  const Gnum *restrict const velotax = grafptr->s.velotax;
+  const Gnum *restrict const edgetax = grafptr->s.edgetax;
+  const Gnum *restrict const edlotax = grafptr->s.edlotax;
+  const Gnum *restrict const veextax = grafptr->veextax;
 
-  if (grafptr->compsize0 != grafptr->s.vertnbr)   /* If not all vertices already in part 0 */
-    bgraphZero (grafptr);                         /* Move all graph vertices to part 0     */
+  if (grafptr->compsize0 !=
+      grafptr->s.vertnbr) /* If not all vertices already in part 0 */
+    bgraphZero(grafptr);  /* Move all graph vertices to part 0     */
 
-  if (memAllocGroup ((void **) (void *)
-                     &queudat.queutab, (size_t) (grafptr->s.vertnbr * sizeof (Gnum)),
-                     &vexxtax,         (size_t) (grafptr->s.vertnbr * sizeof (BgraphBipartGpVertex)), NULL) == NULL) {
-    errorPrint ("bgraphBipartGp: out of memory");
-    return     (1);
+  if (memAllocGroup((void **)(void *)&queudat.queutab,
+                    (size_t)(grafptr->s.vertnbr * sizeof(Gnum)), &vexxtax,
+                    (size_t)(grafptr->s.vertnbr * sizeof(BgraphBipartGpVertex)),
+                    NULL) == NULL) {
+    errorPrint("bgraphBipartGp: out of memory");
+    return (1);
   }
 
-  memSet (vexxtax, 0, grafptr->s.vertnbr * sizeof (BgraphBipartGpVertex)); /* Initialize pass numbers */
+  memSet(vexxtax, 0,
+         grafptr->s.vertnbr *
+             sizeof(BgraphBipartGpVertex)); /* Initialize pass numbers */
   vexxtax -= grafptr->s.baseval;
 
-  compsize0    = grafptr->s.vertnbr;              /* All vertices in part zero */
+  compsize0 = grafptr->s.vertnbr; /* All vertices in part zero */
   compload0dlt = grafptr->s.velosum - grafptr->compload0avg;
   commloadintn = 0;
   commloadextn = 0;
-  for (rootnum = grafptr->s.baseval;              /* Loop on connected components */
-       (rootnum < grafptr->s.vertnnd) && (compload0dlt > 0); rootnum ++) {
-    Gnum                passnum;                  /* Pass number                                        */
-    Gnum                diamnum;                  /* Number of current diameter vertex                  */
-    Gnum                diamval;                  /* Current diameter value                             */
-    Gnum                diamdeg;                  /* Degree of current diameter vertex                  */
-    int                 diamflag;                 /* Flag set if improvement in diameter between passes */
+  for (rootnum = grafptr->s.baseval; /* Loop on connected components */
+       (rootnum < grafptr->s.vertnnd) && (compload0dlt > 0); rootnum++) {
+    Gnum passnum; /* Pass number                                        */
+    Gnum diamnum; /* Number of current diameter vertex                  */
+    Gnum diamval; /* Current diameter value                             */
+    Gnum diamdeg; /* Degree of current diameter vertex                  */
+    int diamflag; /* Flag set if improvement in diameter between passes */
 
-    while (vexxtax[rootnum].passnum != 0)         /* Find first unallocated vertex */
-      rootnum ++;
+    while (vexxtax[rootnum].passnum != 0) /* Find first unallocated vertex */
+      rootnum++;
 
-    for (diamnum = rootnum, diamval = diamdeg = 0, diamflag = 1, passnum = 1; /* Start from root   */
-         (passnum < paraptr->passnbr) && (diamflag -- != 0); passnum ++) { /* Loop if improvements */
-      bgraphBipartGpQueueFlush (&queudat);        /* Flush vertex queue                            */
-      bgraphBipartGpQueuePut   (&queudat, diamnum); /* Start from diameter vertex                  */
-      vexxtax[diamnum].passnum = passnum;         /* It has been enqueued                          */
+    for (diamnum = rootnum, diamval = diamdeg = 0, diamflag = 1,
+        passnum = 1; /* Start from root   */
+         (passnum < paraptr->passnbr) && (diamflag-- != 0);
+         passnum++) {                     /* Loop if improvements */
+      bgraphBipartGpQueueFlush(&queudat); /* Flush vertex queue */
+      bgraphBipartGpQueuePut(&queudat,
+                             diamnum);    /* Start from diameter vertex    */
+      vexxtax[diamnum].passnum = passnum; /* It has been enqueued */
       vexxtax[diamnum].distval = 0;
 
-      do {                                        /* Loop on vertices in queue */
-        Gnum                vertnum;
-        Gnum                distval;
-        Gnum                edgenum;
+      do { /* Loop on vertices in queue */
+        Gnum vertnum;
+        Gnum distval;
+        Gnum edgenum;
 
-        vertnum = bgraphBipartGpQueueGet (&queudat); /* Get vertex from queue */
-        distval = vexxtax[vertnum].distval;       /* Get vertex distance      */
+        vertnum = bgraphBipartGpQueueGet(&queudat); /* Get vertex from queue */
+        distval = vexxtax[vertnum].distval; /* Get vertex distance      */
 
-        if ((distval > diamval) ||                /* If vertex increases diameter         */
-            ((distval == diamval) &&              /* Or is at diameter distance           */
-             ((vendtax[vertnum] - verttax[vertnum]) < diamdeg))) { /* With smaller degree */
-          diamnum  = vertnum;                     /* Set it as new diameter vertex        */
-          diamval  = distval;
-          diamdeg  = vendtax[vertnum] - verttax[vertnum];
+        if ((distval > diamval) ||   /* If vertex increases diameter         */
+            ((distval == diamval) && /* Or is at diameter distance           */
+             ((vendtax[vertnum] - verttax[vertnum]) <
+              diamdeg))) {   /* With smaller degree */
+          diamnum = vertnum; /* Set it as new diameter vertex        */
+          diamval = distval;
+          diamdeg = vendtax[vertnum] - verttax[vertnum];
           diamflag = 1;
         }
 
-        distval ++;                               /* Set neighbor distance */
-        for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum]; edgenum ++) {
-          Gnum                vertend;            /* End vertex number */
+        distval++; /* Set neighbor distance */
+        for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum];
+             edgenum++) {
+          Gnum vertend; /* End vertex number */
 
           vertend = edgetax[edgenum];
-          if (vexxtax[vertend].passnum < passnum) { /* If vertex not yet queued      */
-            bgraphBipartGpQueuePut (&queudat, vertend); /* Enqueue neighbor vertex */
+          if (vexxtax[vertend].passnum <
+              passnum) { /* If vertex not yet queued      */
+            bgraphBipartGpQueuePut(&queudat,
+                                   vertend); /* Enqueue neighbor vertex */
             vexxtax[vertend].passnum = passnum;
             vexxtax[vertend].distval = distval;
           }
         }
-      } while (! bgraphBipartGpQueueEmpty (&queudat)); /* As long as queue is not empty */
+      } while (!bgraphBipartGpQueueEmpty(
+          &queudat)); /* As long as queue is not empty */
     }
 
-    bgraphBipartGpQueueFlush (&queudat);          /* Flush vertex queue         */
-    bgraphBipartGpQueuePut   (&queudat, diamnum); /* Start from diameter vertex */
-    vexxtax[diamnum].passnum = passnum;           /* It has been enqueued       */
+    bgraphBipartGpQueueFlush(&queudat);        /* Flush vertex queue         */
+    bgraphBipartGpQueuePut(&queudat, diamnum); /* Start from diameter vertex */
+    vexxtax[diamnum].passnum = passnum;        /* It has been enqueued       */
     vexxtax[diamnum].distval = 0;
 
-    do {                                          /* Loop on vertices in queue */
-      Gnum                vertnum;
-      Gnum                distval;
-      Gnum                edgenum;
+    do { /* Loop on vertices in queue */
+      Gnum vertnum;
+      Gnum distval;
+      Gnum edgenum;
 
-      vertnum = bgraphBipartGpQueueGet (&queudat); /* Get vertex from queue         */
-      grafptr->parttax[vertnum] = 1;              /* Move selected vertex to part 1 */
-      compsize0    --;
+      vertnum = bgraphBipartGpQueueGet(&queudat); /* Get vertex from queue */
+      grafptr->parttax[vertnum] = 1; /* Move selected vertex to part 1 */
+      compsize0--;
       compload0dlt -= (velotax != NULL) ? velotax[vertnum] : 1;
       if (veextax != NULL)
         commloadextn += veextax[vertnum];
 
       distval = vexxtax[vertnum].distval + 1;
-      for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum]; edgenum ++) {
-        Gnum                vertend;              /* End vertex number */
+      for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum]; edgenum++) {
+        Gnum vertend; /* End vertex number */
 
         vertend = edgetax[edgenum];
-        if (vexxtax[vertend].passnum < passnum) { /* If vertex not yet queued    */
-          bgraphBipartGpQueuePut (&queudat, vertend); /* Enqueue neighbor vertex */
+        if (vexxtax[vertend].passnum <
+            passnum) { /* If vertex not yet queued    */
+          bgraphBipartGpQueuePut(&queudat,
+                                 vertend); /* Enqueue neighbor vertex */
           vexxtax[vertend].passnum = passnum;
           vexxtax[vertend].distval = distval;
         }
       }
-    } while ((compload0dlt > 0) && (! bgraphBipartGpQueueEmpty (&queudat))); /* As long as balance not achieved and queue is not empty */
+    } while ((compload0dlt > 0) &&
+             (!bgraphBipartGpQueueEmpty(
+                 &queudat))); /* As long as balance not achieved and queue is
+                                 not empty */
 
-    if (! bgraphBipartGpQueueEmpty (&queudat)) {  /* If frontier non empty */
-      Gnum                edloval;
-      Gnum                fronnbr;
+    if (!bgraphBipartGpQueueEmpty(&queudat)) { /* If frontier non empty */
+      Gnum edloval;
+      Gnum fronnbr;
 
-      fronnbr = 0;                                /* No frontier yet      */
-      edloval = 1;                                /* Assume no edge loads */
+      fronnbr = 0; /* No frontier yet      */
+      edloval = 1; /* Assume no edge loads */
       do {
-        Gnum                vertnum;
-        Gnum                edgenum;
+        Gnum vertnum;
+        Gnum edgenum;
 
-        vertnum = bgraphBipartGpQueueGet (&queudat); /* Get vertex from queue */
-        grafptr->frontab[fronnbr ++] = vertnum;
+        vertnum = bgraphBipartGpQueueGet(&queudat); /* Get vertex from queue */
+        grafptr->frontab[fronnbr++] = vertnum;
 #ifdef SCOTCH_DEBUG_BGRAPH2
         if (grafptr->parttax[vertnum] != 0) {
-          errorPrint ("bgraphBipartGp: internal error");
-          return     (1);
+          errorPrint("bgraphBipartGp: internal error");
+          return (1);
         }
 #endif /* SCOTCH_DEBUG_BGRAPH2 */
 
-        for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum]; edgenum ++) {
-          Gnum                vertend;            /* End vertex number */
+        for (edgenum = verttax[vertnum]; edgenum < vendtax[vertnum];
+             edgenum++) {
+          Gnum vertend; /* End vertex number */
 
           vertend = edgetax[edgenum];
-          if (grafptr->parttax[vertend] == 1) {   /* If vertex belongs to other part */
+          if (grafptr->parttax[vertend] ==
+              1) { /* If vertex belongs to other part */
             if (edlotax != NULL)
               edloval = edlotax[edgenum];
             commloadintn += edloval;
-            if (vexxtax[vertend].distval != ~0) { /* If neighbor vertex not already put in frontier */
-              grafptr->frontab[fronnbr ++] = vertend; /* Record it in frontier                      */
-              vexxtax[vertend].distval = ~0;      /* Set it as recorded                             */
+            if (vexxtax[vertend].distval !=
+                ~0) { /* If neighbor vertex not already put in frontier */
+              grafptr->frontab[fronnbr++] =
+                  vertend; /* Record it in frontier                      */
+              vexxtax[vertend].distval = ~0; /* Set it as recorded */
             }
           }
         }
-      } while (! bgraphBipartGpQueueEmpty (&queudat));
+      } while (!bgraphBipartGpQueueEmpty(&queudat));
       grafptr->fronnbr = fronnbr;
-      break;                                      /* No need to process rest of graph */
-    }                                             /* Else grafptr->fronnbr = 0 anyway */
+      break; /* No need to process rest of graph */
+    }        /* Else grafptr->fronnbr = 0 anyway */
   }
 
-  grafptr->compload0    = grafptr->compload0avg + compload0dlt;
+  grafptr->compload0 = grafptr->compload0avg + compload0dlt;
   grafptr->compload0dlt = compload0dlt;
-  grafptr->compsize0    = compsize0;
-  grafptr->commload     = grafptr->commloadextn0 + commloadextn + commloadintn * grafptr->domndist;
+  grafptr->compsize0 = compsize0;
+  grafptr->commload =
+      grafptr->commloadextn0 + commloadextn + commloadintn * grafptr->domndist;
   grafptr->commgainextn = grafptr->commgainextn0 - commloadextn * 2;
-  grafptr->bbalval      = (double) ((grafptr->compload0dlt < 0) ? (- grafptr->compload0dlt) : grafptr->compload0dlt) / (double) grafptr->compload0avg;
+  grafptr->bbalval =
+      (double)((grafptr->compload0dlt < 0) ? (-grafptr->compload0dlt)
+                                           : grafptr->compload0dlt) /
+      (double)grafptr->compload0avg;
 
-  memFree (queudat.queutab);                      /* Free group leader */
+  memFree(queudat.queutab); /* Free group leader */
 
 #ifdef SCOTCH_DEBUG_BGRAPH2
-  if (bgraphCheck (grafptr) != 0) {
-    errorPrint ("bgraphBipartGp: inconsistent graph data");
-    return     (1);
+  if (bgraphCheck(grafptr) != 0) {
+    errorPrint("bgraphBipartGp: inconsistent graph data");
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_BGRAPH2 */
 

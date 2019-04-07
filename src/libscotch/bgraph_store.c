@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -73,18 +73,17 @@
 ** - !0  : on error.
 */
 
-int
-bgraphStoreInit (
-const Bgraph * const        grafptr,
-BgraphStore * const         storptr)
-{
-  Gnum                savsize;
+int bgraphStoreInit(const Bgraph *const grafptr, BgraphStore *const storptr) {
+  Gnum savsize;
 
-  savsize = (grafptr->s.vertnnd - grafptr->s.baseval) * (sizeof (GraphPart) + sizeof (Gnum)); /* Compute size for frontier and part arrays */
+  savsize = (grafptr->s.vertnnd - grafptr->s.baseval) *
+            (sizeof(GraphPart) +
+             sizeof(Gnum)); /* Compute size for frontier and part arrays */
 
-  if ((storptr->datatab = (byte *) memAlloc (savsize)) == NULL) { /* Allocate save structure */
-    errorPrint ("bgraphStoreInit: out of memory");
-    return     (1);
+  if ((storptr->datatab = (byte *)memAlloc(savsize)) ==
+      NULL) { /* Allocate save structure */
+    errorPrint("bgraphStoreInit: out of memory");
+    return (1);
   }
 
   return (0);
@@ -95,11 +94,8 @@ BgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-bgraphStoreExit (
-BgraphStore * const         storptr)
-{
-  memFree (storptr->datatab);
+void bgraphStoreExit(BgraphStore *const storptr) {
+  memFree(storptr->datatab);
 #ifdef SCOTCH_DEBUG_BGRAPH2
   storptr->datatab = NULL;
 #endif /* SCOTCH_DEBUG_BGRAPH2 */
@@ -111,27 +107,24 @@ BgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-bgraphStoreSave (
-const Bgraph * const        grafptr,
-BgraphStore * const         storptr)
-{
-  Gnum                vertnbr;                    /* Number of vertices in graph        */
-  byte *              parttab;                    /* Pointer to part data save area     */
-  byte *              frontab;                    /* Pointer to frontier data save area */
+void bgraphStoreSave(const Bgraph *const grafptr, BgraphStore *const storptr) {
+  Gnum vertnbr;  /* Number of vertices in graph        */
+  byte *parttab; /* Pointer to part data save area     */
+  byte *frontab; /* Pointer to frontier data save area */
 
-  storptr->fronnbr      = grafptr->fronnbr;       /* Save partition parameters */
+  storptr->fronnbr = grafptr->fronnbr; /* Save partition parameters */
   storptr->compload0dlt = grafptr->compload0dlt;
-  storptr->compsize0    = grafptr->compsize0;
-  storptr->commload     = grafptr->commload;
+  storptr->compsize0 = grafptr->compsize0;
+  storptr->commload = grafptr->commload;
   storptr->commgainextn = grafptr->commgainextn;
 
-  frontab = storptr->datatab;                     /* Compute data offsets within save structure */
-  parttab = frontab + grafptr->fronnbr * sizeof (Gnum);
+  frontab = storptr->datatab; /* Compute data offsets within save structure */
+  parttab = frontab + grafptr->fronnbr * sizeof(Gnum);
 
   vertnbr = grafptr->s.vertnnd - grafptr->s.baseval;
-  memCpy (frontab, grafptr->frontab, grafptr->fronnbr * sizeof (Gnum));
-  memCpy (parttab, grafptr->parttax + grafptr->s.baseval, vertnbr * sizeof (GraphPart));
+  memCpy(frontab, grafptr->frontab, grafptr->fronnbr * sizeof(Gnum));
+  memCpy(parttab, grafptr->parttax + grafptr->s.baseval,
+         vertnbr * sizeof(GraphPart));
 }
 
 /* This routine updates partition data of the
@@ -140,32 +133,32 @@ BgraphStore * const         storptr)
 ** - VOID  : in all cases.
 */
 
-void
-bgraphStoreUpdt (
-Bgraph * const              grafptr,
-const BgraphStore * const   storptr)
-{
-  Gnum                vertnbr;                    /* Number of vertices in graph        */
-  byte *              frontab;                    /* Pointer to frontier data save area */
-  byte *              parttab;                    /* Pointer to part data save area     */
+void bgraphStoreUpdt(Bgraph *const grafptr, const BgraphStore *const storptr) {
+  Gnum vertnbr;  /* Number of vertices in graph        */
+  byte *frontab; /* Pointer to frontier data save area */
+  byte *parttab; /* Pointer to part data save area     */
 
-  grafptr->fronnbr      = storptr->fronnbr;       /* Load partition parameters */
-  grafptr->compload0    = storptr->compload0dlt + grafptr->compload0avg;
+  grafptr->fronnbr = storptr->fronnbr; /* Load partition parameters */
+  grafptr->compload0 = storptr->compload0dlt + grafptr->compload0avg;
   grafptr->compload0dlt = storptr->compload0dlt;
-  grafptr->compsize0    = storptr->compsize0;
-  grafptr->commload     = storptr->commload;
+  grafptr->compsize0 = storptr->compsize0;
+  grafptr->commload = storptr->commload;
   grafptr->commgainextn = storptr->commgainextn;
-  grafptr->bbalval      = (double) ((grafptr->compload0dlt < 0) ? (- grafptr->compload0dlt) : grafptr->compload0dlt) / (double) grafptr->compload0avg;
+  grafptr->bbalval =
+      (double)((grafptr->compload0dlt < 0) ? (-grafptr->compload0dlt)
+                                           : grafptr->compload0dlt) /
+      (double)grafptr->compload0avg;
 
-  frontab = storptr->datatab;                     /* Compute data offsets within save structure */
-  parttab = frontab + grafptr->fronnbr * sizeof (Gnum);
+  frontab = storptr->datatab; /* Compute data offsets within save structure */
+  parttab = frontab + grafptr->fronnbr * sizeof(Gnum);
 
   vertnbr = grafptr->s.vertnnd - grafptr->s.baseval;
-  memCpy (grafptr->frontab, frontab, grafptr->fronnbr * sizeof (Gnum));
-  memCpy (grafptr->parttax + grafptr->s.baseval, parttab, vertnbr * sizeof (GraphPart));
+  memCpy(grafptr->frontab, frontab, grafptr->fronnbr * sizeof(Gnum));
+  memCpy(grafptr->parttax + grafptr->s.baseval, parttab,
+         vertnbr * sizeof(GraphPart));
 
 #ifdef SCOTCH_DEBUG_BGRAPH2
-  if (bgraphCheck (grafptr) != 0)
-    errorPrint ("bgraphStoreUpdt: inconsistent graph data");
+  if (bgraphCheck(grafptr) != 0)
+    errorPrint("bgraphStoreUpdt: inconsistent graph data");
 #endif /* SCOTCH_DEBUG_BGRAPH2 */
 }

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -61,35 +61,37 @@
 /*+ Method parameters. +*/
 
 typedef struct BgraphBipartGpParam_ {
-  INT                       passnbr;              /*+ Number of passes to do +*/
+  INT passnbr; /*+ Number of passes to do +*/
 } BgraphBipartGpParam;
 
 /*+ Complementary vertex structure. +*/
 
 typedef struct BgraphBipartGpVertex_ {
-  Gnum                      passnum;              /*+ Number of pass when vertex selected   +*/
-  Gnum                      distval;              /*+ Current distance from diameter vertex +*/
+  Gnum passnum; /*+ Number of pass when vertex selected   +*/
+  Gnum distval; /*+ Current distance from diameter vertex +*/
 } BgraphBipartGpVertex;
 
 /*+ Neighbor queue. +*/
 
 typedef struct BgraphBipartGpQueue_ {
-  Gnum                      headnum;              /*+ Head of distance queue  +*/
-  Gnum                      tailnum;              /*+ Tail of distance queue  +*/
-  Gnum *                    queutab;              /*+ Array of queue elements +*/
+  Gnum headnum;  /*+ Head of distance queue  +*/
+  Gnum tailnum;  /*+ Tail of distance queue  +*/
+  Gnum *queutab; /*+ Array of queue elements +*/
 } BgraphBipartGpQueue;
 
 /*
 **  The function prototypes.
 */
 
-int                         bgraphBipartGp      (Bgraph * restrict const, const BgraphBipartGpParam * const);
+int bgraphBipartGp(Bgraph *restrict const, const BgraphBipartGpParam *const);
 
 /*
 **  The macro definitions.
 */
 
-#define bgraphBipartGpQueueFlush(queue) ((queue)->headnum = (queue)->tailnum = 0)
+#define bgraphBipartGpQueueFlush(queue)                                        \
+  ((queue)->headnum = (queue)->tailnum = 0)
 #define bgraphBipartGpQueueEmpty(queue) ((queue)->headnum <= (queue)->tailnum)
-#define bgraphBipartGpQueuePut(queue,vnum) ((queue)->queutab[(queue)->headnum ++] = (vnum))
-#define bgraphBipartGpQueueGet(queue) ((queue)->queutab[(queue)->tailnum ++])
+#define bgraphBipartGpQueuePut(queue, vnum)                                    \
+  ((queue)->queutab[(queue)->headnum++] = (vnum))
+#define bgraphBipartGpQueueGet(queue) ((queue)->queutab[(queue)->tailnum++])

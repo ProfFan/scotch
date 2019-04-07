@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -69,97 +69,76 @@
 **
 */
 
-SCOTCH_FORTRAN (                      \
-DGRAPHINIT, dgraphinit, (             \
-SCOTCH_Dgraph * const       grafptr,  \
-const MPI_Fint * const      commptr,  \
-int * const                 revaptr), \
-(grafptr, commptr, revaptr))
-{
-  MPI_Comm            commdat;
+SCOTCH_FORTRAN(DGRAPHINIT, dgraphinit,
+               (SCOTCH_Dgraph *const grafptr, const MPI_Fint *const commptr,
+                int *const revaptr),
+               (grafptr, commptr, revaptr)) {
+  MPI_Comm commdat;
 
-  commdat = MPI_Comm_f2c (*commptr);
-  *revaptr = SCOTCH_dgraphInit (grafptr, commdat);
+  commdat = MPI_Comm_f2c(*commptr);
+  *revaptr = SCOTCH_dgraphInit(grafptr, commdat);
 }
 
 /*
 **
 */
 
-SCOTCH_FORTRAN (                      \
-DGRAPHEXIT, dgraphexit, (             \
-SCOTCH_Dgraph * const       grafptr), \
-(grafptr))
-{
-  SCOTCH_dgraphExit (grafptr);
+SCOTCH_FORTRAN(DGRAPHEXIT, dgraphexit, (SCOTCH_Dgraph *const grafptr),
+               (grafptr)) {
+  SCOTCH_dgraphExit(grafptr);
 }
 
 /*
 **
 */
 
-SCOTCH_FORTRAN (                         \
-DGRAPHSIZE, dgraphsize, (                \
-const SCOTCH_Dgraph * const grafptr,     \
-SCOTCH_Num * const          vertglbptr,  \
-SCOTCH_Num * const          vertlocptr,  \
-SCOTCH_Num * const          edgeglbptr,  \
-SCOTCH_Num * const          edgelocptr), \
-(grafptr, vertglbptr, vertlocptr, edgeglbptr, edgelocptr))
-{
-  SCOTCH_dgraphSize (grafptr, vertglbptr, vertlocptr, edgeglbptr, edgelocptr);
+SCOTCH_FORTRAN(DGRAPHSIZE, dgraphsize,
+               (const SCOTCH_Dgraph *const grafptr,
+                SCOTCH_Num *const vertglbptr, SCOTCH_Num *const vertlocptr,
+                SCOTCH_Num *const edgeglbptr, SCOTCH_Num *const edgelocptr),
+               (grafptr, vertglbptr, vertlocptr, edgeglbptr, edgelocptr)) {
+  SCOTCH_dgraphSize(grafptr, vertglbptr, vertlocptr, edgeglbptr, edgelocptr);
 }
 
 /*
 **
 */
 
-SCOTCH_FORTRAN (                        \
-DGRAPHDATA, dgraphdata, (               \
-const SCOTCH_Dgraph * const grafptr,    \
-const SCOTCH_Num * const    indxptr,    \
-SCOTCH_Num * const          baseptr,    \
-SCOTCH_Num * const          vertglbptr, \
-SCOTCH_Num * const          vertlocptr, \
-SCOTCH_Num * const          vertlocptz, \
-SCOTCH_Num * const          vertgstptr, \
-SCOTCH_Idx * const          vertlocidx, \
-SCOTCH_Idx * const          vendlocidx, \
-SCOTCH_Idx * const          velolocidx, \
-SCOTCH_Idx * const          vlbllocidx, \
-SCOTCH_Num * const          edgeglbptr, \
-SCOTCH_Num * const          edgelocptr, \
-SCOTCH_Num * const          edgelocptz, \
-SCOTCH_Idx * const          edgelocidx, \
-SCOTCH_Idx * const          edgegstidx, \
-SCOTCH_Idx * const          edlolocidx, \
-MPI_Fint * const            commptr),   \
-(grafptr, indxptr, baseptr,             \
- vertglbptr, vertlocptr, vertlocptz,    \
- vertgstptr, vertlocidx, vendlocidx,    \
- velolocidx, vlbllocidx, edgeglbptr,    \
- edgelocptr, edgelocptz, edgelocidx,    \
- edgegstidx, edlolocidx, commptr))
-{
-  SCOTCH_Num *        vertloctab;                 /* Pointer to graph arrays */
-  SCOTCH_Num *        vendloctab;
-  SCOTCH_Num *        veloloctab;
-  SCOTCH_Num *        vlblloctab;
-  SCOTCH_Num *        edgeloctab;
-  SCOTCH_Num *        edgegsttab;
-  SCOTCH_Num *        edloloctab;
-  MPI_Comm            commdat;
+SCOTCH_FORTRAN(DGRAPHDATA, dgraphdata,
+               (const SCOTCH_Dgraph *const grafptr,
+                const SCOTCH_Num *const indxptr, SCOTCH_Num *const baseptr,
+                SCOTCH_Num *const vertglbptr, SCOTCH_Num *const vertlocptr,
+                SCOTCH_Num *const vertlocptz, SCOTCH_Num *const vertgstptr,
+                SCOTCH_Idx *const vertlocidx, SCOTCH_Idx *const vendlocidx,
+                SCOTCH_Idx *const velolocidx, SCOTCH_Idx *const vlbllocidx,
+                SCOTCH_Num *const edgeglbptr, SCOTCH_Num *const edgelocptr,
+                SCOTCH_Num *const edgelocptz, SCOTCH_Idx *const edgelocidx,
+                SCOTCH_Idx *const edgegstidx, SCOTCH_Idx *const edlolocidx,
+                MPI_Fint *const commptr),
+               (grafptr, indxptr, baseptr, vertglbptr, vertlocptr, vertlocptz,
+                vertgstptr, vertlocidx, vendlocidx, velolocidx, vlbllocidx,
+                edgeglbptr, edgelocptr, edgelocptz, edgelocidx, edgegstidx,
+                edlolocidx, commptr)) {
+  SCOTCH_Num *vertloctab; /* Pointer to graph arrays */
+  SCOTCH_Num *vendloctab;
+  SCOTCH_Num *veloloctab;
+  SCOTCH_Num *vlblloctab;
+  SCOTCH_Num *edgeloctab;
+  SCOTCH_Num *edgegsttab;
+  SCOTCH_Num *edloloctab;
+  MPI_Comm commdat;
 
-  SCOTCH_dgraphData (grafptr, baseptr, vertglbptr, vertlocptr, vertlocptz, vertgstptr,
-                     &vertloctab, &vendloctab, &veloloctab, &vlblloctab,
-                     edgeglbptr, edgelocptr, edgelocptz,
-                     &edgeloctab, &edgegsttab, &edloloctab, &commdat);
-  *vertlocidx = (vertloctab - indxptr) + 1;       /* Add 1 since Fortran indices start at 1 */
+  SCOTCH_dgraphData(grafptr, baseptr, vertglbptr, vertlocptr, vertlocptz,
+                    vertgstptr, &vertloctab, &vendloctab, &veloloctab,
+                    &vlblloctab, edgeglbptr, edgelocptr, edgelocptz,
+                    &edgeloctab, &edgegsttab, &edloloctab, &commdat);
+  *vertlocidx =
+      (vertloctab - indxptr) + 1; /* Add 1 since Fortran indices start at 1 */
   *vendlocidx = (vendloctab - indxptr) + 1;
   *velolocidx = (veloloctab != NULL) ? (veloloctab - indxptr) + 1 : *vertlocidx;
   *vlbllocidx = (vlblloctab != NULL) ? (vlblloctab - indxptr) + 1 : *vertlocidx;
   *edgelocidx = (edgeloctab - indxptr) + 1;
   *edgegstidx = (edgegsttab != NULL) ? (edgegsttab - indxptr) + 1 : *vertlocidx;
   *edlolocidx = (edloloctab != NULL) ? (edloloctab - indxptr) + 1 : *vertlocidx;
-  *commptr = MPI_Comm_c2f (commdat);
+  *commptr = MPI_Comm_c2f(commdat);
 }

@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010,2013,2016 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010,2013,2016 IPB, Universite de Bordeaux, INRIA &
+*CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -75,186 +76,181 @@
 ** - !0  : on error.
 */
 
-int
-graphGeomLoadChac (
-Graph * restrict const      grafptr,              /* Graph to load    */
-Geom * restrict const       geomptr,              /* Geometry to load */
-FILE * const                filesrcptr,           /* Topological data */
-FILE * const                filegeoptr,           /* No use           */
-const char * const          dataptr)              /* No use           */
+int graphGeomLoadChac(Graph *restrict const grafptr, /* Graph to load    */
+                      Geom *restrict const geomptr,  /* Geometry to load */
+                      FILE *const filesrcptr,        /* Topological data */
+                      FILE *const filegeoptr,        /* No use           */
+                      const char *const dataptr)     /* No use           */
 {
-  char              chalinetab[80];               /* Header line                */
-  long              chavertnbr;                   /* Number of vertices         */
-  Gnum              chavertnum;                   /* Number of vertex read      */
-  long              chaedgenbr;                   /* Number of edges            */
-  long              chaflagval;                   /* Flag on numeric form       */
-  char              chaflagstr[4];                /* Flag for optional data     */
-  int               chabuffcar;                   /* Buffer for line processing */
-  Gnum              vertnum;
-  Gnum              velosiz;
-  Gnum              velosum;
-  Gnum              vlblsiz;
-  Gnum              vlblmax;
-  Gnum              edgenum;
-  Gnum              edlosiz;
-  Gnum              edlosum;
-  Gnum              degrmax;
+  char chalinetab[80]; /* Header line                */
+  long chavertnbr;     /* Number of vertices         */
+  Gnum chavertnum;     /* Number of vertex read      */
+  long chaedgenbr;     /* Number of edges            */
+  long chaflagval;     /* Flag on numeric form       */
+  char chaflagstr[4];  /* Flag for optional data     */
+  int chabuffcar;      /* Buffer for line processing */
+  Gnum vertnum;
+  Gnum velosiz;
+  Gnum velosum;
+  Gnum vlblsiz;
+  Gnum vlblmax;
+  Gnum edgenum;
+  Gnum edlosiz;
+  Gnum edlosum;
+  Gnum degrmax;
 
-  do {                                            /* Skip comment lines   */
-    chabuffcar = getc (filesrcptr);               /* Read first character */
-    if (chabuffcar == '%') {                      /* If comment line      */
-      fscanf (filesrcptr, "%*[^\n]");             /* Purge line           */
-      getc   (filesrcptr);                        /* Purge newline        */
+  do {                               /* Skip comment lines   */
+    chabuffcar = getc(filesrcptr);   /* Read first character */
+    if (chabuffcar == '%') {         /* If comment line      */
+      fscanf(filesrcptr, "%*[^\n]"); /* Purge line           */
+      getc(filesrcptr);              /* Purge newline        */
     }
   } while (chabuffcar == '%');
-  ungetc (chabuffcar, filesrcptr);
+  ungetc(chabuffcar, filesrcptr);
 
   chaflagval = 0;
-  if ((fscanf (filesrcptr, "%79[^\n]%*[^\n]", chalinetab) != 1) || /* Read graph header */
-      (sscanf (chalinetab, "%ld%ld%ld",
-               &chavertnbr,
-               &chaedgenbr,
-               &chaflagval) < 2)) {
-    errorPrint ("graphGeomLoadChac: bad input (1)");
-    return     (1);
+  if ((fscanf(filesrcptr, "%79[^\n]%*[^\n]", chalinetab) !=
+       1) || /* Read graph header */
+      (sscanf(chalinetab, "%ld%ld%ld", &chavertnbr, &chaedgenbr, &chaflagval) <
+       2)) {
+    errorPrint("graphGeomLoadChac: bad input (1)");
+    return (1);
   }
-  getc (filesrcptr);                              /* Purge newline; cannot be merged with fscanf above */
+  getc(filesrcptr); /* Purge newline; cannot be merged with fscanf above */
 
-  chaflagstr[0] =                                 /* Pre-set flag array */
-  chaflagstr[1] =
-  chaflagstr[2] =
-  chaflagstr[3] = '\0';
+  chaflagstr[0] = /* Pre-set flag array */
+      chaflagstr[1] = chaflagstr[2] = chaflagstr[3] = '\0';
   chaflagstr[0] = '0' + ((chaflagval / 100) % 10); /* Set the flags */
-  chaflagstr[1] = '0' + ((chaflagval / 10)  % 10);
-  chaflagstr[2] = '0' + ((chaflagval)       % 10);
+  chaflagstr[1] = '0' + ((chaflagval / 10) % 10);
+  chaflagstr[2] = '0' + ((chaflagval) % 10);
 
   grafptr->flagval = GRAPHFREETABS | GRAPHVERTGROUP | GRAPHEDGEGROUP;
-  grafptr->baseval = 1;                         /* Chaco graphs are based */
+  grafptr->baseval = 1; /* Chaco graphs are based */
   grafptr->vertnbr = chavertnbr;
   grafptr->vertnnd = chavertnbr + 1;
-  grafptr->edgenbr = chaedgenbr * 2;            /* We are counting arcs */
+  grafptr->edgenbr = chaedgenbr * 2; /* We are counting arcs */
 
   vlblsiz = (chaflagstr[0] != '0') ? grafptr->vertnbr : 0;
   velosiz = (chaflagstr[1] != '0') ? grafptr->vertnbr : 0;
   edlosiz = (chaflagstr[2] != '0') ? grafptr->edgenbr : 0;
 
-  if ((memAllocGroup ((void **) (void *)
-                      &grafptr->verttax, (size_t) (grafptr->vertnnd * sizeof (Gnum)),
-                      &grafptr->velotax, (size_t) (velosiz          * sizeof (Gnum)),
-                      &grafptr->vlbltax, (size_t) (vlblsiz          * sizeof (Gnum)), NULL) == NULL) ||
-      (memAllocGroup ((void **) (void *)
-                      &grafptr->edgetax, (size_t) (grafptr->edgenbr * sizeof (Gnum)),
-                      &grafptr->edlotax, (size_t) (edlosiz          * sizeof (Gnum)), NULL) == NULL)) {
+  if ((memAllocGroup((void **)(void *)&grafptr->verttax,
+                     (size_t)(grafptr->vertnnd * sizeof(Gnum)),
+                     &grafptr->velotax, (size_t)(velosiz * sizeof(Gnum)),
+                     &grafptr->vlbltax, (size_t)(vlblsiz * sizeof(Gnum)),
+                     NULL) == NULL) ||
+      (memAllocGroup((void **)(void *)&grafptr->edgetax,
+                     (size_t)(grafptr->edgenbr * sizeof(Gnum)),
+                     &grafptr->edlotax, (size_t)(edlosiz * sizeof(Gnum)),
+                     NULL) == NULL)) {
     if (grafptr->verttax != NULL)
-      memFree (grafptr->verttax);
-    errorPrint ("graphGeomLoadChac: out of memory");
-    return     (1);
+      memFree(grafptr->verttax);
+    errorPrint("graphGeomLoadChac: out of memory");
+    return (1);
   }
-  grafptr->verttax --;
+  grafptr->verttax--;
   grafptr->vendtax = grafptr->verttax + 1;
   grafptr->vlbltax = (chaflagstr[0] != '0') ? (grafptr->vlbltax - 1) : NULL;
-  grafptr->edgetax --;
+  grafptr->edgetax--;
   if (chaflagstr[1] != '0') {
-    grafptr->velotax --;
+    grafptr->velotax--;
     velosum = 0;
-  }
-  else {
+  } else {
     grafptr->velotax = NULL;
-    velosum = grafptr->vertnbr;                   /* No vertex loads */
+    velosum = grafptr->vertnbr; /* No vertex loads */
   }
   if (chaflagstr[2] != '0') {
-    grafptr->edlotax --;
+    grafptr->edlotax--;
     edlosum = 0;
-  }
-  else {
+  } else {
     grafptr->edlotax = NULL;
     edlosum = grafptr->edgenbr;
   }
 
-  for (vertnum = edgenum = 1, degrmax = vlblmax = 0;
-       vertnum < grafptr->vertnnd; vertnum ++) {
-    do {                                          /* Skip comment lines   */
-      chabuffcar = getc (filesrcptr);             /* Read first character */
-      if (chabuffcar == '%') {                    /* If comment line      */
-        fscanf (filesrcptr, "%*[^\n]");           /* Purge line           */
-        getc   (filesrcptr);                      /* Purge newline        */
+  for (vertnum = edgenum = 1, degrmax = vlblmax = 0; vertnum < grafptr->vertnnd;
+       vertnum++) {
+    do {                               /* Skip comment lines   */
+      chabuffcar = getc(filesrcptr);   /* Read first character */
+      if (chabuffcar == '%') {         /* If comment line      */
+        fscanf(filesrcptr, "%*[^\n]"); /* Purge line           */
+        getc(filesrcptr);              /* Purge newline        */
       }
     } while (chabuffcar == '%');
-    ungetc (chabuffcar, filesrcptr);              /* Put character back to filesrcptr */
+    ungetc(chabuffcar, filesrcptr); /* Put character back to filesrcptr */
 
     if (grafptr->vlbltax != NULL) {
-      if ((intLoad (filesrcptr, &grafptr->vlbltax[vertnum]) != 1) ||
-          (grafptr->vlbltax[vertnum] < 1)                         ||
+      if ((intLoad(filesrcptr, &grafptr->vlbltax[vertnum]) != 1) ||
+          (grafptr->vlbltax[vertnum] < 1) ||
           (grafptr->vlbltax[vertnum] > chavertnbr)) {
-        errorPrint ("graphGeomLoadChac: bad input (2)");
-        graphFree  (grafptr);
-        return     (1);
+        errorPrint("graphGeomLoadChac: bad input (2)");
+        graphFree(grafptr);
+        return (1);
       }
       if (grafptr->vlbltax[vertnum] > vlblmax)
         vlblmax = grafptr->vlbltax[vertnum];
     }
     if (grafptr->velotax != NULL) {
-      if ((intLoad (filesrcptr, &grafptr->velotax[vertnum]) != 1) ||
+      if ((intLoad(filesrcptr, &grafptr->velotax[vertnum]) != 1) ||
           (grafptr->velotax[vertnum] < 1)) {
-        errorPrint ("graphGeomLoadChac: bad input (3)");
-        graphFree  (grafptr);
-        return     (1);
+        errorPrint("graphGeomLoadChac: bad input (3)");
+        graphFree(grafptr);
+        return (1);
       }
       velosum += grafptr->velotax[vertnum];
     }
-    grafptr->verttax[vertnum] = edgenum;          /* Set based edge array index */
+    grafptr->verttax[vertnum] = edgenum; /* Set based edge array index */
 
-    while (1) {                                   /* Read graph edges              */
-      fscanf (filesrcptr, "%*[ \t\r]");           /* Skip white spaces except '\n' */
-      chabuffcar = getc (filesrcptr);             /* Read next char                */
-      if (chabuffcar == EOF)                      /* If end of file reached        */
-        chabuffcar = '\n';                        /* Indicate line as complete     */
-      if (chabuffcar == '\n')                     /* Exit loop if line is complete */
+    while (1) {                        /* Read graph edges              */
+      fscanf(filesrcptr, "%*[ \t\r]"); /* Skip white spaces except '\n' */
+      chabuffcar = getc(filesrcptr);   /* Read next char                */
+      if (chabuffcar == EOF)           /* If end of file reached        */
+        chabuffcar = '\n';             /* Indicate line as complete     */
+      if (chabuffcar == '\n')          /* Exit loop if line is complete */
         break;
 
-      ungetc (chabuffcar, filesrcptr);            /* Else put character back to stream */
+      ungetc(chabuffcar, filesrcptr); /* Else put character back to stream */
 
-      if ((intLoad (filesrcptr, &chavertnum) != 1) ||
-          (chavertnum < 1)                         ||
-          (chavertnum > chavertnbr)                ||
+      if ((intLoad(filesrcptr, &chavertnum) != 1) || (chavertnum < 1) ||
+          (chavertnum > chavertnbr) ||
           ((grafptr->edlotax != NULL) &&
-           ((intLoad (filesrcptr, &grafptr->edlotax[edgenum]) != 1) ||
-            (edlosum += grafptr->edlotax[edgenum], grafptr->edlotax[edgenum] < 1)))) {
-        errorPrint ("graphGeomLoadChac: bad input (4)");
-        graphFree  (grafptr);
-        return     (1);
+           ((intLoad(filesrcptr, &grafptr->edlotax[edgenum]) != 1) ||
+            (edlosum += grafptr->edlotax[edgenum],
+             grafptr->edlotax[edgenum] < 1)))) {
+        errorPrint("graphGeomLoadChac: bad input (4)");
+        graphFree(grafptr);
+        return (1);
       }
       if (edgenum > (grafptr->edgenbr + 1)) { /* Test edge array overflow */
-        errorPrint ("graphGeomLoadChac: bad input (5)");
-        graphFree  (grafptr);
-        return     (1);
+        errorPrint("graphGeomLoadChac: bad input (5)");
+        graphFree(grafptr);
+        return (1);
       }
-      grafptr->edgetax[edgenum ++] = chavertnum;
+      grafptr->edgetax[edgenum++] = chavertnum;
     }
 
     if ((edgenum - grafptr->verttax[vertnum]) > degrmax)
       degrmax = edgenum - grafptr->verttax[vertnum];
   }
-  grafptr->verttax[vertnum] = edgenum;            /* Set end of based vertex array */
+  grafptr->verttax[vertnum] = edgenum; /* Set end of based vertex array */
   grafptr->velosum = velosum;
   grafptr->edlosum = edlosum;
   grafptr->degrmax = degrmax;
 
-  if (grafptr->vlbltax != NULL) {                 /* If graph has labels       */
-    if (graphLoad2 (1,                grafptr->vertnnd, /* Un-label graph data */
-                    grafptr->verttax, grafptr->vendtax,
-                    grafptr->edgetax, vlblmax, grafptr->vlbltax) != 0) {
-      errorPrint ("graphGeomLoadChac: cannot relabel graph");
-      graphFree  (grafptr);
-      return     (1);
+  if (grafptr->vlbltax != NULL) {       /* If graph has labels       */
+    if (graphLoad2(1, grafptr->vertnnd, /* Un-label graph data */
+                   grafptr->verttax, grafptr->vendtax, grafptr->edgetax,
+                   vlblmax, grafptr->vlbltax) != 0) {
+      errorPrint("graphGeomLoadChac: cannot relabel graph");
+      graphFree(grafptr);
+      return (1);
     }
   }
 
 #ifdef SCOTCH_DEBUG_GRAPH2
-  if (graphCheck (grafptr) != 0) {                /* Check graph consistency */
-    errorPrint ("graphGeomLoadChac: internal error");
-    graphFree  (grafptr);
-    return     (1);
+  if (graphCheck(grafptr) != 0) { /* Check graph consistency */
+    errorPrint("graphGeomLoadChac: internal error");
+    graphFree(grafptr);
+    return (1);
   }
 #endif /* SCOTCH_DEBUG_GRAPH2 */
 
@@ -268,63 +264,62 @@ const char * const          dataptr)              /* No use           */
 ** - !0  : on error.
 */
 
-int
-graphGeomSaveChac (
-const Graph * restrict const  grafptr,            /* Graph to save    */
-const Geom * restrict const   geomptr,            /* Geometry to save */
-FILE * const                  filesrcptr,         /* Topological data */
-FILE * const                  filegeoptr,         /* No use           */
-const char * const            dataptr)            /* No use           */
+int graphGeomSaveChac(const Graph *restrict const grafptr, /* Graph to save */
+                      const Geom *restrict const geomptr, /* Geometry to save */
+                      FILE *const filesrcptr,             /* Topological data */
+                      FILE *const filegeoptr,             /* No use           */
+                      const char *const dataptr)          /* No use           */
 {
-  Gnum              baseadj;                      /* Base adjustment  */
-  Gnum              vertnum;                      /* Current vertex   */
-  Gnum              edgenum;                      /* Current edge     */
-  char *            sepaptr;                      /* Separator string */
-  int               o;
+  Gnum baseadj;  /* Base adjustment  */
+  Gnum vertnum;  /* Current vertex   */
+  Gnum edgenum;  /* Current edge     */
+  char *sepaptr; /* Separator string */
+  int o;
 
-  baseadj = 1 - grafptr->baseval;                 /* Output base is always 1 */
+  baseadj = 1 - grafptr->baseval; /* Output base is always 1 */
 
-  o = (fprintf (filesrcptr, GNUMSTRING "\t" GNUMSTRING "\t%c%c%c\n", /* Write graph header */
-                (Gnum)  grafptr->vertnbr,
-                (Gnum) (grafptr->edgenbr / 2),
-                ((grafptr->vlbltax != NULL) ? '1' : '0'),
-                ((grafptr->velotax != NULL) ? '1' : '0'),
-                ((grafptr->edlotax != NULL) ? '1' : '0')) < 0);
+  o = (fprintf(filesrcptr,
+               GNUMSTRING "\t" GNUMSTRING "\t%c%c%c\n", /* Write graph header */
+               (Gnum)grafptr->vertnbr, (Gnum)(grafptr->edgenbr / 2),
+               ((grafptr->vlbltax != NULL) ? '1' : '0'),
+               ((grafptr->velotax != NULL) ? '1' : '0'),
+               ((grafptr->edlotax != NULL) ? '1' : '0')) < 0);
 
-  for (vertnum = grafptr->baseval; (o == 0) && (vertnum < grafptr->vertnnd); vertnum ++) {
-    sepaptr = "";                                 /* Start lines as is */
+  for (vertnum = grafptr->baseval; (o == 0) && (vertnum < grafptr->vertnnd);
+       vertnum++) {
+    sepaptr = ""; /* Start lines as is */
 
     if (grafptr->vlbltax != NULL) {
-      o |= (fprintf (filesrcptr, GNUMSTRING, (Gnum) (grafptr->vlbltax[vertnum] + baseadj)) < 0);
+      o |= (fprintf(filesrcptr, GNUMSTRING,
+                    (Gnum)(grafptr->vlbltax[vertnum] + baseadj)) < 0);
       sepaptr = "\t";
     }
     if (grafptr->velotax != NULL) {
-      o |= (fprintf (filesrcptr, "%s" GNUMSTRING,
-                     sepaptr,
-                     (Gnum) grafptr->velotax[vertnum]) < 0);
+      o |= (fprintf(filesrcptr, "%s" GNUMSTRING, sepaptr,
+                    (Gnum)grafptr->velotax[vertnum]) < 0);
       sepaptr = "\t";
     }
 
     for (edgenum = grafptr->verttax[vertnum];
-         (o == 0) && (edgenum < grafptr->vendtax[vertnum]); edgenum ++) {
+         (o == 0) && (edgenum < grafptr->vendtax[vertnum]); edgenum++) {
       if (grafptr->vlbltax != NULL)
-        o |= (fprintf (filesrcptr, "%s" GNUMSTRING,
-                       sepaptr,
-                       (Gnum) (grafptr->vlbltax[grafptr->edgetax[edgenum]] + baseadj)) < 0);
+        o |= (fprintf(filesrcptr, "%s" GNUMSTRING, sepaptr,
+                      (Gnum)(grafptr->vlbltax[grafptr->edgetax[edgenum]] +
+                             baseadj)) < 0);
       else
-        o |= (fprintf (filesrcptr, "%s" GNUMSTRING,
-                       sepaptr,
-                       (Gnum) (grafptr->edgetax[edgenum] + baseadj)) < 0);
+        o |= (fprintf(filesrcptr, "%s" GNUMSTRING, sepaptr,
+                      (Gnum)(grafptr->edgetax[edgenum] + baseadj)) < 0);
 
       if (grafptr->edlotax != NULL)
-        o |= (fprintf (filesrcptr, " " GNUMSTRING, (Gnum) grafptr->edlotax[edgenum]) < 0);
+        o |= (fprintf(filesrcptr, " " GNUMSTRING,
+                      (Gnum)grafptr->edlotax[edgenum]) < 0);
 
       sepaptr = "\t";
     }
-    o |= (fprintf (filesrcptr, "\n") < 0);
+    o |= (fprintf(filesrcptr, "\n") < 0);
   }
   if (o != 0)
-    errorPrint ("graphGeomSaveChac: bad output");
+    errorPrint("graphGeomSaveChac: bad output");
 
   return (o);
 }

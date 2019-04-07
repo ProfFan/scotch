@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -70,17 +70,14 @@
 ** - VOID  : in all cases.
 */
 
-void
-vmeshExit (
-Vmesh * const               meshptr)
-{
-  if (meshptr->parttax != NULL)                   /* Free leader of group (parttab + frontab) */
-    memFree (meshptr->parttax + meshptr->m.baseval);
+void vmeshExit(Vmesh *const meshptr) {
+  if (meshptr->parttax != NULL) /* Free leader of group (parttab + frontab) */
+    memFree(meshptr->parttax + meshptr->m.baseval);
 
-  meshFree (&meshptr->m);                         /* Free source mesh */
+  meshFree(&meshptr->m); /* Free source mesh */
 
 #ifdef SCOTCH_DEBUG_VMESH2
-  memSet (meshptr, ~0, sizeof (Vmesh));
+  memSet(meshptr, ~0, sizeof(Vmesh));
 #endif /* SCOTCH_DEBUG_VMESH2 */
 }
 
@@ -90,19 +87,15 @@ Vmesh * const               meshptr)
 ** - VOID  : in all cases.
 */
 
-void
-vmeshZero (
-Vmesh * const               meshptr)
-{
-  memSet (meshptr->parttax + meshptr->m.baseval, 0, (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof (GraphPart));
+void vmeshZero(Vmesh *const meshptr) {
+  memSet(meshptr->parttax + meshptr->m.baseval, 0,
+         (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof(GraphPart));
 
   meshptr->ecmpsize[0] = meshptr->m.velmnbr;
   meshptr->ecmpsize[1] = 0;
   meshptr->ncmpload[0] = meshptr->m.vnlosum;
-  meshptr->ncmpload[1] =
-  meshptr->ncmpload[2] = 0;
+  meshptr->ncmpload[1] = meshptr->ncmpload[2] = 0;
   meshptr->ncmploaddlt = meshptr->m.vnlosum;
   meshptr->ncmpsize[0] = meshptr->m.vnodnbr;
-  meshptr->ncmpsize[1] =
-  meshptr->fronnbr     = 0;
+  meshptr->ncmpsize[1] = meshptr->fronnbr = 0;
 }

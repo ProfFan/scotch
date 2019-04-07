@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -48,11 +48,11 @@
 */
 
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE               600
+#define _XOPEN_SOURCE 600
 #endif /* _XOPEN_SOURCE */
 #ifndef __USE_XOPEN2K
-#define __USE_XOPEN2K                             /* For POSIX pthread_barrier_t */
-#endif /* __USE_XOPEN2K */
+#define __USE_XOPEN2K /* For POSIX pthread_barrier_t */
+#endif                /* __USE_XOPEN2K */
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -63,20 +63,20 @@
 #include "../libscotch/common.h"
 #include "scotch.h"
 
-#define C_FILENBR                   2            /* Number of files in list */
+#define C_FILENBR 2 /* Number of files in list */
 
-#define C_BUFFSIZ                   65536
+#define C_BUFFSIZ 65536
 
-#define C_filepntrinp               fileBlockFile (C_fileTab, 0) /* Input file  */
-#define C_filepntrout               fileBlockFile (C_fileTab, 1) /* Output file */
+#define C_filepntrinp fileBlockFile(C_fileTab, 0) /* Input file  */
+#define C_filepntrout fileBlockFile(C_fileTab, 1) /* Output file */
 
 /*
 **  The static and global variables.
 */
 
-static File                 C_fileTab[2] = {      /* File array */
-                              { FILEMODER },
-                              { FILEMODEW } };
+static File C_fileTab[2] = {/* File array */
+                            {FILEMODER},
+                            {FILEMODEW}};
 
 /*********************/
 /*                   */
@@ -84,58 +84,56 @@ static File                 C_fileTab[2] = {      /* File array */
 /*                   */
 /*********************/
 
-int
-main (
-int                 argc,
-char *              argv[])
-{
-  byte *              bufftab;
+int main(int argc, char *argv[]) {
+  byte *bufftab;
 
   if (argc != 3) {
-    SCOTCH_errorPrint ("usage: %s infile outfile", argv[0]);
-    exit (EXIT_FAILURE);
+    SCOTCH_errorPrint("usage: %s infile outfile", argv[0]);
+    exit(EXIT_FAILURE);
   }
 
-  if ((bufftab = malloc (C_BUFFSIZ * sizeof (byte))) == NULL) {
-    SCOTCH_errorPrint ("main: out of memory");
-    exit (EXIT_FAILURE);
+  if ((bufftab = malloc(C_BUFFSIZ * sizeof(byte))) == NULL) {
+    SCOTCH_errorPrint("main: out of memory");
+    exit(EXIT_FAILURE);
   }
 
-  fileBlockInit (C_fileTab, C_FILENBR);           /* Set default stream pointers */
-  fileBlockName (C_fileTab, 0) = argv[1];
-  fileBlockName (C_fileTab, 1) = argv[2];
+  fileBlockInit(C_fileTab, C_FILENBR); /* Set default stream pointers */
+  fileBlockName(C_fileTab, 0) = argv[1];
+  fileBlockName(C_fileTab, 1) = argv[2];
 
-  switch (fileBlockOpen (C_fileTab, C_FILENBR)) { /* Open all files */
-    case 2 :
-      SCOTCH_errorPrint ("main: (un)compression method not implemented");
-      free (bufftab);
-      exit (EXIT_SUCCESS);
-    case 1 :
-      SCOTCH_errorPrint ("main: cannot open files");
-      free (bufftab);
-      exit (EXIT_FAILURE);
+  switch (fileBlockOpen(C_fileTab, C_FILENBR)) { /* Open all files */
+  case 2:
+    SCOTCH_errorPrint("main: (un)compression method not implemented");
+    free(bufftab);
+    exit(EXIT_SUCCESS);
+  case 1:
+    SCOTCH_errorPrint("main: cannot open files");
+    free(bufftab);
+    exit(EXIT_FAILURE);
   }
 
   while (1) {
-    size_t              bytenbr;
+    size_t bytenbr;
 
-    if ((bytenbr = fread (bufftab, 1, C_BUFFSIZ, C_filepntrinp)) == 0) {
-      if (ferror (C_filepntrinp))
-        SCOTCH_errorPrint ("main: read error");
+    if ((bytenbr = fread(bufftab, 1, C_BUFFSIZ, C_filepntrinp)) == 0) {
+      if (ferror(C_filepntrinp))
+        SCOTCH_errorPrint("main: read error");
       break;
     }
-    if (fwrite (bufftab, 1, bytenbr, C_filepntrout) != bytenbr) {
-      SCOTCH_errorPrint ("main: write error");
+    if (fwrite(bufftab, 1, bytenbr, C_filepntrout) != bytenbr) {
+      SCOTCH_errorPrint("main: write error");
       break;
     }
   }
 
-  free (bufftab);
+  free(bufftab);
 
-  fileBlockClose (C_fileTab, C_FILENBR);          /* Always close explicitely to end eventual (un)compression tasks */
+  fileBlockClose(C_fileTab, C_FILENBR); /* Always close explicitely to end
+                                           eventual (un)compression tasks */
 
 #ifdef COMMON_PTHREAD
-  pthread_exit ((void *) 0);                      /* Allow potential (un)compression tasks to complete */
-#endif /* COMMON_PTHREAD */
-  exit (EXIT_SUCCESS);
+  pthread_exit(
+      (void *)0); /* Allow potential (un)compression tasks to complete */
+#endif            /* COMMON_PTHREAD */
+  exit(EXIT_SUCCESS);
 }

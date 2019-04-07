@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -62,33 +62,41 @@
 
 /*+ File name aliases. +*/
 
-#define C_FILENBR                   4             /* Number of files in list                */
-#define C_FILEARGNBR                4             /* Number of files which can be arguments */
+#define C_FILENBR 4    /* Number of files in list                */
+#define C_FILEARGNBR 4 /* Number of files which can be arguments */
 
-#define C_filenamesrcinp            fileBlockName (C_fileTab, 0) /* Source graph file name          */
-#define C_filenamegeoinp            fileBlockName (C_fileTab, 1) /* Source graph geometry file name */
-#define C_filenamemapinp            fileBlockName (C_fileTab, 2) /* Mapping result file name        */
-#define C_filenamedatout            fileBlockName (C_fileTab, 3) /* Output data file name           */
+#define C_filenamesrcinp                                                       \
+  fileBlockName(C_fileTab, 0) /* Source graph file name          */
+#define C_filenamegeoinp                                                       \
+  fileBlockName(C_fileTab, 1) /* Source graph geometry file name */
+#define C_filenamemapinp                                                       \
+  fileBlockName(C_fileTab, 2) /* Mapping result file name        */
+#define C_filenamedatout                                                       \
+  fileBlockName(C_fileTab, 3) /* Output data file name           */
 
-#define C_filepntrsrcinp            fileBlockFile (C_fileTab, 0) /* Source graph input file    */
-#define C_filepntrgeoinp            fileBlockFile (C_fileTab, 1) /* Source graph geometry file */
-#define C_filepntrmapinp            fileBlockFile (C_fileTab, 2) /* Mapping result input file  */
-#define C_filepntrdatout            fileBlockFile (C_fileTab, 3) /* Data output file           */
+#define C_filepntrsrcinp                                                       \
+  fileBlockFile(C_fileTab, 0) /* Source graph input file    */
+#define C_filepntrgeoinp                                                       \
+  fileBlockFile(C_fileTab, 1) /* Source graph geometry file */
+#define C_filepntrmapinp                                                       \
+  fileBlockFile(C_fileTab, 2) /* Mapping result input file  */
+#define C_filepntrdatout                                                       \
+  fileBlockFile(C_fileTab, 3) /* Data output file           */
 
-#define C_filemodemapinp            fileBlockMode (C_fileTab, 2) /* Mapping result mode */
+#define C_filemodemapinp fileBlockMode(C_fileTab, 2) /* Mapping result mode */
 
 /*+ Dimension definitions. +*/
 
-#define x                           c[0]
-#define y                           c[1]
-#define z                           c[2]
+#define x c[0]
+#define y c[1]
+#define z c[2]
 
 /*+ Geometry flags. +*/
 
-#define C_GEOFLAGDEFAULT            0x0001        /* Default geometry flag            */
-#define C_GEOFLAGUSE                0x0001        /* Use geometry                     */
-#define C_GEOFLAGROTATE             0x0002        /* Rotate the picture by 90 degrees */
-#define C_GEOFLAGPERMUT             0x0004        /* Permute Y and Z dimensions       */
+#define C_GEOFLAGDEFAULT 0x0001 /* Default geometry flag            */
+#define C_GEOFLAGUSE 0x0001     /* Use geometry                     */
+#define C_GEOFLAGROTATE 0x0002  /* Rotate the picture by 90 degrees */
+#define C_GEOFLAGPERMUT 0x0004  /* Permute Y and Z dimensions       */
 
 /*
 **  The type and structure definitions.
@@ -97,20 +105,20 @@
 /*+ This structure defines a source graph. +*/
 
 typedef struct C_Graph_ {
-  SCOTCH_Graph            grafdat;                /*+ Source graph data  +*/
-  SCOTCH_Num              baseval;                /*+ Base value         +*/
-  SCOTCH_Num              vertnbr;                /*+ Number of vertices +*/
-  SCOTCH_Num *            verttab;                /*+ Vertex array       +*/
-  SCOTCH_Num *            vendtab;                /*+ Vertex end array   +*/
-  SCOTCH_Num *            vlbltab;                /*+ Vertex label array +*/
-  SCOTCH_Num              edgenbr;                /*+ Number of edges    +*/
-  SCOTCH_Num *            edgetab;                /*+ Edge array         +*/
+  SCOTCH_Graph grafdat; /*+ Source graph data  +*/
+  SCOTCH_Num baseval;   /*+ Base value         +*/
+  SCOTCH_Num vertnbr;   /*+ Number of vertices +*/
+  SCOTCH_Num *verttab;  /*+ Vertex array       +*/
+  SCOTCH_Num *vendtab;  /*+ Vertex end array   +*/
+  SCOTCH_Num *vlbltab;  /*+ Vertex label array +*/
+  SCOTCH_Num edgenbr;   /*+ Number of edges    +*/
+  SCOTCH_Num *edgetab;  /*+ Edge array         +*/
 } C_Graph;
 
 /*+ This structure defines a geometrical vertex. +*/
 
 typedef struct C_GeoVert_ {
-  double                    c[3];                 /*+ Vertex coordinates (x,y,z) +*/
+  double c[3]; /*+ Vertex coordinates (x,y,z) +*/
 } C_GeoVert;
 
 /*+ This structure defines a geometrical
@@ -118,8 +126,8 @@ typedef struct C_GeoVert_ {
     of the graph vertices.               +*/
 
 typedef struct C_Geometry_ {
-  const C_Graph *         grafptr;                /*+ Pointer to source graph      +*/
-  C_GeoVert *             verttab;                /*+ Pointer to coordinates array +*/
+  const C_Graph *grafptr; /*+ Pointer to source graph      +*/
+  C_GeoVert *verttab;     /*+ Pointer to coordinates array +*/
 } C_Geometry;
 
 /*+ This structure defines a domain label
@@ -127,53 +135,54 @@ typedef struct C_Geometry_ {
     to the mapping source graph.          +*/
 
 typedef struct C_Mapping_ {
-  const C_Graph *         grafptr;                /*+ Pointer to source graph +*/
-  SCOTCH_Num *            labltab;                /*+ Pointer to label array  +*/
+  const C_Graph *grafptr; /*+ Pointer to source graph +*/
+  SCOTCH_Num *labltab;    /*+ Pointer to label array  +*/
 } C_Mapping;
 
 /*+ The sort structure, used to sort graph vertices by label. +*/
 
 typedef struct C_VertSort_ {
-  SCOTCH_Num                labl;                 /*+ Vertex label  +*/
-  SCOTCH_Num                num;                  /*+ Vertex number +*/
+  SCOTCH_Num labl; /*+ Vertex label  +*/
+  SCOTCH_Num num;  /*+ Vertex number +*/
 } C_VertSort;
 
 /*+ This structure is the code
     name array entries.        +*/
 
 typedef struct C_ParseCode_ {
-  int                       code;                 /*+ Code value +*/
-  char *                    name;                 /*+ Code name  +*/
+  int code;   /*+ Code value +*/
+  char *name; /*+ Code name  +*/
 } C_ParseCode;
 
 /* This structure defines the
    code argument array entries. */
 
 typedef struct C_ParseArg_ {
-  const char *              name;                 /*+ Name of the argument                         +*/
-  int                       code;                 /*+ Code value                                   +*/
-  const char *              format;               /*+ scanf-like format; NULL means char, no value +*/
-  const void *              ptr;                  /*+ Pointer to the argument location             +*/
-  int                    (* func) ();             /*+ Pointer to the argument test function        +*/
+  const char *name;   /*+ Name of the argument                         +*/
+  int code;           /*+ Code value                                   +*/
+  const char *format; /*+ scanf-like format; NULL means char, no value +*/
+  const void *ptr;    /*+ Pointer to the argument location             +*/
+  int (*func)();      /*+ Pointer to the argument test function        +*/
 } C_ParseArg;
 
 /*
 **  The global data declarations.
 */
 
-extern File                 C_fileTab[C_FILENBR]; /*+ File array +*/
+extern File C_fileTab[C_FILENBR]; /*+ File array +*/
 
 /*
 **  The function prototypes.
 */
 
-int                         C_geoParse          (const char * const);
-void                        C_geoInit           (C_Geometry * const, const C_Graph * const);
-void                        C_geoExit           (C_Geometry * const);
-int                         C_geoLoad           (C_Geometry * const, FILE * const);
+int C_geoParse(const char *const);
+void C_geoInit(C_Geometry *const, const C_Graph *const);
+void C_geoExit(C_Geometry *const);
+int C_geoLoad(C_Geometry *const, FILE *const);
 
-void                        C_mapInit           (C_Mapping * const, const C_Graph * const);
-void                        C_mapExit           (C_Mapping * const);
-int                         C_mapLoad           (C_Mapping * const, FILE * const);
+void C_mapInit(C_Mapping *const, const C_Graph *const);
+void C_mapExit(C_Mapping *const);
+int C_mapLoad(C_Mapping *const, FILE *const);
 
-int                         C_parse             (const C_ParseCode * const, const C_ParseArg * const, int * const, char * const);
+int C_parse(const C_ParseCode *const, const C_ParseArg *const, int *const,
+            char *const);

@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -69,18 +69,17 @@
 ** - !0  : on error.
 */
 
-int
-vmeshStoreInit (
-const Vmesh * const         meshptr,
-VmeshStore * const          storptr)
-{
-  Gnum                savsize;
+int vmeshStoreInit(const Vmesh *const meshptr, VmeshStore *const storptr) {
+  Gnum savsize;
 
-  savsize = (meshptr->m.velmnbr + meshptr->m.vnodnbr) * (sizeof (GraphPart) + sizeof (Gnum)); /* Compute size for frontier and part arrays */
+  savsize = (meshptr->m.velmnbr + meshptr->m.vnodnbr) *
+            (sizeof(GraphPart) +
+             sizeof(Gnum)); /* Compute size for frontier and part arrays */
 
-  if ((storptr->datatab = (byte *) memAlloc (savsize)) == NULL) { /* Allocate save structure */
-    errorPrint ("vmeshStoreInit: out of memory");
-    return     (1);
+  if ((storptr->datatab = (byte *)memAlloc(savsize)) ==
+      NULL) { /* Allocate save structure */
+    errorPrint("vmeshStoreInit: out of memory");
+    return (1);
   }
 
   return (0);
@@ -92,11 +91,8 @@ VmeshStore * const          storptr)
 ** - VOID  : in all cases.
 */
 
-void
-vmeshStoreExit (
-VmeshStore * const          storptr)
-{
-  memFree (storptr->datatab);
+void vmeshStoreExit(VmeshStore *const storptr) {
+  memFree(storptr->datatab);
 #ifdef SCOTCH_DEBUG_VMESH2
   storptr->datatab = NULL;
 #endif /* SCOTCH_DEBUG_VMESH2 */
@@ -109,15 +105,11 @@ VmeshStore * const          storptr)
 ** - VOID  : in all cases.
 */
 
-void
-vmeshStoreSave (
-const Vmesh * const         meshptr,
-VmeshStore * const          storptr)
-{
-  byte *              parttab;                    /* Pointer to part data save area     */
-  byte *              frontab;                    /* Pointer to frontier data save area */
+void vmeshStoreSave(const Vmesh *const meshptr, VmeshStore *const storptr) {
+  byte *parttab; /* Pointer to part data save area     */
+  byte *frontab; /* Pointer to frontier data save area */
 
-  storptr->ecmpsize[0] = meshptr->ecmpsize[0];    /* Save partition parameters */
+  storptr->ecmpsize[0] = meshptr->ecmpsize[0]; /* Save partition parameters */
   storptr->ecmpsize[1] = meshptr->ecmpsize[1];
   storptr->ncmpload[0] = meshptr->ncmpload[0];
   storptr->ncmpload[1] = meshptr->ncmpload[1];
@@ -125,13 +117,14 @@ VmeshStore * const          storptr)
   storptr->ncmploaddlt = meshptr->ncmploaddlt;
   storptr->ncmpsize[0] = meshptr->ncmpsize[0];
   storptr->ncmpsize[1] = meshptr->ncmpsize[1];
-  storptr->fronnbr     = meshptr->fronnbr;
+  storptr->fronnbr = meshptr->fronnbr;
 
-  frontab = storptr->datatab;                     /* Compute data offsets within save structure */
-  parttab = frontab + meshptr->fronnbr * sizeof (Gnum);
+  frontab = storptr->datatab; /* Compute data offsets within save structure */
+  parttab = frontab + meshptr->fronnbr * sizeof(Gnum);
 
-  memCpy (frontab, meshptr->frontab, meshptr->fronnbr * sizeof (Gnum));
-  memCpy (parttab, meshptr->parttax + meshptr->m.baseval, (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof (GraphPart));
+  memCpy(frontab, meshptr->frontab, meshptr->fronnbr * sizeof(Gnum));
+  memCpy(parttab, meshptr->parttax + meshptr->m.baseval,
+         (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof(GraphPart));
 }
 
 /* This routine updates partition data of the
@@ -140,15 +133,11 @@ VmeshStore * const          storptr)
 ** - VOID  : in all cases.
 */
 
-void
-vmeshStoreUpdt (
-Vmesh * const               meshptr,
-const VmeshStore * const    storptr)
-{
-  byte *              frontab;                    /* Pointer to frontier data save area */
-  byte *              parttab;                    /* Pointer to part data save area     */
+void vmeshStoreUpdt(Vmesh *const meshptr, const VmeshStore *const storptr) {
+  byte *frontab; /* Pointer to frontier data save area */
+  byte *parttab; /* Pointer to part data save area     */
 
-  meshptr->ecmpsize[0] = storptr->ecmpsize[0];    /* Load partition parameters */
+  meshptr->ecmpsize[0] = storptr->ecmpsize[0]; /* Load partition parameters */
   meshptr->ecmpsize[1] = storptr->ecmpsize[1];
   meshptr->ncmpload[0] = storptr->ncmpload[0];
   meshptr->ncmpload[1] = storptr->ncmpload[1];
@@ -156,11 +145,12 @@ const VmeshStore * const    storptr)
   meshptr->ncmploaddlt = storptr->ncmploaddlt;
   meshptr->ncmpsize[0] = storptr->ncmpsize[0];
   meshptr->ncmpsize[1] = storptr->ncmpsize[1];
-  meshptr->fronnbr     = storptr->fronnbr;
+  meshptr->fronnbr = storptr->fronnbr;
 
-  frontab = storptr->datatab;                     /* Compute data offsets within save structure */
-  parttab = frontab + storptr->fronnbr * sizeof (Gnum);
+  frontab = storptr->datatab; /* Compute data offsets within save structure */
+  parttab = frontab + storptr->fronnbr * sizeof(Gnum);
 
-  memCpy (meshptr->frontab, frontab, storptr->fronnbr * sizeof (Gnum));
-  memCpy (meshptr->parttax + meshptr->m.baseval, parttab, (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof (GraphPart));
+  memCpy(meshptr->frontab, frontab, storptr->fronnbr * sizeof(Gnum));
+  memCpy(meshptr->parttax + meshptr->m.baseval, parttab,
+         (meshptr->m.velmnbr + meshptr->m.vnodnbr) * sizeof(GraphPart));
 }

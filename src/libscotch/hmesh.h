@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -80,25 +80,29 @@
     instance by grouping these arrays with verttab.      +*/
 
 typedef struct Hmesh_ {
-  Mesh                      m;                    /*+ Source mesh                                                              +*/
-  Gnum * restrict           vehdtax;              /*+ End vertex array for elements [based] (non-halo nodes look at m.vendtax) +*/
-  Gnum                      veihnbr;              /*+ Number of halo isolated element vertices, which have halo nodes only     +*/
-  Gnum                      vnohnbr;              /*+ Number of non-halo node vertices                                         +*/
-  Gnum                      vnohnnd;              /*+ Based number of first halo node vertex in mesh graph (m.vnodnnd if none) +*/
-  Gnum                      vnhlsum;              /*+ Sum of non-halo node vertex weights                                      +*/
-  Gnum                      enohnbr;              /*+ Number of non-halo edges                                                 +*/
-  Gnum                      levlnum;              /*+ Nested dissection level                                                  +*/
+  Mesh m;                 /*+ Source mesh                 +*/
+  Gnum *restrict vehdtax; /*+ End vertex array for elements [based] (non-halo
+                             nodes look at m.vendtax) +*/
+  Gnum veihnbr; /*+ Number of halo isolated element vertices, which have halo
+                   nodes only     +*/
+  Gnum vnohnbr; /*+ Number of non-halo node vertices +*/
+  Gnum vnohnnd; /*+ Based number of first halo node vertex in mesh graph
+                   (m.vnodnnd if none) +*/
+  Gnum vnhlsum; /*+ Sum of non-halo node vertex weights +*/
+  Gnum enohnbr; /*+ Number of non-halo edges +*/
+  Gnum levlnum; /*+ Nested dissection level +*/
 } Hmesh;
 
 /*
 **  The function prototypes.
 */
 
-void                        hmeshExit           (Hmesh * const);
-Gnum                        hmeshBase           (Hmesh * const, const Gnum);
+void hmeshExit(Hmesh *const);
+Gnum hmeshBase(Hmesh *const, const Gnum);
 #ifdef HGRAPH_H
-int                         hmeshHgraph         (const Hmesh * restrict const, Hgraph * restrict const);
+int hmeshHgraph(const Hmesh *restrict const, Hgraph *restrict const);
 #endif /* HGRAPH_H */
-int                         hmeshInducePart     (const Hmesh * const, const GraphPart * const, const GraphPart, const Gnum, const Gnum, const Gnum, Hmesh * const);
-int                         hmeshMesh           (const Hmesh * restrict const, Mesh * restrict const);
-int                         hmeshCheck          (const Hmesh *);
+int hmeshInducePart(const Hmesh *const, const GraphPart *const, const GraphPart,
+                    const Gnum, const Gnum, const Gnum, Hmesh *const);
+int hmeshMesh(const Hmesh *restrict const, Mesh *restrict const);
+int hmeshCheck(const Hmesh *);

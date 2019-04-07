@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -75,16 +76,15 @@
 **  The static variables.
 */
 
-static int                  C_fileNum = 0;        /* Number of file in arg list */
-static File                 C_fileTab[C_FILENBR] = { /* File array              */
-                              { FILEMODER },
-                              { FILEMODEW } };
+static int C_fileNum = 0;           /* Number of file in arg list */
+static File C_fileTab[C_FILENBR] = {/* File array              */
+                                    {FILEMODER},
+                                    {FILEMODEW}};
 
-static const char *         C_usageList[] = {
-  "acpl [<input target file> [<output target file>]] <options>",
-  "  -h  : Display this help",
-  "  -V  : Print program version and copyright",
-  NULL };
+static const char *C_usageList[] = {
+    "acpl [<input target file> [<output target file>]] <options>",
+    "  -h  : Display this help", "  -V  : Print program version and copyright",
+    NULL};
 
 /******************************/
 /*                            */
@@ -92,63 +92,63 @@ static const char *         C_usageList[] = {
 /*                            */
 /******************************/
 
-int
-main (
-int                         argc,
-char *                      argv[])
-{
-  SCOTCH_Arch         arch;                       /* Architecture read and written */
-  int                 i;
+int main(int argc, char *argv[]) {
+  SCOTCH_Arch arch; /* Architecture read and written */
+  int i;
 
-  errorProg ("acpl");
+  errorProg("acpl");
 
-  if ((argc >= 2) && (argv[1][0] == '?')) {       /* If need for help */
-    usagePrint (stdout, C_usageList);
-    return     (0);
+  if ((argc >= 2) && (argv[1][0] == '?')) { /* If need for help */
+    usagePrint(stdout, C_usageList);
+    return (0);
   }
 
-  fileBlockInit (C_fileTab, C_FILENBR);           /* Set default stream pointers */
+  fileBlockInit(C_fileTab, C_FILENBR); /* Set default stream pointers */
 
-  for (i = 1; i < argc; i ++) {                   /* Loop for all option codes                        */
-    if ((argv[i][0] != '-') || (argv[i][1] == '\0') || (argv[i][1] == '.')) { /* If found a file name */
-      if (C_fileNum < C_FILEARGNBR)               /* File name has been given                         */
-        fileBlockName (C_fileTab, C_fileNum ++) = argv[i];
+  for (i = 1; i < argc; i++) { /* Loop for all option codes */
+    if ((argv[i][0] != '-') || (argv[i][1] == '\0') ||
+        (argv[i][1] == '.')) {      /* If found a file name */
+      if (C_fileNum < C_FILEARGNBR) /* File name has been given */
+        fileBlockName(C_fileTab, C_fileNum++) = argv[i];
       else {
-        errorPrint ("main: too many file names given");
-        return     (1);
+        errorPrint("main: too many file names given");
+        return (1);
       }
-    }
-    else {                                        /* If found an option name */
+    } else { /* If found an option name */
       switch (argv[i][1]) {
-        case 'H' :                                /* Give the usage message */
-        case 'h' :
-          usagePrint (stdout, C_usageList);
-          return     (0);
-        case 'V' :
-          fprintf (stderr, "acpl, version " SCOTCH_VERSION_STRING "\n");
-          fprintf (stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, Universite de Bordeaux, INRIA & CNRS, France\n");
-          fprintf (stderr, "This software is libre/free software under CeCILL-C -- see the user's manual for more information\n");
-          return  (0);
-        default :
-          errorPrint ("main: unprocessed option '%s'", argv[i]);
-          return     (1);
+      case 'H': /* Give the usage message */
+      case 'h':
+        usagePrint(stdout, C_usageList);
+        return (0);
+      case 'V':
+        fprintf(stderr, "acpl, version " SCOTCH_VERSION_STRING "\n");
+        fprintf(stderr, "Copyright 2004,2007,2008,2010-2012,2014,2018 IPB, "
+                        "Universite de Bordeaux, INRIA & CNRS, France\n");
+        fprintf(stderr, "This software is libre/free software under CeCILL-C "
+                        "-- see the user's manual for more information\n");
+        return (0);
+      default:
+        errorPrint("main: unprocessed option '%s'", argv[i]);
+        return (1);
       }
     }
   }
 
-  fileBlockOpen (C_fileTab, C_FILENBR);           /* Open all files */
+  fileBlockOpen(C_fileTab, C_FILENBR); /* Open all files */
 
-  SCOTCH_archInit (&arch);                        /* Initialize architecture structure */
-  SCOTCH_archLoad (&arch, C_filepntrtgtinp);      /* Load architecture                 */
-  if (strcmp (SCOTCH_archName (&arch), "deco") != 0) { /* If not a decomposition       */
-    errorPrint ("main: architecture is not decomposition-defined");
-    return     (1);
+  SCOTCH_archInit(&arch); /* Initialize architecture structure */
+  SCOTCH_archLoad(&arch, C_filepntrtgtinp); /* Load architecture */
+  if (strcmp(SCOTCH_archName(&arch), "deco") !=
+      0) { /* If not a decomposition       */
+    errorPrint("main: architecture is not decomposition-defined");
+    return (1);
   }
-  SCOTCH_archSave (&arch, C_filepntrtgtout);      /* Save the compiled architecture */
+  SCOTCH_archSave(&arch, C_filepntrtgtout); /* Save the compiled architecture */
 
-  fileBlockClose (C_fileTab, C_FILENBR);          /* Always close explicitely to end eventual (un)compression tasks */
+  fileBlockClose(C_fileTab, C_FILENBR); /* Always close explicitely to end
+                                           eventual (un)compression tasks */
 
-  SCOTCH_archExit (&arch);
+  SCOTCH_archExit(&arch);
 
   return (0);
 }

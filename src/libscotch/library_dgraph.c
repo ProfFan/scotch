@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -56,7 +56,7 @@
 
 #include "module.h"
 #include "common.h"
-#include "graph.h"                                /* For graphPtscotch() */
+#include "graph.h" /* For graphPtscotch() */
 #include "dgraph.h"
 #include "ptscotch.h"
 
@@ -75,10 +75,8 @@
 *** - NULL   : on error.
 +*/
 
-SCOTCH_Dgraph *
-SCOTCH_dgraphAlloc ()
-{
-  return ((SCOTCH_Dgraph *) memAlloc (sizeof (SCOTCH_Dgraph)));
+SCOTCH_Dgraph *SCOTCH_dgraphAlloc() {
+  return ((SCOTCH_Dgraph *)memAlloc(sizeof(SCOTCH_Dgraph)));
 }
 
 /*+ This routine initializes the opaque
@@ -90,33 +88,34 @@ SCOTCH_dgraphAlloc ()
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphInit (
-SCOTCH_Dgraph * const       grafptr,
-MPI_Comm                    proccomm)             /* Communicator to be used for all communications */
+int SCOTCH_dgraphInit(
+    SCOTCH_Dgraph *const grafptr,
+    MPI_Comm proccomm) /* Communicator to be used for all communications */
 {
 #ifdef SCOTCH_PTHREAD
-  int                 thrdlvlval;
+  int thrdlvlval;
 #endif /* SCOTCH_PTHREAD */
 
 #ifdef SCOTCH_PTHREAD
-  MPI_Query_thread (&thrdlvlval);
+  MPI_Query_thread(&thrdlvlval);
   if (thrdlvlval < MPI_THREAD_MULTIPLE) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphInit) ": Scotch compiled with SCOTCH_PTHREAD and program not launched with MPI_THREAD_MULTIPLE");
-    return     (1);
+    errorPrint(STRINGIFY(
+        SCOTCH_dgraphInit) ": Scotch compiled with SCOTCH_PTHREAD and program "
+                           "not launched with MPI_THREAD_MULTIPLE");
+    return (1);
   }
 #endif /* SCOTCH_PTHREAD */
 
-  if (sizeof (SCOTCH_Num) != sizeof (Gnum)) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphInit) ": internal error (1)");
-    return     (1);
+  if (sizeof(SCOTCH_Num) != sizeof(Gnum)) {
+    errorPrint(STRINGIFY(SCOTCH_dgraphInit) ": internal error (1)");
+    return (1);
   }
-  if (sizeof (SCOTCH_Dgraph) < sizeof (Dgraph)) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphInit) ": internal error (2)");
-    return     (1);
+  if (sizeof(SCOTCH_Dgraph) < sizeof(Dgraph)) {
+    errorPrint(STRINGIFY(SCOTCH_dgraphInit) ": internal error (2)");
+    return (1);
   }
 
-  return (dgraphInit ((Dgraph *) grafptr, proccomm));
+  return (dgraphInit((Dgraph *)grafptr, proccomm));
 }
 
 /*+ This routine frees the contents of the
@@ -125,11 +124,8 @@ MPI_Comm                    proccomm)             /* Communicator to be used for
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_dgraphExit (
-SCOTCH_Dgraph * const       grafptr)
-{
-  dgraphExit ((Dgraph *) grafptr);
+void SCOTCH_dgraphExit(SCOTCH_Dgraph *const grafptr) {
+  dgraphExit((Dgraph *)grafptr);
 }
 
 /*+ This routine frees the contents of the
@@ -139,11 +135,8 @@ SCOTCH_Dgraph * const       grafptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_dgraphFree (
-SCOTCH_Dgraph * const       grafptr)
-{
-  dgraphFree ((Dgraph *) grafptr);
+void SCOTCH_dgraphFree(SCOTCH_Dgraph *const grafptr) {
+  dgraphFree((Dgraph *)grafptr);
 }
 
 /*+ This routine accesses graph size data.
@@ -153,26 +146,23 @@ SCOTCH_Dgraph * const       grafptr)
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_dgraphSize (
-const SCOTCH_Dgraph * const grafptr,
-SCOTCH_Num * const          vertglbnbr,
-SCOTCH_Num * const          vertlocnbr,
-SCOTCH_Num * const          edgeglbnbr,
-SCOTCH_Num * const          edgelocnbr)
-{
-  const Dgraph *      srcgrafptr;
+void SCOTCH_dgraphSize(const SCOTCH_Dgraph *const grafptr,
+                       SCOTCH_Num *const vertglbnbr,
+                       SCOTCH_Num *const vertlocnbr,
+                       SCOTCH_Num *const edgeglbnbr,
+                       SCOTCH_Num *const edgelocnbr) {
+  const Dgraph *srcgrafptr;
 
-  srcgrafptr = (Dgraph *) grafptr;
+  srcgrafptr = (Dgraph *)grafptr;
 
   if (vertglbnbr != NULL)
-    *vertglbnbr = (SCOTCH_Num) (srcgrafptr->vertglbnbr);
+    *vertglbnbr = (SCOTCH_Num)(srcgrafptr->vertglbnbr);
   if (vertlocnbr != NULL)
-    *vertlocnbr = (SCOTCH_Num) (srcgrafptr->vertlocnbr);
+    *vertlocnbr = (SCOTCH_Num)(srcgrafptr->vertlocnbr);
   if (edgeglbnbr != NULL)
-    *edgeglbnbr = (SCOTCH_Num) srcgrafptr->edgeglbnbr;
+    *edgeglbnbr = (SCOTCH_Num)srcgrafptr->edgeglbnbr;
   if (edgelocnbr != NULL)
-    *edgelocnbr = (SCOTCH_Num) srcgrafptr->edgelocnbr;
+    *edgelocnbr = (SCOTCH_Num)srcgrafptr->edgelocnbr;
 }
 
 /*+ This routine accesses all of the graph data.
@@ -183,29 +173,28 @@ SCOTCH_Num * const          edgelocnbr)
 *** - VOID  : in all cases.
 +*/
 
-void
-SCOTCH_dgraphData (
-const SCOTCH_Dgraph * const grafptr,              /* Graph structure to read          */
-SCOTCH_Num * const          baseptr,              /* Base value                       */
-SCOTCH_Num * const          vertglbptr,           /* Number of global vertices        */
-SCOTCH_Num * const          vertlocptr,           /* Number of local vertices         */
-SCOTCH_Num * const          vertlocptz,           /* Maximum number of local vertices */
-SCOTCH_Num * const          vertgstptr,           /* Number of local + ghost vertices */
-SCOTCH_Num ** const         vertloctab,           /* Vertex array [vertnbr+1]         */
-SCOTCH_Num ** const         vendloctab,           /* Vertex array [vertnbr]           */
-SCOTCH_Num ** const         veloloctab,           /* Vertex load array                */
-SCOTCH_Num ** const         vlblloctab,           /* Vertex label array               */
-SCOTCH_Num * const          edgeglbptr,           /* Number of global edges (arcs)    */
-SCOTCH_Num * const          edgelocptr,           /* Number of local edges (arcs)     */
-SCOTCH_Num * const          edgelocptz,           /* Size of local edge array         */
-SCOTCH_Num ** const         edgeloctab,           /* Local edge array [edgelocsiz]    */
-SCOTCH_Num ** const         edgegsttab,           /* Ghost edge array [edgelocsiz]    */
-SCOTCH_Num ** const         edloloctab,           /* Edge load array [edgelocsiz]     */
-MPI_Comm * const            comm)                 /* MPI Communicator                 */
+void SCOTCH_dgraphData(
+    const SCOTCH_Dgraph *const grafptr, /* Graph structure to read          */
+    SCOTCH_Num *const baseptr,          /* Base value                       */
+    SCOTCH_Num *const vertglbptr,       /* Number of global vertices        */
+    SCOTCH_Num *const vertlocptr,       /* Number of local vertices         */
+    SCOTCH_Num *const vertlocptz,       /* Maximum number of local vertices */
+    SCOTCH_Num *const vertgstptr,       /* Number of local + ghost vertices */
+    SCOTCH_Num **const vertloctab,      /* Vertex array [vertnbr+1]         */
+    SCOTCH_Num **const vendloctab,      /* Vertex array [vertnbr]           */
+    SCOTCH_Num **const veloloctab,      /* Vertex load array                */
+    SCOTCH_Num **const vlblloctab,      /* Vertex label array               */
+    SCOTCH_Num *const edgeglbptr,       /* Number of global edges (arcs)    */
+    SCOTCH_Num *const edgelocptr,       /* Number of local edges (arcs)     */
+    SCOTCH_Num *const edgelocptz,       /* Size of local edge array         */
+    SCOTCH_Num **const edgeloctab,      /* Local edge array [edgelocsiz]    */
+    SCOTCH_Num **const edgegsttab,      /* Ghost edge array [edgelocsiz]    */
+    SCOTCH_Num **const edloloctab,      /* Edge load array [edgelocsiz]     */
+    MPI_Comm *const comm)               /* MPI Communicator                 */
 {
-  const Dgraph *      srcgrafptr;                 /* Pointer to source graph structure */
+  const Dgraph *srcgrafptr; /* Pointer to source graph structure */
 
-  srcgrafptr = (const Dgraph *) grafptr;
+  srcgrafptr = (const Dgraph *)grafptr;
 
   if (baseptr != NULL)
     *baseptr = srcgrafptr->baseval;
@@ -214,17 +203,24 @@ MPI_Comm * const            comm)                 /* MPI Communicator           
   if (vertlocptr != NULL)
     *vertlocptr = srcgrafptr->vertlocnbr;
   if (vertlocptz != NULL)
-    *vertlocptz = srcgrafptr->procvrttab[srcgrafptr->proclocnum + 1] - srcgrafptr->procvrttab[srcgrafptr->proclocnum];
+    *vertlocptz = srcgrafptr->procvrttab[srcgrafptr->proclocnum + 1] -
+                  srcgrafptr->procvrttab[srcgrafptr->proclocnum];
   if (vertgstptr != NULL)
-    *vertgstptr = ((srcgrafptr->flagval & DGRAPHHASEDGEGST) != 0) ? srcgrafptr->vertgstnbr : -1;
+    *vertgstptr = ((srcgrafptr->flagval & DGRAPHHASEDGEGST) != 0)
+                      ? srcgrafptr->vertgstnbr
+                      : -1;
   if (vertloctab != NULL)
     *vertloctab = srcgrafptr->vertloctax + srcgrafptr->baseval;
   if (vendloctab != NULL)
     *vendloctab = srcgrafptr->vendloctax + srcgrafptr->baseval;
   if (veloloctab != NULL)
-    *veloloctab = (srcgrafptr->veloloctax != NULL) ? srcgrafptr->veloloctax + srcgrafptr->baseval : NULL;
+    *veloloctab = (srcgrafptr->veloloctax != NULL)
+                      ? srcgrafptr->veloloctax + srcgrafptr->baseval
+                      : NULL;
   if (vlblloctab != NULL)
-    *vlblloctab = (srcgrafptr->vlblloctax != NULL) ? srcgrafptr->vlblloctax + srcgrafptr->baseval : NULL;
+    *vlblloctab = (srcgrafptr->vlblloctax != NULL)
+                      ? srcgrafptr->vlblloctax + srcgrafptr->baseval
+                      : NULL;
   if (edgeglbptr != NULL)
     *edgeglbptr = srcgrafptr->edgeglbnbr;
   if (edgelocptr != NULL)
@@ -234,9 +230,13 @@ MPI_Comm * const            comm)                 /* MPI Communicator           
   if (edgeloctab != NULL)
     *edgeloctab = srcgrafptr->edgeloctax + srcgrafptr->baseval;
   if (edgegsttab != NULL)
-    *edgegsttab = (srcgrafptr->edgegsttax != NULL) ? srcgrafptr->edgegsttax + srcgrafptr->baseval : NULL;
+    *edgegsttab = (srcgrafptr->edgegsttax != NULL)
+                      ? srcgrafptr->edgegsttax + srcgrafptr->baseval
+                      : NULL;
   if (edloloctab != NULL)
-    *edloloctab = (srcgrafptr->edloloctax != NULL) ? srcgrafptr->edloloctax + srcgrafptr->baseval : NULL;
+    *edloloctab = (srcgrafptr->edloloctax != NULL)
+                      ? srcgrafptr->edloloctax + srcgrafptr->baseval
+                      : NULL;
   if (comm != NULL)
     *comm = srcgrafptr->proccomm;
 }

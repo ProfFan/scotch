@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -68,42 +68,48 @@
 ** - !0  : on error.
 */
 
-int
-hdgraphOrderSi (
-const Hdgraph * restrict const  grafptr,
-DorderCblk * restrict const     cblkptr)          /*+ Single column-block +*/
+int hdgraphOrderSi(
+    const Hdgraph *restrict const grafptr,
+    DorderCblk *restrict const cblkptr) /*+ Single column-block +*/
 {
-  Gnum * restrict     periloctab;
-  Gnum * restrict     periloctax;
-  Gnum                vnohlocnbr;
-  Gnum                vertlocnum;
+  Gnum *restrict periloctab;
+  Gnum *restrict periloctax;
+  Gnum vnohlocnbr;
+  Gnum vertlocnum;
 #ifdef SCOTCH_DEBUG_HDGRAPH1
-  int                 cheklocval;
-  int                 chekglbval;
+  int cheklocval;
+  int chekglbval;
 
   cheklocval = 0;
 #endif /* SCOTCH_DEBUG_HDGRAPH1 */
-  vnohlocnbr = grafptr->s.vertlocnbr;             /* Get number of local non-halo vertices */
-  if ((periloctab = (Gnum *) memAlloc (vnohlocnbr * sizeof (Gnum))) == NULL) { /* Allocate local fragment */
-    errorPrint ("hdgraphOrderSi: out of memory");
+  vnohlocnbr =
+      grafptr->s.vertlocnbr; /* Get number of local non-halo vertices */
+  if ((periloctab = (Gnum *)memAlloc(vnohlocnbr * sizeof(Gnum))) ==
+      NULL) { /* Allocate local fragment */
+    errorPrint("hdgraphOrderSi: out of memory");
 #ifndef SCOTCH_DEBUG_HDGRAPH1
     return (1);
   }
-#else /* SCOTCH_DEBUG_HDGRAPH1 */
+#else  /* SCOTCH_DEBUG_HDGRAPH1 */
   }
-  if (MPI_Allreduce (&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX, grafptr->s.proccomm) != MPI_SUCCESS) { /* Communication cannot be merged with a useful one */
-    errorPrint ("hdgraphOrderSi: communication error (1)");
-    return     (1);
+  if (MPI_Allreduce(&cheklocval, &chekglbval, 1, MPI_INT, MPI_MAX,
+                    grafptr->s.proccomm) !=
+      MPI_SUCCESS) { /* Communication cannot be merged with a useful one */
+    errorPrint("hdgraphOrderSi: communication error (1)");
+    return (1);
   }
   if (chekglbval != 0) {
     if (periloctab != NULL)
-      memFree (periloctab);
+      memFree(periloctab);
     return (1);
   }
 #endif /* SCOTCH_DEBUG_HDGRAPH1 */
 
-  cblkptr->typeval = DORDERCBLKLEAF;              /* Fill node as leaf */
-  cblkptr->data.leaf.ordelocval = cblkptr->ordeglbval + grafptr->s.procdsptab[grafptr->s.proclocnum] - grafptr->s.baseval;;
+  cblkptr->typeval = DORDERCBLKLEAF; /* Fill node as leaf */
+  cblkptr->data.leaf.ordelocval = cblkptr->ordeglbval +
+                                  grafptr->s.procdsptab[grafptr->s.proclocnum] -
+                                  grafptr->s.baseval;
+  ;
   cblkptr->data.leaf.vnodlocnbr = vnohlocnbr;
   cblkptr->data.leaf.periloctab = periloctab;
   cblkptr->data.leaf.nodelocnbr = 0;
@@ -113,15 +119,17 @@ DorderCblk * restrict const     cblkptr)          /*+ Single column-block +*/
 #endif /* SCOTCH_DEBUG_HDGRAPH2 */
 
   periloctax = periloctab - grafptr->s.baseval;
-  if (grafptr->s.vnumloctax == NULL) {            /* If graph is original graph */
-    Gnum                vertglbadj;
+  if (grafptr->s.vnumloctax == NULL) { /* If graph is original graph */
+    Gnum vertglbadj;
 
-    vertglbadj = grafptr->s.procdsptab[grafptr->s.proclocnum] - grafptr->s.baseval; /* Set adjustement for global ordering */
-    for (vertlocnum = grafptr->s.baseval; vertlocnum < grafptr->s.vertlocnnd; vertlocnum ++)
+    vertglbadj = grafptr->s.procdsptab[grafptr->s.proclocnum] -
+                 grafptr->s.baseval; /* Set adjustement for global ordering */
+    for (vertlocnum = grafptr->s.baseval; vertlocnum < grafptr->s.vertlocnnd;
+         vertlocnum++)
       periloctax[vertlocnum] = vertlocnum + vertglbadj;
-  }
-  else {                                          /* Graph is not original graph */
-    for (vertlocnum = grafptr->s.baseval; vertlocnum < grafptr->s.vertlocnnd; vertlocnum ++)
+  } else { /* Graph is not original graph */
+    for (vertlocnum = grafptr->s.baseval; vertlocnum < grafptr->s.vertlocnnd;
+         vertlocnum++)
       periloctax[vertlocnum] = grafptr->s.vnumloctax[vertlocnum];
   }
 

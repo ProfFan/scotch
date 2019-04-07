@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2011,2014,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2011,2014,2015,2018 IPB, Universite de Bordeaux,
+*INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -61,12 +62,12 @@
 /*+ The variable-sized hypercube bipartitioning definitions. +*/
 
 typedef struct ArchVhcub_ {
-  int                       padding;              /*+ No data needed +*/
+  int padding; /*+ No data needed +*/
 } ArchVhcub;
 
 typedef struct ArchVhcubDom_ {
-  Anum                      termlvl;              /*+ Terminal depth  +*/
-  Anum                      termnum;              /*+ Terminal number +*/
+  Anum termlvl; /*+ Terminal depth  +*/
+  Anum termnum; /*+ Terminal number +*/
 } ArchVhcubDom;
 
 #endif /* ARCH_VHCUB_H_STRUCT */
@@ -79,26 +80,32 @@ typedef struct ArchVhcubDom_ {
 #ifndef ARCH_VHCUB_H_PROTO
 #define ARCH_VHCUB_H_PROTO
 
-#define archVhcubArchLoad           NULL
-#define archVhcubArchSave           NULL
-#define archVhcubArchFree           NULL
+#define archVhcubArchLoad NULL
+#define archVhcubArchSave NULL
+#define archVhcubArchFree NULL
 
-#define archVhcubMatchInit          NULL
-#define archVhcubMatchExit          NULL
-#define archVhcubMatchMate          NULL
+#define archVhcubMatchInit NULL
+#define archVhcubMatchExit NULL
+#define archVhcubMatchMate NULL
 
-ArchDomNum                  archVhcubDomNum     (const ArchVhcub * const, const ArchVhcubDom * const);
-int                         archVhcubDomTerm    (const ArchVhcub * const, ArchVhcubDom * restrict const, const ArchDomNum);
-Anum                        archVhcubDomSize    (const ArchVhcub * const, const ArchVhcubDom * const);
-#define archVhcubDomWght            archVhcubDomSize
-Anum                        archVhcubDomDist    (const ArchVhcub * const, const ArchVhcubDom * const, const ArchVhcubDom * const);
-int                         archVhcubDomFrst    (const ArchVhcub * const, ArchVhcubDom * const);
-int                         archVhcubDomLoad    (const ArchVhcub * const, ArchVhcubDom * const, FILE * const);
-int                         archVhcubDomSave    (const ArchVhcub * const, const ArchVhcubDom * const, FILE * const);
-int                         archVhcubDomBipart  (const ArchVhcub * const, const ArchVhcubDom * const, ArchVhcubDom * restrict const, ArchVhcubDom * restrict const);
-int                         archVhcubDomIncl    (const ArchVhcub * const, const ArchVhcubDom * const, const ArchVhcubDom * const);
+ArchDomNum archVhcubDomNum(const ArchVhcub *const, const ArchVhcubDom *const);
+int archVhcubDomTerm(const ArchVhcub *const, ArchVhcubDom *restrict const,
+                     const ArchDomNum);
+Anum archVhcubDomSize(const ArchVhcub *const, const ArchVhcubDom *const);
+#define archVhcubDomWght archVhcubDomSize
+Anum archVhcubDomDist(const ArchVhcub *const, const ArchVhcubDom *const,
+                      const ArchVhcubDom *const);
+int archVhcubDomFrst(const ArchVhcub *const, ArchVhcubDom *const);
+int archVhcubDomLoad(const ArchVhcub *const, ArchVhcubDom *const, FILE *const);
+int archVhcubDomSave(const ArchVhcub *const, const ArchVhcubDom *const,
+                     FILE *const);
+int archVhcubDomBipart(const ArchVhcub *const, const ArchVhcubDom *const,
+                       ArchVhcubDom *restrict const,
+                       ArchVhcubDom *restrict const);
+int archVhcubDomIncl(const ArchVhcub *const, const ArchVhcubDom *const,
+                     const ArchVhcubDom *const);
 #ifdef SCOTCH_PTSCOTCH
-int                         archVhcubDomMpiType (const ArchVhcub * const, MPI_Datatype * const);
+int archVhcubDomMpiType(const ArchVhcub *const, MPI_Datatype *const);
 #endif /* SCOTCH_PTSCOTCH */
 
 #endif /* ARCH_VHCUB_H_PROTO */

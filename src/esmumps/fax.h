@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -67,26 +67,53 @@
 **  The function prototypes.
 */
 
-int                         symbolCompact       (SymbolMatrix * const symbptr);
-int                         symbolFax           (SymbolMatrix * const symbptr, const INT vertnbr, const INT edgenbr, const INT baseval, void * const ngbdptr, INT ngbfrst (void * const, const INT), INT ngbnext (void * const), INT ngbdegr (void * const, const INT), const Order * const ordeptr);
+int symbolCompact(SymbolMatrix *const symbptr);
+int symbolFax(SymbolMatrix *const symbptr, const INT vertnbr, const INT edgenbr,
+              const INT baseval, void *const ngbdptr,
+              INT ngbfrst(void *const, const INT), INT ngbnext(void *const),
+              INT ngbdegr(void *const, const INT), const Order *const ordeptr);
 #ifdef GRAPH_H
-int                         symbolFaxGraph      (SymbolMatrix * const symbptr, const Graph * const grafptr, const Order * const ordeptr);
+int symbolFaxGraph(SymbolMatrix *const symbptr, const Graph *const grafptr,
+                   const Order *const ordeptr);
 #endif /* GRAPH_H */
-int                         symbolFaxGrid2C     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT baseval, const Order * const ordeptr);
-int                         symbolFaxGrid2D     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT baseval, const Order * const ordeptr);
-int                         symbolFaxGrid2E     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT baseval, const Order * const ordeptr);
-int                         symbolFaxGrid3C     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT znbr, const INT baseval, const Order * const ordeptr);
-int                         symbolFaxGrid3D     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT znbr, const INT baseval, const Order * const ordeptr);
-int                         symbolFaxGrid3E     (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT znbr, const INT baseval, const Order * const ordeptr);
+int symbolFaxGrid2C(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT baseval, const Order *const ordeptr);
+int symbolFaxGrid2D(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT baseval, const Order *const ordeptr);
+int symbolFaxGrid2E(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT baseval, const Order *const ordeptr);
+int symbolFaxGrid3C(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT znbr, const INT baseval,
+                    const Order *const ordeptr);
+int symbolFaxGrid3D(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT znbr, const INT baseval,
+                    const Order *const ordeptr);
+int symbolFaxGrid3E(SymbolMatrix *const symbptr, const INT xnbr, const INT ynbr,
+                    const INT znbr, const INT baseval,
+                    const Order *const ordeptr);
 #ifdef MESH_H
-int                         symbolFaxMesh       (SymbolMatrix * const symbptr, const Mesh * const meshptr, const Order * const ordeptr);
+int symbolFaxMesh(SymbolMatrix *const symbptr, const Mesh *const meshptr,
+                  const Order *const ordeptr);
 #endif /* MESH_H */
 
-int                         symbolFaxi          (SymbolMatrix * const symbptr, const INT vertnbr, const INT edgenbr, const INT baseval, void * const ngbdptr, INT ngbfrst (void * const, const INT), INT ngbnext (void * const), INT ngbdegr (void * const, const INT), const Order * const ordeptr, const INT levfmax);
+int symbolFaxi(SymbolMatrix *const symbptr, const INT vertnbr,
+               const INT edgenbr, const INT baseval, void *const ngbdptr,
+               INT ngbfrst(void *const, const INT), INT ngbnext(void *const),
+               INT ngbdegr(void *const, const INT), const Order *const ordeptr,
+               const INT levfmax);
 #ifdef GRAPH_H
-int                         symbolFaxiGraph     (SymbolMatrix * const symbptr, const Graph * const grafptr, const Order * const ordeptr, const INT levfmax);
+int symbolFaxiGraph(SymbolMatrix *const symbptr, const Graph *const grafptr,
+                    const Order *const ordeptr, const INT levfmax);
 #endif /* GRAPH_H */
-int                         symbolFaxiGrid2D    (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT baseval, const Order * const ordeptr, const INT levfmax);
-int                         symbolFaxiGrid2E    (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT baseval, const Order * const ordeptr, const INT levfmax);
-int                         symbolFaxiGrid3D    (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT znbr, const INT baseval, const Order * const ordeptr, const INT levfmax);
-int                         symbolFaxiGrid3E    (SymbolMatrix * const symbptr, const INT xnbr, const INT ynbr, const INT znbr, const INT baseval, const Order * const ordeptr, const INT levfmax);
+int symbolFaxiGrid2D(SymbolMatrix *const symbptr, const INT xnbr,
+                     const INT ynbr, const INT baseval,
+                     const Order *const ordeptr, const INT levfmax);
+int symbolFaxiGrid2E(SymbolMatrix *const symbptr, const INT xnbr,
+                     const INT ynbr, const INT baseval,
+                     const Order *const ordeptr, const INT levfmax);
+int symbolFaxiGrid3D(SymbolMatrix *const symbptr, const INT xnbr,
+                     const INT ynbr, const INT znbr, const INT baseval,
+                     const Order *const ordeptr, const INT levfmax);
+int symbolFaxiGrid3E(SymbolMatrix *const symbptr, const INT xnbr,
+                     const INT ynbr, const INT znbr, const INT baseval,
+                     const Order *const ordeptr, const INT levfmax);

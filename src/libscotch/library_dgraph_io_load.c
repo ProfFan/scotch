@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -78,26 +78,22 @@
 *** - !0  : on error.
 +*/
 
-int
-SCOTCH_dgraphLoad (
-SCOTCH_Dgraph * const       grafptr,
-FILE * const                stream,
-const SCOTCH_Num            baseval,
-const SCOTCH_Num            flagval)
-{
-  GraphFlag           srcgrafflag;                /* Graph flags */
+int SCOTCH_dgraphLoad(SCOTCH_Dgraph *const grafptr, FILE *const stream,
+                      const SCOTCH_Num baseval, const SCOTCH_Num flagval) {
+  GraphFlag srcgrafflag; /* Graph flags */
 
   if ((baseval < -1) || (baseval > 1)) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphLoad) ": invalid base parameter");
-    return     (1);
+    errorPrint(STRINGIFY(SCOTCH_dgraphLoad) ": invalid base parameter");
+    return (1);
   }
   if ((flagval < 0) || (flagval > 3)) {
-    errorPrint (STRINGIFY (SCOTCH_dgraphLoad) ": invalid flag parameter");
-    return     (1);
+    errorPrint(STRINGIFY(SCOTCH_dgraphLoad) ": invalid flag parameter");
+    return (1);
   }
 
   srcgrafflag = (((flagval & 1) != 0) ? GRAPHIONOLOADVERT : 0) +
                 (((flagval & 2) != 0) ? GRAPHIONOLOADEDGE : 0);
 
-  return (dgraphLoad ((Dgraph * const) grafptr, stream, (Gnum) baseval, srcgrafflag));
+  return (
+      dgraphLoad((Dgraph *const)grafptr, stream, (Gnum)baseval, srcgrafflag));
 }

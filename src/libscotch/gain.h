@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -57,9 +57,9 @@
 **  The defines.
 */
 
-#define GAINMAX                  ((INT) (((UINT) 1 << ((sizeof (INT) << 3) - 1)) - 2))
+#define GAINMAX ((INT)(((UINT)1 << ((sizeof(INT) << 3) - 1)) - 2))
 
-#define GAIN_LINMAX              1024
+#define GAIN_LINMAX 1024
 
 /*
 **  The type and structure definitions.
@@ -70,15 +70,15 @@
    tables.                                         */
 
 typedef struct GainLink_ {
-  struct GainLink_ *        next;                 /*+ Pointer to next element: FIRST +*/
-  struct GainLink_ *        prev;                 /*+ Pointer to previous element    +*/
-  struct GainEntr_ *        tabl;                 /*+ Index into the gain table      +*/
+  struct GainLink_ *next; /*+ Pointer to next element: FIRST +*/
+  struct GainLink_ *prev; /*+ Pointer to previous element    +*/
+  struct GainEntr_ *tabl; /*+ Index into the gain table      +*/
 } GainLink;
 
 /* Gain table entry structure. */
 
 typedef struct GainEntr_ {
-  GainLink *                next;                 /*+ Pointer to first element: FIRST +*/
+  GainLink *next; /*+ Pointer to first element: FIRST +*/
 } GainEntr;
 
 /* The gain table structure, built from table entries.
@@ -86,43 +86,45 @@ typedef struct GainEntr_ {
    must be the first field of the structure.           */
 
 typedef struct GainTabl_ {
-  void                   (* tablAdd)  (struct GainTabl_ * const, GainLink * const, const INT); /*+ Add method +*/
-  INT                       subbits;              /*+ Number of subbits                      +*/
-  INT                       submask;              /*+ Subbit mask                            +*/
-  INT                       totsize;              /*+ Total table size                       +*/
-  GainEntr *                tmin;                 /*+ Non-empty entry of minimum gain        +*/
-  GainEntr *                tmax;                 /*+ Non-empty entry of maximum gain        +*/
-  GainEntr *                tend;                 /*+ Point after last valid gain entry      +*/
-  GainEntr *                tabl;                 /*+ Gain table structure is.. [SIZE - ADJ] +*/
-  GainEntr                  tabk[1];              /*+ Split in two for relative access [ADJ] +*/
+  void (*tablAdd)(struct GainTabl_ *const, GainLink *const,
+                  const INT); /*+ Add method +*/
+  INT subbits;                /*+ Number of subbits                      +*/
+  INT submask;                /*+ Subbit mask                            +*/
+  INT totsize;                /*+ Total table size                       +*/
+  GainEntr *tmin;             /*+ Non-empty entry of minimum gain        +*/
+  GainEntr *tmax;             /*+ Non-empty entry of maximum gain        +*/
+  GainEntr *tend;             /*+ Point after last valid gain entry      +*/
+  GainEntr *tabl;             /*+ Gain table structure is.. [SIZE - ADJ] +*/
+  GainEntr tabk[1];           /*+ Split in two for relative access [ADJ] +*/
 } GainTabl;
 
 /*
 **  The function prototypes.
 */
 
-GainTabl *                  gainTablInit        (const INT, const INT);
-void                        gainTablExit        (GainTabl * const);
-void                        gainTablFree        (GainTabl * const);
-void                        gainTablAddLin      (GainTabl * const, GainLink * const, const INT);
-void                        gainTablAddLog      (GainTabl * const, GainLink * const, const INT);
-void                        gainTablDel         (GainTabl * const, GainLink * const);
-GainLink *                  gainTablFrst        (GainTabl * const);
-GainLink *                  gainTablNext        (GainTabl * const, const GainLink * const);
+GainTabl *gainTablInit(const INT, const INT);
+void gainTablExit(GainTabl *const);
+void gainTablFree(GainTabl *const);
+void gainTablAddLin(GainTabl *const, GainLink *const, const INT);
+void gainTablAddLog(GainTabl *const, GainLink *const, const INT);
+void gainTablDel(GainTabl *const, GainLink *const);
+GainLink *gainTablFrst(GainTabl *const);
+GainLink *gainTablNext(GainTabl *const, const GainLink *const);
 #ifdef SCOTCH_DEBUG_GAIN3
 #ifdef GAIN
-static int                  gainTablCheck2      (GainEntr * const, GainLink * const);
+static int gainTablCheck2(GainEntr *const, GainLink *const);
 #endif /* GAIN */
-int                         gainTablCheck       (GainEntr * const);
+int gainTablCheck(GainEntr *const);
 #endif /* SCOTCH_DEBUG_GAIN3 */
 
 /*
 **  The marco definitions.
 */
 
-#define gainTablEmpty(tabl)         ((tabl)->tmin == (tabl)->tend)
-#define gainTablAdd(tabl,link,gain) ((tabl)->tablAdd  ((tabl), (link), (gain)))
-#if ((! defined GAIN) && (! defined SCOTCH_DEBUG_GAIN1))
-#define gainTablDel(tabl,link)      (((GainLink *) (link))->next->prev = ((GainLink *) (link))->prev, \
-                                     ((GainLink *) (link))->prev->next = ((GainLink *) (link))->next)
+#define gainTablEmpty(tabl) ((tabl)->tmin == (tabl)->tend)
+#define gainTablAdd(tabl, link, gain) ((tabl)->tablAdd((tabl), (link), (gain)))
+#if ((!defined GAIN) && (!defined SCOTCH_DEBUG_GAIN1))
+#define gainTablDel(tabl, link)                                                \
+  (((GainLink *)(link))->next->prev = ((GainLink *)(link))->prev,              \
+   ((GainLink *)(link))->prev->next = ((GainLink *)(link))->next)
 #endif /* ((! defined GAIN) && (! defined SCOTCH_DEBUG_GAIN1)) */

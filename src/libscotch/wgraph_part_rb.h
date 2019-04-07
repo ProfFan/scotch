@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -56,21 +56,22 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct WgraphPartRbParam_ {
-  Strat *                   stratptr;             /*+ Bipartitioning strategy used +*/
+  Strat *stratptr; /*+ Bipartitioning strategy used +*/
 } WgraphPartRbParam;
 
 /*+ This structure holds global data. +*/
 
 typedef struct WgraphPartRbData_ {
-  const Graph *             grafptr;              /*+ Pointer to top-level graph          +*/
-  Gnum *                    frontab;              /*+ Pointer to top-level frontier array +*/
-  Gnum                      fronnbr;              /*+ Current number of frontier vertices +*/
-  Mapping                   mappdat;              /*+ Current state of mapping            +*/
-  Strat *                   stratptr;             /*+ Bipartitioning strategy used        +*/
+  const Graph *grafptr; /*+ Pointer to top-level graph          +*/
+  Gnum *frontab;        /*+ Pointer to top-level frontier array +*/
+  Gnum fronnbr;         /*+ Current number of frontier vertices +*/
+  Mapping mappdat;      /*+ Current state of mapping            +*/
+  Strat *stratptr;      /*+ Bipartitioning strategy used        +*/
 } WgraphPartRbData;
 
 /*
 **  The function prototypes.
 */
 
-int                         wgraphPartRb        (Wgraph * restrict const, const WgraphPartRbParam * restrict const);
+int wgraphPartRb(Wgraph *restrict const,
+                 const WgraphPartRbParam *restrict const);

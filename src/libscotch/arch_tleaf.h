@@ -1,4 +1,5 @@
-/* Copyright 2004,2007,2008,2010-2012,2014,2015,2018 IPB, Universite de Bordeaux, INRIA & CNRS
+/* Copyright 2004,2007,2008,2010-2012,2014,2015,2018 IPB, Universite de
+*Bordeaux, INRIA & CNRS
 **
 ** This file is part of the Scotch software package for static mapping,
 ** graph partitioning and sparse matrix ordering.
@@ -8,13 +9,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +26,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -77,37 +78,37 @@
 /** The Tree-Leaf graph definitions. **/
 
 typedef struct ArchTleaf_ {
-  Anum                      termnbr;              /*+ Number of terminal domains in architecture   +*/
-  Anum                      levlnbr;              /*+ Number of levels                             +*/
-  Anum *                    sizetab;              /*+ Array of cluster sizes, per descending level +*/
-  Anum *                    linktab;              /*+ Value of extra-cluster link costs            +*/
-  Anum                      permnbr;              /*+ Number of label permutation indices          +*/
-  Anum *                    permtab;              /*+ Label permutation array                      +*/
-  Anum *                    peritab;              /*+ Invertse label permutation array             +*/
+  Anum termnbr;  /*+ Number of terminal domains in architecture   +*/
+  Anum levlnbr;  /*+ Number of levels                             +*/
+  Anum *sizetab; /*+ Array of cluster sizes, per descending level +*/
+  Anum *linktab; /*+ Value of extra-cluster link costs            +*/
+  Anum permnbr;  /*+ Number of label permutation indices          +*/
+  Anum *permtab; /*+ Label permutation array                      +*/
+  Anum *peritab; /*+ Invertse label permutation array             +*/
 } ArchTleaf;
 
 typedef struct ArchTleafDom_ {
-  Anum                      levlnum;              /*+ Current block level         +*/
-  Anum                      indxmin;              /*+ Minimum index in level      +*/
-  Anum                      indxnbr;              /*+ Number of indices in domain +*/
+  Anum levlnum; /*+ Current block level         +*/
+  Anum indxmin; /*+ Minimum index in level      +*/
+  Anum indxnbr; /*+ Number of indices in domain +*/
 } ArchTleafDom;
 
 typedef struct ArchTleafMatch_ {
-  const ArchTleaf *         archptr;              /*+ Pointer to architecture             +*/
-  ArchCoarsenMulti *        multtab;              /*+ Multinode array for all coarsenings +*/
-  Anum                      passnum;              /*+ Pass number                         +*/
-  Anum                      levlnum;              /*+ Current block level                 +*/
-  Anum                      levlsiz;              /*+ Size of current level               +*/
-  Anum                      vertnbr;              /*+ Number of vertices at current stage +*/
+  const ArchTleaf *archptr;  /*+ Pointer to architecture             +*/
+  ArchCoarsenMulti *multtab; /*+ Multinode array for all coarsenings +*/
+  Anum passnum;              /*+ Pass number                         +*/
+  Anum levlnum;              /*+ Current block level                 +*/
+  Anum levlsiz;              /*+ Size of current level               +*/
+  Anum vertnbr;              /*+ Number of vertices at current stage +*/
 } ArchTleafMatch;
 
 #endif /* ARCH_TLEAF_H_STRUCT */
 
 /** The Ltree-Leaf architecture definitions. **/
 
-#define ArchLtleaf                  ArchTleaf
-#define ArchLtleafDom               ArchTleafDom
-#define ArchLtleafMatch             ArchTleafMatch
+#define ArchLtleaf ArchTleaf
+#define ArchLtleafDom ArchTleafDom
+#define ArchLtleafMatch ArchTleafMatch
 
 /*
 **  The function prototypes.
@@ -117,48 +118,58 @@ typedef struct ArchTleafMatch_ {
 #ifndef ARCH_TLEAF_H_PROTO
 #define ARCH_TLEAF_H_PROTO
 
-int                         archTleafArchLoad   (ArchTleaf * restrict const, FILE * restrict const);
-int                         archTleafArchSave   (const ArchTleaf * const, FILE * restrict const);
-int                         archTleafArchFree   (ArchTleaf * restrict const);
+int archTleafArchLoad(ArchTleaf *restrict const, FILE *restrict const);
+int archTleafArchSave(const ArchTleaf *const, FILE *restrict const);
+int archTleafArchFree(ArchTleaf *restrict const);
 
-int                         archTleafMatchInit  (ArchTleafMatch * restrict const, const ArchTleaf * restrict const);
-void                        archTleafMatchExit  (ArchTleafMatch * restrict const);
-Anum                        archTleafMatchMate  (ArchTleafMatch * restrict const, ArchCoarsenMulti ** restrict const);
+int archTleafMatchInit(ArchTleafMatch *restrict const,
+                       const ArchTleaf *restrict const);
+void archTleafMatchExit(ArchTleafMatch *restrict const);
+Anum archTleafMatchMate(ArchTleafMatch *restrict const,
+                        ArchCoarsenMulti **restrict const);
 
-ArchDomNum                  archTleafDomNum     (const ArchTleaf * const, const ArchTleafDom * const);
-int                         archTleafDomTerm    (const ArchTleaf * const, ArchTleafDom * restrict const, const ArchDomNum);
-Anum                        archTleafDomSize    (const ArchTleaf * const, const ArchTleafDom * const);
-#define archTleafDomWght            archTleafDomSize
-Anum                        archTleafDomDist    (const ArchTleaf * const, const ArchTleafDom * const, const ArchTleafDom * const);
-int                         archTleafDomFrst    (const ArchTleaf * const, ArchTleafDom * restrict const);
-int                         archTleafDomLoad    (const ArchTleaf * const, ArchTleafDom * restrict const, FILE * restrict const);
-int                         archTleafDomSave    (const ArchTleaf * const, const ArchTleafDom * const, FILE * restrict const);
-int                         archTleafDomBipart  (const ArchTleaf * const, const ArchTleafDom * const, ArchTleafDom * restrict const, ArchTleafDom * restrict const);
-int                         archTleafDomIncl    (const ArchTleaf * const, const ArchTleafDom * const, const ArchTleafDom * const);
+ArchDomNum archTleafDomNum(const ArchTleaf *const, const ArchTleafDom *const);
+int archTleafDomTerm(const ArchTleaf *const, ArchTleafDom *restrict const,
+                     const ArchDomNum);
+Anum archTleafDomSize(const ArchTleaf *const, const ArchTleafDom *const);
+#define archTleafDomWght archTleafDomSize
+Anum archTleafDomDist(const ArchTleaf *const, const ArchTleafDom *const,
+                      const ArchTleafDom *const);
+int archTleafDomFrst(const ArchTleaf *const, ArchTleafDom *restrict const);
+int archTleafDomLoad(const ArchTleaf *const, ArchTleafDom *restrict const,
+                     FILE *restrict const);
+int archTleafDomSave(const ArchTleaf *const, const ArchTleafDom *const,
+                     FILE *restrict const);
+int archTleafDomBipart(const ArchTleaf *const, const ArchTleafDom *const,
+                       ArchTleafDom *restrict const,
+                       ArchTleafDom *restrict const);
+int archTleafDomIncl(const ArchTleaf *const, const ArchTleafDom *const,
+                     const ArchTleafDom *const);
 #ifdef SCOTCH_PTSCOTCH
-int                         archTleafDomMpiType (const ArchTleaf * const, MPI_Datatype * const);
+int archTleafDomMpiType(const ArchTleaf *const, MPI_Datatype *const);
 #endif /* SCOTCH_PTSCOTCH */
 
-int                         archLtleafArchLoad  (ArchTleaf * restrict const, FILE * restrict const);
-int                         archLtleafArchSave  (const ArchTleaf * const, FILE * restrict const);
-#define archLtleafArchFree          archTleafArchFree
+int archLtleafArchLoad(ArchTleaf *restrict const, FILE *restrict const);
+int archLtleafArchSave(const ArchTleaf *const, FILE *restrict const);
+#define archLtleafArchFree archTleafArchFree
 
 #define archLtleafMatchInit archTleafMatchInit
 #define archLtleafMatchExit archTleafMatchExit
 #define archLtleafMatchMate archTleafMatchMate
 
-ArchDomNum                  archLtleafDomNum    (const ArchTleaf * const, const ArchTleafDom * const);
-int                         archLtleafDomTerm   (const ArchTleaf * const, ArchTleafDom * restrict const, const ArchDomNum);
-#define archLtleafDomSize           archTleafDomSize
-#define archLtleafDomWght           archTleafDomWght
-#define archLtleafDomDist           archTleafDomDist
-#define archLtleafDomFrst           archTleafDomFrst
-#define archLtleafDomLoad           archTleafDomLoad
-#define archLtleafDomSave           archTleafDomSave
-#define archLtleafDomBipart         archTleafDomBipart
-#define archLtleafDomIncl           archTleafDomIncl
+ArchDomNum archLtleafDomNum(const ArchTleaf *const, const ArchTleafDom *const);
+int archLtleafDomTerm(const ArchTleaf *const, ArchTleafDom *restrict const,
+                      const ArchDomNum);
+#define archLtleafDomSize archTleafDomSize
+#define archLtleafDomWght archTleafDomWght
+#define archLtleafDomDist archTleafDomDist
+#define archLtleafDomFrst archTleafDomFrst
+#define archLtleafDomLoad archTleafDomLoad
+#define archLtleafDomSave archTleafDomSave
+#define archLtleafDomBipart archTleafDomBipart
+#define archLtleafDomIncl archTleafDomIncl
 #ifdef SCOTCH_PTSCOTCH
-#define archLtleafDomMpiType        archTleafDomMpiType
+#define archLtleafDomMpiType archTleafDomMpiType
 #endif /* SCOTCH_PTSCOTCH */
 
 #endif /* ARCH_TLEAF_H_PROTO */

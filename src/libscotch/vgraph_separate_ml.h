@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -57,11 +57,11 @@
 /*+ This structure holds the method parameters. +*/
 
 typedef struct VgraphSeparateMlParam_ {
-  INT                       coarnbr;             /*+ Minimum number of vertices   +*/
-  double                    coarval;             /*+ Coarsening ratio             +*/
-  GraphCoarsenType          coartype;            /*+ Edge matching function type  +*/
-  Strat *                   stratlow;            /*+ Strategy at lowest level     +*/
-  Strat *                   stratasc;            /*+ Strategy at ascending levels +*/
+  INT coarnbr;               /*+ Minimum number of vertices   +*/
+  double coarval;            /*+ Coarsening ratio             +*/
+  GraphCoarsenType coartype; /*+ Edge matching function type  +*/
+  Strat *stratlow;           /*+ Strategy at lowest level     +*/
+  Strat *stratasc;           /*+ Strategy at ascending levels +*/
 } VgraphSeparateMlParam;
 
 /*
@@ -70,10 +70,13 @@ typedef struct VgraphSeparateMlParam_ {
 
 #ifdef VGRAPH_SEPARATE_ML
 
-static int                  vgraphSeparateMlCoarsen (const Vgraph * const, Vgraph * const, GraphCoarsenMulti * restrict * const, const VgraphSeparateMlParam * const);
-static int                  vgraphSeparateMlUncoarsen (Vgraph * const, const Vgraph * const, const GraphCoarsenMulti * restrict const);
-static int                  vgraphSeparateMl2   (Vgraph * const, const VgraphSeparateMlParam * const);
+static int vgraphSeparateMlCoarsen(const Vgraph *const, Vgraph *const,
+                                   GraphCoarsenMulti *restrict *const,
+                                   const VgraphSeparateMlParam *const);
+static int vgraphSeparateMlUncoarsen(Vgraph *const, const Vgraph *const,
+                                     const GraphCoarsenMulti *restrict const);
+static int vgraphSeparateMl2(Vgraph *const, const VgraphSeparateMlParam *const);
 
 #endif /* VGRAPH_SEPARATE_ML */
 
-int                         vgraphSeparateMl    (Vgraph * const, const VgraphSeparateMlParam * const);
+int vgraphSeparateMl(Vgraph *const, const VgraphSeparateMlParam *const);

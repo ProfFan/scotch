@@ -8,13 +8,13 @@
 ** use, modify and/or redistribute the software under the terms of the
 ** CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
 ** URL: "http://www.cecill.info".
-** 
+**
 ** As a counterpart to the access to the source code and rights to copy,
 ** modify and redistribute granted by the license, users are provided
 ** only with a limited warranty and the software's author, the holder of
 ** the economic rights, and the successive licensors have only limited
 ** liability.
-** 
+**
 ** In this respect, the user's attention is drawn to the risks associated
 ** with loading, using, modifying and/or developing or reproducing the
 ** software by the user in light of its specific status of free software,
@@ -25,7 +25,7 @@
 ** their requirements in conditions enabling the security of their
 ** systems and/or data to be ensured and, more generally, to use and
 ** operate it in the same conditions as regards security.
-** 
+**
 ** The fact that you are presently reading this means that you have had
 ** knowledge of the CeCILL-C license and that you accept its terms.
 */
@@ -56,8 +56,8 @@
 
 /*+ Graph option flags. +*/
 
-#define HDGRAPHFREEVHND             0x0400        /* Free vnhdtab array */
-#define HDGRAPHFREETABS             (DGRAPHFREETABS | HGRAPHFREEVHND)
+#define HDGRAPHFREEVHND 0x0400 /* Free vnhdtab array */
+#define HDGRAPHFREETABS (DGRAPHFREETABS | HGRAPHFREEVHND)
 
 /*
 **  The type and structure definitions.
@@ -84,24 +84,25 @@
     a sequential halo graph.                                */
 
 typedef struct Hdgraph_ {
-  Dgraph                    s;                    /*+ Source distributed graph                       +*/
-  Gnum                      vhallocnbr;           /*+ Local number of halo end vertices              +*/
-  Gnum *                    vhndloctax;           /*+ End vertex array including halo vertex indices +*/
-  Gnum                      ehallocnbr;           /*+ Local number of halo edges                     +*/
-  Gnum                      levlnum;              /*+ Nested dissection level                        +*/
+  Dgraph s;         /*+ Source distributed graph                       +*/
+  Gnum vhallocnbr;  /*+ Local number of halo end vertices              +*/
+  Gnum *vhndloctax; /*+ End vertex array including halo vertex indices +*/
+  Gnum ehallocnbr;  /*+ Local number of halo edges                     +*/
+  Gnum levlnum;     /*+ Nested dissection level                        +*/
 } Hdgraph;
 
 /*
 **  The function prototypes.
 */
 
-int                         hdgraphInit         (Hdgraph * const);
-void                        hdgraphExit         (Hdgraph * const);
-void                        hdgraphFree         (Hdgraph * const);
-int                         hdgraphFold         (const Hdgraph *, const int, Hdgraph * const);
-int                         hdgraphFold2        (const Hdgraph *, const int, Hdgraph * const, MPI_Comm);
-int                         hdgraphCheck        (const Hdgraph *);
+int hdgraphInit(Hdgraph *const);
+void hdgraphExit(Hdgraph *const);
+void hdgraphFree(Hdgraph *const);
+int hdgraphFold(const Hdgraph *, const int, Hdgraph *const);
+int hdgraphFold2(const Hdgraph *, const int, Hdgraph *const, MPI_Comm);
+int hdgraphCheck(const Hdgraph *);
 #ifdef HGRAPH_H
-int                         hdgraphGather       (Hdgraph *, Hgraph *);
+int hdgraphGather(Hdgraph *, Hgraph *);
 #endif /* HGRAPH_H */
-int                         hdgraphInduceList   (Hdgraph * restrict const, const Gnum, const Gnum * restrict const, Hdgraph * restrict const);
+int hdgraphInduceList(Hdgraph *restrict const, const Gnum,
+                      const Gnum *restrict const, Hdgraph *restrict const);

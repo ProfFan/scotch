@@ -56,23 +56,23 @@
 /*+ Method types. +*/
 
 typedef enum BdgraphBipartStMethodType_ {
-  BDGRAPHBIPARTSTMETHBD = 0,                      /*+ Band (strategy)        +*/
-  BDGRAPHBIPARTSTMETHDF,                          /*+ Diffusion              +*/
-  BDGRAPHBIPARTSTMETHEX,                          /*+ Exactifier             +*/
-  BDGRAPHBIPARTSTMETHML,                          /*+ Multi-level (strategy) +*/
-  BDGRAPHBIPARTSTMETHSQ,                          /*+ Sequential Method      +*/
-  BDGRAPHBIPARTSTMETHZR,                          /*+ Move all to part zero  +*/
-  BDGRAPHBIPARTSTMETHNBR                          /*+ Number of methods      +*/
+  BDGRAPHBIPARTSTMETHBD = 0, /*+ Band (strategy)        +*/
+  BDGRAPHBIPARTSTMETHDF,     /*+ Diffusion              +*/
+  BDGRAPHBIPARTSTMETHEX,     /*+ Exactifier             +*/
+  BDGRAPHBIPARTSTMETHML,     /*+ Multi-level (strategy) +*/
+  BDGRAPHBIPARTSTMETHSQ,     /*+ Sequential Method      +*/
+  BDGRAPHBIPARTSTMETHZR,     /*+ Move all to part zero  +*/
+  BDGRAPHBIPARTSTMETHNBR     /*+ Number of methods      +*/
 } BdgraphBipartStMethodType;
 
 /*
 **  The external declarations.
 */
 
-extern StratTab             bdgraphbipartststratab;
+extern StratTab bdgraphbipartststratab;
 
 /*
 **  The function prototypes.
 */
 
-int                         bdgraphBipartSt   (Bdgraph * const, const Strat * const);
+int bdgraphBipartSt(Bdgraph *const, const Strat *const);
